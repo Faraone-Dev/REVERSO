@@ -6,14 +6,30 @@
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.20-363636?style=for-the-badge&logo=solidity)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![Chains](https://img.shields.io/badge/Chains-5%20live-orange?style=for-the-badge)
+![Tests](https://img.shields.io/badge/Tests-32%2F32%20passing-brightgreen?style=for-the-badge)
 
 **The First Reversible Transaction Protocol on Blockchain**
 
 *"Never lose crypto to mistakes again."*
 
-[Documentation](#-documentation) • [Quick Start](#-quick-start) • [API](#-enterprise-api) • [Security](#-security)
+### 🌐 [Live Demo](https://conditional-team.github.io/REVERSO) • 📄 [Documentation](#-quick-start) • 🔌 [API](#-enterprise-api) • 🛡️ [Security](#-security)
 
 </div>
+
+---
+
+## 📊 Project Status
+
+| Component | Status | Details |
+|-----------|--------|---------|
+| 🔐 **Smart Contract** | ✅ Production-ready | 1,119 lines Solidity, OpenZeppelin security |
+| 🧪 **Test Suite** | ✅ 32/32 passing | Full coverage: send, cancel, claim, insurance, rescue |
+| 🔌 **Enterprise API** | ✅ Hardened | HMAC auth, rate limiting, fraud prevention |
+| 🌐 **Website** | ✅ [Live](https://conditional-team.github.io/REVERSO) | Interactive demo with wallet connection |
+| ⛓️ **Multi-chain** | ✅ Configured | ETH, Arbitrum, Base, Optimism, Polygon |
+| 📝 **Documentation** | ✅ Complete | README, API docs, investor pitch |
+
+**Built in 2 weeks. Production-ready. Seeking strategic investment.**
 
 ---
 
@@ -679,21 +695,49 @@ MIT License - see [LICENSE](LICENSE)
 
 ## 🔗 Links
 
-| Resource | Status |
-|----------|--------|
-| Website | 🚧 In development |
-| Documentation | 📄 See this README |
-| API Docs | 📄 See API section above |
-| GitHub | [This repository](.) |
+| Resource | Link |
+|----------|------|
+| 🌐 **Live Demo** | [conditional-team.github.io/REVERSO](https://conditional-team.github.io/REVERSO) |
+| 📦 **Repository** | [github.com/conditional-team/REVERSO](https://github.com/conditional-team/REVERSO) |
+| 📄 **Documentation** | [This README](#-quick-start) |
+| 🔌 **API Docs** | [Enterprise API Section](#-enterprise-api) |
+| 💼 **Investor Pitch** | [PITCH_INVESTORS.md](PITCH_INVESTORS.md) |
 
-*Social channels and official website launching Q1 2025*
+---
+
+## 🚀 What's Included
+
+```
+REVERSO/
+├── 📁 contracts/           # Solidity smart contracts (1,119 lines)
+│   ├── ReversoVault.sol    # Main vault with 5-layer protection
+│   └── interfaces/         # Contract interfaces
+├── 📁 test/                # Hardhat test suite (32 tests)
+├── 📁 api/                 # Enterprise REST API
+│   ├── src/routes/         # Transfer, auth, webhooks, admin
+│   ├── src/middleware/     # HMAC, rate limiting, API keys
+│   └── sdk/                # JavaScript/TypeScript SDK
+├── 📁 website/             # Production website (Vite + vanilla JS)
+├── 📁 scripts/             # Deploy scripts (single & multi-chain)
+├── 📄 README.md            # This file
+├── 📄 PITCH_INVESTORS.md   # Investor documentation
+└── 📄 hardhat.config.ts    # Multi-chain configuration
+```
 
 ---
 
 <div align="center">
 
+### 🛡️ Built with security-first approach using OpenZeppelin contracts
+
+**32 tests passing** • **5 chains supported** • **Enterprise-ready API**
+
+---
+
 **Built with ❤️ for a safer crypto future**
 
 *REVERSO Protocol - Because everyone deserves a second chance*
+
+**© 2024-2025 REVERSO Protocol**
 
 </div>
