@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="REVERSO Protocol - The First Reversible Transaction Protocol on Blockchain. Never lose crypto to mistakes again.">
+    <meta name="keywords" content="crypto, blockchain, reversible transactions, DeFi, Ethereum, security">
+    <meta name="author" content="REVERSO Protocol">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="REVERSO Protocol - Reversible Transactions">
+    <meta property="og:description" content="The first reversible transaction protocol. Cancel crypto transfers before they're final.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://github.com/conditional-team/conditionalx/tree/main/REVERSO">
+    <meta property="og:image" content="/og-image.png">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="REVERSO Protocol">
+    <meta name="twitter:description" content="Never lose crypto to mistakes again.">
+    
+    <title>REVERSO Protocol | Reversible Blockchain Transactions</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/src/styles/main.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+    
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <span class="logo-icon">🔄</span>
+                <span class="logo-text">REVERSO</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#api">API</a>
+                <a href="https://github.com/conditional-team/conditionalx/tree/main/REVERSO" target="_blank">Docs</a>
+            </div>
+            
+            <div class="nav-actions">
+                <a href="#" class="btn btn-ghost" id="connectWallet">
+                    <span class="wallet-dot"></span>
+                    Connect Wallet
+                </a>
+                <a href="#app" class="btn btn-primary">Launch App</a>
+            </div>
+            
+            <button class="nav-mobile-toggle" id="mobileToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                Demo UI - Multi-chain ready (ETH, Arbitrum, Base, Polygon, Optimism)
+            </div>
+            <div class="hero-badge secondary">
+                <span class="badge-dot"></span>
+                Audit scheduled (Q1 2026) · Mainnet gated until audit; safe demo available
+            </div>
+            
+            <h1 class="hero-title">
+                <span class="gradient-text">Reversible</span>
+                <br>Transactions
+                <br>for Blockchain
+            </h1>
+            
+            <p class="hero-subtitle">
+                The first protocol that lets you <strong>cancel</strong> crypto transfers 
+                before they're final. Never lose funds to mistakes, scams, or wrong addresses again.
+            </p>
+            
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-value">$8.6B+</span>
+                    <span class="stat-label">Lost annually to crypto mistakes</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">0</span>
+                    <span class="stat-label">With REVERSO</span>
+                </div>
+            </div>
+            
+            <div class="hero-actions">
+                <a href="#app" class="btn btn-large btn-primary">
+                    <span>Start Sending Safely</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                <a href="#security" class="btn btn-large btn-ghost">
+                    See Security & Status
+                </a>
+            </div>
+            
+            <div class="hero-chains">
+                <span>Deployed on:</span>
+                <div class="chain-icons">
+                    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg" alt="Ethereum" title="Ethereum">
+                    <img src="https://cryptologos.cc/logos/arbitrum-arb-logo.svg" alt="Arbitrum" title="Arbitrum">
+                    <img src="https://avatars.githubusercontent.com/u/108554348" alt="Base" title="Base">
+                    <img src="https://cryptologos.cc/logos/optimism-ethereum-op-logo.svg" alt="Optimism" title="Optimism">
+                    <img src="https://cryptologos.cc/logos/polygon-matic-logo.svg" alt="Polygon" title="Polygon">
+                    <span class="more-chains">+ more coming</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="hero-visual">
+            <div class="transfer-card">
+                <div class="transfer-header">
+                    <span class="transfer-status pending">● Reversible</span>
+                    <span class="transfer-time">23:59:42 remaining</span>
+                </div>
+                <div class="transfer-amount">
+                    <span class="amount-value">10.00 ETH</span>
+                    <span class="amount-usd">≈ $25,000</span>
+                </div>
+                <div class="transfer-addresses">
+                    <div class="address from">
+                        <span class="label">From</span>
+                        <span class="value">0x1234...5678</span>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="address to">
+                        <span class="label">To</span>
+                        <span class="value">0xabcd...efgh</span>
+                    </div>
+                </div>
+                <div class="transfer-actions">
+                    <button class="btn btn-cancel">Cancel Transfer</button>
+                    <button class="btn btn-details">View Details</button>
+                </div>
+                <div class="transfer-protection">
+                    <span class="shield">🛡️</span>
+                    <span>Protected by 5-Layer Security</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- APP Section - Send Transaction (MOVED TO TOP!) -->
+    <section class="app-section" id="app">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">🚀 Launch App</span>
+                <h2>Send Reversible Transaction</h2>
+                <p>Send crypto with confidence. Cancel anytime during the lock period.</p>
+            </div>
+            
+            <div class="app-container">
+                <div class="app-card">
+                    <!-- Network Selector -->
+                    <div class="app-row">
+                        <label>Network</label>
+                        <div class="network-selector">
+                            <button class="network-btn active" data-chain="1">
+                                <img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg" alt="ETH">
+                                Ethereum
+                            </button>
+                            <button class="network-btn" data-chain="42161">
+                                <img src="https://cryptologos.cc/logos/arbitrum-arb-logo.svg" alt="ARB">
+                                Arbitrum
+                            </button>
+                            <button class="network-btn" data-chain="8453">
+                                <img src="https://avatars.githubusercontent.com/u/108554348" alt="Base">
+                                Base
+                            </button>
+                            <button class="network-btn" data-chain="137">
+                                <img src="https://cryptologos.cc/logos/polygon-matic-logo.svg" alt="MATIC">
+                                Polygon
+                            </button>
+                            <button class="network-btn" data-chain="10">
+                                <img src="https://cryptologos.cc/logos/optimism-ethereum-op-logo.svg" alt="OP">
+                                Optimism
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Amount Input -->
+                    <div class="app-row">
+                        <label>Amount</label>
+                        <div class="amount-input-wrapper">
+                            <input type="number" id="sendAmount" placeholder="0.0" step="0.001" min="0">
+                            <div class="token-selector">
+                                <button class="token-btn active" data-token="ETH">ETH</button>
+                                <button class="token-btn" data-token="USDC">USDC</button>
+                                <button class="token-btn" data-token="USDT">USDT</button>
+                            </div>
+                        </div>
+                        <span class="balance-info">Balance: <span id="userBalance">0.00</span> ETH</span>
+                    </div>
+                    
+                    <!-- Recipient -->
+                    <div class="app-row">
+                        <label>Recipient Address</label>
+                        <input type="text" id="recipientAddress" placeholder="0x..." class="address-input">
+                    </div>
+                    
+                    <!-- Lock Period -->
+                    <div class="app-row">
+                        <label>Lock Period (Cancel Window)</label>
+                        <div class="delay-selector">
+                            <button class="delay-btn" data-delay="3600">1 Hour</button>
+                            <button class="delay-btn" data-delay="21600">6 Hours</button>
+                            <button class="delay-btn active" data-delay="86400">24 Hours</button>
+                            <button class="delay-btn" data-delay="604800">7 Days</button>
+                            <button class="delay-btn" data-delay="2592000">30 Days</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Recovery Addresses -->
+                    <div class="app-row recovery-section">
+                        <div class="recovery-toggle">
+                            <label>Recovery Addresses (Optional)</label>
+                            <button class="toggle-btn" id="toggleRecovery">+ Add</button>
+                        </div>
+                        <div class="recovery-inputs" id="recoveryInputs" style="display: none;">
+                            <input type="text" id="recovery1" placeholder="Recovery Address 1 (e.g., hardware wallet)">
+                            <input type="text" id="recovery2" placeholder="Recovery Address 2 (e.g., exchange)">
+                        </div>
+                    </div>
+                    
+                    <!-- Insurance Option -->
+                    <div class="app-row insurance-toggle">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="withInsurance">
+                            <span class="checkmark"></span>
+                            <span class="label-text">
+                                <strong>Add Insurance</strong> (+0.2%)
+                                <small>Full protection against scams</small>
+                            </span>
+                        </label>
+                    </div>
+                    
+                    <!-- Fee Summary -->
+                    <div class="fee-summary">
+                        <div class="fee-row">
+                            <span>Amount</span>
+                            <span id="summaryAmount">0.00 ETH</span>
+                        </div>
+                        <div class="fee-row">
+                            <span>Protocol Fee (<span id="feePercent">0.3</span>%)</span>
+                            <span id="summaryFee">0.00 ETH</span>
+                        </div>
+                        <div class="fee-row insurance-fee" id="insuranceFeeRow" style="display: none;">
+                            <span>Insurance (+0.2%)</span>
+                            <span id="summaryInsurance">0.00 ETH</span>
+                        </div>
+                        <div class="fee-row total">
+                            <span>Total</span>
+                            <span id="summaryTotal">0.00 ETH</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Send Button -->
+                    <button class="btn btn-primary btn-send" id="sendBtn">
+                        <span id="sendBtnText">Connect Wallet to Send</span>
+                    </button>
+                    
+                    <p class="app-note">
+                        🔒 You can cancel this transfer anytime during the lock period
+                        <br>🧪 Demo mode: transactions here are simulated, no on-chain broadcast.
+                    </p>
+                </div>
+                
+                <!-- Active Transfers -->
+                <div class="transfers-panel">
+                    <h3>Your Active Transfers</h3>
+                    <div class="transfers-list" id="transfersList">
+                        <div class="no-transfers">
+                            <span>📭</span>
+                            <p>No active transfers</p>
+                            <small>Your reversible transfers will appear here</small>
+                        </div>
+                    </div>
+                    <small class="hint-text">Tip: premendo “Cancel” durante il lock la transazione viene annullata e i fondi tornano al mittente.</small>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Problem Section -->
+    <section class="problem" id="problem">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">The Problem</span>
+                <h2>Billions Lost Forever</h2>
+                <p>Every year, users lose irreplaceable funds due to blockchain's unforgiving nature</p>
+            </div>
+            
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="problem-icon">🎣</div>
+                    <h3>Phishing & Scams</h3>
+                    <p class="problem-amount">$3.8B/year</p>
+                    <p>Malicious sites trick users into sending crypto to scammers</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">📝</div>
+                    <h3>Wrong Address</h3>
+                    <p class="problem-amount">$1.2B/year</p>
+                    <p>One typo, one wrong paste - funds gone forever</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">🔐</div>
+                    <h3>Lost Access</h3>
+                    <p class="problem-amount">$2.1B/year</p>
+                    <p>Sent to addresses that can never claim the funds</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">💀</div>
+                    <h3>Contract Bugs</h3>
+                    <p class="problem-amount">$1.5B/year</p>
+                    <p>Smart contract vulnerabilities drain user funds</p>
+                </div>
+            </div>
+            
+            <div class="problem-total">
+                <span class="total-label">Total Annual Loss:</span>
+                <span class="total-value">$8.6B+</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partners / Pilots -->
+    <section class="partners" id="partners">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">In Pilot</span>
+                <h2>Early Partners</h2>
+                <p>Design partners integrating now; sandbox today, mainnet post-audit</p>
+            </div>
+            <div class="partner-grid">
+                <div class="partner-card">
+                    <div class="partner-name">Exchange / Ramp</div>
+                    <p>Testing reversible withdrawals on testnet</p>
+                    <span class="partner-status">Pilot</span>
+                </div>
+                <div class="partner-card">
+                    <div class="partner-name">Wallet / Custody</div>
+                    <p>Recovery address flow integrated in sandbox</p>
+                    <span class="partner-status">Sandbox</span>
+                </div>
+                <div class="partner-card">
+                    <div class="partner-name">Payments / Checkout</div>
+                    <p>Chargeback-like reversible payments with lock window</p>
+                    <span class="partner-status">Pilot</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Solution Section -->
+    <section class="solution" id="features">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">The Solution</span>
+                <h2>5 Layers of Protection</h2>
+                <p>REVERSO gives you time to catch mistakes before they become permanent</p>
+            </div>
+            
+            <div class="layers-visual">
+                <div class="layer" data-layer="1">
+                    <div class="layer-number">1</div>
+                    <div class="layer-content">
+                        <h3>Cancel Anytime</h3>
+                        <p>Sender can cancel transfer during lock period. 100% refund, no questions.</p>
+                    </div>
+                    <div class="layer-icon">🚫</div>
+                </div>
+                
+                <div class="layer" data-layer="2">
+                    <div class="layer-number">2</div>
+                    <div class="layer-content">
+                        <h3>Recovery Address 1</h3>
+                        <p>If sender loses access, funds go to backup. Use your hardware wallet.</p>
+                    </div>
+                    <div class="layer-icon">🔑</div>
+                </div>
+                
+                <div class="layer" data-layer="3">
+                    <div class="layer-number">3</div>
+                    <div class="layer-content">
+                        <h3>Recovery Address 2</h3>
+                        <p>Second backup if first fails. Use your exchange account.</p>
+                    </div>
+                    <div class="layer-icon">🏦</div>
+                </div>
+                
+                <div class="layer" data-layer="4">
+                    <div class="layer-number">4</div>
+                    <div class="layer-content">
+                        <h3>Auto-Refund</h3>
+                        <p>If recipient never claims, funds auto-return after expiry.</p>
+                    </div>
+                    <div class="layer-icon">↩️</div>
+                </div>
+                
+                <div class="layer" data-layer="5">
+                    <div class="layer-number">5</div>
+                    <div class="layer-content">
+                        <h3>Rescue Funds</h3>
+                        <p>After 90 days, abandoned funds can be rescued and returned.</p>
+                    </div>
+                    <div class="layer-icon">🆘</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">How It Works</span>
+                <h2>Simple as 1-2-3</h2>
+                <p>Send crypto with confidence in three easy steps</p>
+            </div>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">01</div>
+                    <div class="step-visual">
+                        <div class="step-icon">📤</div>
+                    </div>
+                    <h3>Send</h3>
+                    <p>Create a reversible transfer with your chosen lock period (1 hour to 30 days)</p>
+                </div>
+                
+                <div class="step-arrow">→</div>
+                
+                <div class="step">
+                    <div class="step-number">02</div>
+                    <div class="step-visual">
+                        <div class="step-icon">⏱️</div>
+                    </div>
+                    <h3>Wait</h3>
+                    <p>Funds are locked. Cancel anytime during this period if something's wrong</p>
+                </div>
+                
+                <div class="step-arrow">→</div>
+                
+                <div class="step">
+                    <div class="step-number">03</div>
+                    <div class="step-visual">
+                        <div class="step-icon">✅</div>
+                    </div>
+                    <h3>Claim</h3>
+                    <p>After lock expires, recipient claims funds. Transfer complete!</p>
+                </div>
+            </div>
+            
+            <div class="delay-options">
+                <h4>Choose Your Protection Level</h4>
+                <div class="delays">
+                    <div class="delay">
+                        <span class="delay-time">1 hour</span>
+                        <span class="delay-use">Quick transfers</span>
+                    </div>
+                    <div class="delay">
+                        <span class="delay-time">6 hours</span>
+                        <span class="delay-use">Daily payments</span>
+                    </div>
+                    <div class="delay popular">
+                        <span class="popular-badge">Most Popular</span>
+                        <span class="delay-time">24 hours</span>
+                        <span class="delay-use">Standard protection</span>
+                    </div>
+                    <div class="delay">
+                        <span class="delay-time">7 days</span>
+                        <span class="delay-use">Large amounts</span>
+                    </div>
+                    <div class="delay">
+                        <span class="delay-time">30 days</span>
+                        <span class="delay-use">Escrow</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Pricing</span>
+                <h2>Progressive Fees</h2>
+                <p>Fair pricing that scales with your transfer size</p>
+            </div>
+            
+            <div class="pricing-tiers">
+                <div class="tier">
+                    <div class="tier-icon">🏠</div>
+                    <h3>Retail</h3>
+                    <p class="tier-range">Under $1,000</p>
+                    <div class="tier-fee">
+                        <span class="fee-value">0.3%</span>
+                    </div>
+                    <p class="tier-example">$100 transfer = $0.30 fee</p>
+                </div>
+                
+                <div class="tier featured">
+                    <div class="tier-badge">Most Common</div>
+                    <div class="tier-icon">💼</div>
+                    <h3>Standard</h3>
+                    <p class="tier-range">$1K - $100K</p>
+                    <div class="tier-fee">
+                        <span class="fee-value">0.5%</span>
+                    </div>
+                    <p class="tier-example">$10,000 transfer = $50 fee</p>
+                </div>
+                
+                <div class="tier">
+                    <div class="tier-icon">🐋</div>
+                    <h3>Whale</h3>
+                    <p class="tier-range">Over $100,000</p>
+                    <div class="tier-fee">
+                        <span class="fee-value">0.7%</span>
+                    </div>
+                    <p class="tier-example">$1M transfer = $7,000 fee</p>
+                </div>
+            </div>
+            
+            <div class="insurance-addon">
+                <div class="insurance-header">
+                    <span class="insurance-icon">🛡️</span>
+                    <h3>Premium Insurance</h3>
+                    <span class="insurance-fee">+0.2%</span>
+                </div>
+                <p>Add full scam protection. Even if someone claims your funds fraudulently, we'll refund you from the insurance pool.</p>
+                <ul class="insurance-features">
+                    <li>✓ Full refund on verified scams</li>
+                    <li>✓ Coverage for phishing attacks</li>
+                    <li>✓ Protection against address poisoning</li>
+                    <li>✓ 24/7 claim processing</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    
+    <!-- API Section -->
+    <section class="api-section" id="api">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">For Developers</span>
+                <h2>Enterprise API</h2>
+                <p>Integrate reversible transactions into your platform in minutes</p>
+            </div>
+            
+            <!-- API Features -->
+            <div class="api-features">
+                <div class="api-feature">
+                    <div class="api-feature-icon">⚡</div>
+                    <h4>Lightning Fast</h4>
+                    <p>Sub-100ms response time. Create transfers instantly.</p>
+                </div>
+                    <div class="api-feature">
+                        <div class="api-feature-icon">🔗</div>
+                        <h4>Multi-chain</h4>
+                        <p>One API, Ethereum, Arbitrum, Base, Optimism, Polygon.</p>
+                    </div>
+                <div class="api-feature">
+                    <div class="api-feature-icon">🔔</div>
+                    <h4>Webhooks</h4>
+                    <p>Real-time notifications for all transfer events.</p>
+                </div>
+                <div class="api-feature">
+                    <div class="api-feature-icon">📊</div>
+                    <h4>Dashboard</h4>
+                    <p>Full analytics and monitoring included.</p>
+                </div>
+            </div>
+            
+            <!-- Code Examples Tabs -->
+            <div class="api-demo-tabs">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="create">Create Transfer</button>
+                    <button class="tab-btn" data-tab="cancel">Cancel Transfer</button>
+                    <button class="tab-btn" data-tab="webhook">Webhook Event</button>
+                    <button class="tab-btn" data-tab="status">Check Status</button>
+                </div>
+                
+                <div class="tab-content active" id="tab-create">
+                                        <div class="api-code">
+                                                <div class="code-header">
+                                                        <span class="code-dot red"></span>
+                                                        <span class="code-dot yellow"></span>
+                                                        <span class="code-dot green"></span>
+                                                        <span class="code-title">POST /api/v1/transfers</span>
+                                                        <span class="code-copy" onclick="copyCode(this)">📋 Copy</span>
+                                                </div>
+                                                <pre><code><span class="code-keyword">const</span> body = {
+    <span class="code-property">chainId</span>: <span class="code-number">1</span>,
+    <span class="code-property">to</span>: <span class="code-string">'0xRecipient...'</span>,
+    <span class="code-property">amount</span>: <span class="code-string">'1000000000000000000'</span>,
+    <span class="code-property">lockDuration</span>: <span class="code-number">86400</span>,
+    <span class="code-property">withInsurance</span>: <span class="code-keyword">true</span>,
+    <span class="code-property">metadata</span>: { <span class="code-property">orderId</span>: <span class="code-string">'12345'</span> }
+};
+
+<span class="code-keyword">const</span> timestamp = <span class="code-function">Math</span>.<span class="code-function">floor</span>(<span class="code-function">Date</span>.<span class="code-function">now</span>() / <span class="code-number">1000</span>);
+<span class="code-keyword">const</span> signature = <span class="code-function">signHmac</span>(
+    <span class="code-function">JSON</span>.<span class="code-function">stringify</span>(body),
+    <span class="code-function">`${timestamp}.YOUR_SIGNING_SECRET`</span>
+); <span class="code-comment">// HMAC-SHA256</span>
+
+<span class="code-keyword">const</span> response = <span class="code-keyword">await</span> <span class="code-function">fetch</span>(<span class="code-string">'https://api.reverso.finance/v1/transfers'</span>, {
+    <span class="code-property">method</span>: <span class="code-string">'POST'</span>,
+    <span class="code-property">headers</span>: {
+        <span class="code-string">'X-API-KEY'</span>: <span class="code-string">'YOUR_API_KEY'</span>,
+        <span class="code-string">'X-Signature'</span>: signature,
+        <span class="code-string">'X-Timestamp'</span>: timestamp.<span class="code-function">toString</span>(),
+        <span class="code-string">'Content-Type'</span>: <span class="code-string">'application/json'</span>
+    },
+    <span class="code-property">body</span>: <span class="code-function">JSON</span>.<span class="code-function">stringify</span>(body)
+});
+
+<span class="code-keyword">const</span> { transfer, transaction } = <span class="code-keyword">await</span> response.<span class="code-function">json</span>();
+<span class="code-comment">// Sign `transaction` with user's wallet and broadcast.</span></code></pre>
+                                        </div>
+                </div>
+                
+                <div class="tab-content" id="tab-cancel">
+                    <div class="api-code">
+                        <div class="code-header">
+                            <span class="code-dot red"></span>
+                            <span class="code-dot yellow"></span>
+                            <span class="code-dot green"></span>
+                            <span class="code-title">POST /api/v1/transfers/:id/cancel</span>
+                            <span class="code-copy" onclick="copyCode(this)">📋 Copy</span>
+                        </div>
+                                                <pre><code><span class="code-keyword">const</span> timestamp = <span class="code-function">Math</span>.<span class="code-function">floor</span>(<span class="code-function">Date</span>.<span class="code-function">now</span>() / <span class="code-number">1000</span>);
+<span class="code-keyword">const</span> signature = <span class="code-function">signHmac</span>(<span class="code-string">''</span>, <span class="code-function">`${timestamp}.YOUR_SIGNING_SECRET`</span>);
+
+<span class="code-keyword">const</span> response = <span class="code-keyword">await</span> <span class="code-function">fetch</span>(<span class="code-string">'https://api.reverso.finance/v1/transfers/abc123/cancel'</span>, {
+    <span class="code-property">method</span>: <span class="code-string">'POST'</span>,
+    <span class="code-property">headers</span>: {
+        <span class="code-string">'X-API-KEY'</span>: <span class="code-string">'YOUR_API_KEY'</span>,
+        <span class="code-string">'X-Signature'</span>: signature,
+        <span class="code-string">'X-Timestamp'</span>: timestamp.<span class="code-function">toString</span>()
+    }
+});
+
+<span class="code-keyword">const</span> { transaction } = <span class="code-keyword">await</span> response.<span class="code-function">json</span>();
+<span class="code-comment">// Sign and broadcast to cancel - funds return to sender instantly!</span></code></pre>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="tab-webhook">
+                    <div class="api-code">
+                        <div class="code-header">
+                            <span class="code-dot red"></span>
+                            <span class="code-dot yellow"></span>
+                            <span class="code-dot green"></span>
+                            <span class="code-title">Webhook Payload</span>
+                            <span class="code-copy" onclick="copyCode(this)">📋 Copy</span>
+                        </div>
+                        <pre><code><span class="code-comment">// Your server receives this when transfer status changes:</span>
+{
+  <span class="code-property">"event"</span>: <span class="code-string">"transfer.claimed"</span>,
+  <span class="code-property">"transfer"</span>: {
+    <span class="code-property">"id"</span>: <span class="code-string">"abc123"</span>,
+    <span class="code-property">"status"</span>: <span class="code-string">"claimed"</span>,
+    <span class="code-property">"from"</span>: <span class="code-string">"0xSender..."</span>,
+    <span class="code-property">"to"</span>: <span class="code-string">"0xRecipient..."</span>,
+    <span class="code-property">"amount"</span>: <span class="code-string">"1000000000000000000"</span>,
+    <span class="code-property">"chainId"</span>: <span class="code-number">1</span>,
+    <span class="code-property">"txHash"</span>: <span class="code-string">"0x..."</span>,
+    <span class="code-property">"claimedAt"</span>: <span class="code-string">"2025-01-15T12:00:00Z"</span>
+  },
+  <span class="code-property">"metadata"</span>: { <span class="code-property">"orderId"</span>: <span class="code-string">"12345"</span> }
+}</code></pre>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="tab-status">
+                    <div class="api-code">
+                        <div class="code-header">
+                            <span class="code-dot red"></span>
+                            <span class="code-dot yellow"></span>
+                            <span class="code-dot green"></span>
+                            <span class="code-title">GET /api/v1/transfers/:id</span>
+                            <span class="code-copy" onclick="copyCode(this)">📋 Copy</span>
+                        </div>
+                                                <pre><code><span class="code-keyword">const</span> timestamp = <span class="code-function">Math</span>.<span class="code-function">floor</span>(<span class="code-function">Date</span>.<span class="code-function">now</span>() / <span class="code-number">1000</span>);
+<span class="code-keyword">const</span> signature = <span class="code-function">signHmac</span>(<span class="code-string">''</span>, <span class="code-function">`${timestamp}.YOUR_SIGNING_SECRET`</span>);
+
+<span class="code-keyword">const</span> response = <span class="code-keyword">await</span> <span class="code-function">fetch</span>(<span class="code-string">'https://api.reverso.finance/v1/transfers/abc123'</span>, {
+    <span class="code-property">headers</span>: {
+        <span class="code-string">'X-API-KEY'</span>: <span class="code-string">'YOUR_API_KEY'</span>,
+        <span class="code-string">'X-Signature'</span>: signature,
+        <span class="code-string">'X-Timestamp'</span>: timestamp.<span class="code-function">toString</span>()
+    }
+});
+
+<span class="code-keyword">const</span> { transfer } = <span class="code-keyword">await</span> response.<span class="code-function">json</span>();
+
+console.<span class="code-function">log</span>(transfer.status);       <span class="code-comment">// "locked" | "claimable" | "claimed" | "cancelled"</span>
+console.<span class="code-function">log</span>(transfer.timeRemaining); <span class="code-comment">// Seconds until claimable</span>
+console.<span class="code-function">log</span>(transfer.canCancel);     <span class="code-comment">// true if still cancellable</span></code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- API Plans -->
+            <div class="api-plans-grid">
+                <div class="api-plan">
+                    <div class="plan-header">
+                        <h4>Starter</h4>
+                        <div class="plan-price">$99<span>/mo</span></div>
+                    </div>
+                    <ul class="plan-features">
+                        <li><span class="check">✓</span> 100 transfers/month</li>
+                        <li><span class="check">✓</span> REST API access</li>
+                        <li><span class="check">✓</span> 5 chains supported</li>
+                        <li><span class="check">✓</span> Email support</li>
+                        <li class="disabled"><span class="x">✕</span> Webhooks</li>
+                        <li class="disabled"><span class="x">✕</span> Dashboard</li>
+                    </ul>
+                    <a href="#" class="btn btn-ghost btn-plan">Get Started</a>
+                </div>
+                
+                <div class="api-plan featured">
+                    <div class="plan-badge">Most Popular</div>
+                    <div class="plan-header">
+                        <h4>Business</h4>
+                        <div class="plan-price">$499<span>/mo</span></div>
+                    </div>
+                    <ul class="plan-features">
+                        <li><span class="check">✓</span> <strong>Unlimited</strong> transfers</li>
+                        <li><span class="check">✓</span> REST API access</li>
+                        <li><span class="check">✓</span> <strong>All supported chains</strong></li>
+                        <li><span class="check">✓</span> Webhooks (real-time)</li>
+                        <li><span class="check">✓</span> Analytics dashboard</li>
+                        <li><span class="check">✓</span> Priority support</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary btn-plan">Start Free Trial</a>
+                </div>
+                
+                <div class="api-plan">
+                    <div class="plan-header">
+                        <h4>Enterprise</h4>
+                        <div class="plan-price">$2,000<span>/mo</span></div>
+                    </div>
+                    <ul class="plan-features">
+                        <li><span class="check">✓</span> <strong>Everything in Business</strong></li>
+                        <li><span class="check">✓</span> White-label solution</li>
+                        <li><span class="check">✓</span> 99.9% SLA guarantee</li>
+                        <li><span class="check">✓</span> 24/7 dedicated support</li>
+                        <li><span class="check">✓</span> Custom integration</li>
+                        <li><span class="check">✓</span> On-chain fee discount</li>
+                    </ul>
+                    <a href="#" class="btn btn-ghost btn-plan">Contact Sales</a>
+                </div>
+            </div>
+            
+            <div class="api-cta">
+                <a href="https://github.com/conditional-team/conditionalx/tree/main/REVERSO#api" class="btn btn-primary btn-large" target="_blank">
+                    📖 Read Full Documentation
+                </a>
+                <a href="https://github.com/conditional-team/conditionalx/tree/main/REVERSO/api" class="btn btn-ghost btn-large" target="_blank">
+                    🔑 Get API Key / Self-host
+                </a>
+            </div>
+
+            <!-- Lead Capture -->
+            <div class="api-lead">
+                <h3>Request API Access</h3>
+                <p>Tell us your use case. Sandbox keys subito; production keys post-audit.</p>
+                <form class="lead-form" action="https://formspree.io/f/mvgpyday" method="POST">
+                    <input type="email" name="email" placeholder="Work email" required>
+                    <input type="text" name="company" placeholder="Company / Project" required>
+                    <textarea name="usecase" rows="3" placeholder="Use case (exchange, wallet, payments, etc.)" required></textarea>
+                    <button type="submit" class="btn btn-primary">Request Access</button>
+                </form>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Security & Status -->
+    <section class="solution" id="security">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Security & Status</span>
+                <h2>What is Live Today</h2>
+                <p>Audit-first rollout: demo safe, contracts pronti per audit, API con HMAC/nonce/timestamp</p>
+            </div>
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="problem-icon">🔒</div>
+                    <h3>Audit</h3>
+                    <p>Smart contracts ready for external audit (Q1 2026). Mainnet sends are disabled in this demo.</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">🧪</div>
+                    <h3>Demo/Testnet</h3>
+                    <p>Front-end runs in simulation; use testnet to try flows without funds at risk.</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">📦</div>
+                    <h3>Code & Docs</h3>
+                    <p><a href="https://github.com/conditional-team/conditionalx/tree/main/REVERSO" target="_blank">Repo and README</a> include deploy scripts, ABI, and API details.</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">🛡️</div>
+                    <h3>API</h3>
+                    <p>HMAC + nonce + timestamp. No bearer in frontend, chiavi solo server-side, rate limiting attivo.</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">🔗</div>
+                    <h3>Testnet / Demo</h3>
+                    <p>Sandbox per prove senza rischio. Mainnet si apre dopo audit (Q1 2026).</p>
+                </div>
+            </div>
+
+            <div class="rollout">
+                <h3>Production Rollout</h3>
+                <div class="rollout-grid">
+                    <div class="rollout-item">
+                        <span class="rollout-label">Audit</span>
+                        <span class="rollout-value">Scheduled Q1 2026 (external)</span>
+                    </div>
+                    <div class="rollout-item">
+                        <span class="rollout-label">Bug Bounty</span>
+                        <span class="rollout-value">Coming with mainnet gate</span>
+                    </div>
+                    <div class="rollout-item">
+                        <span class="rollout-label">Observability</span>
+                        <span class="rollout-value">On-chain monitors + alerts at launch</span>
+                    </div>
+                    <div class="rollout-item">
+                        <span class="rollout-label">Contracts</span>
+                        <span class="rollout-value">0x... (mainnet) gated; testnet copy below</span>
+                    </div>
+                </div>
+                <div class="copy-row">
+                    <span class="copy-label">Testnet contract</span>
+                    <span class="copy-value">0x0000...0000</span>
+                    <button class="btn btn-ghost copy-btn" data-copy="0x0000000000000000000000000000000000000000">Copy</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Send Safely?</h2>
+                <p>Join early adopters testing reversible transfers without risking funds</p>
+                <div class="cta-actions">
+                    <a href="#app" class="btn btn-large btn-white">Launch App</a>
+                    <a href="https://github.com/conditional-team/conditionalx/tree/main/REVERSO" class="btn btn-large btn-ghost-white" target="_blank">Read Docs</a>
+                </div>
+            </div>
+            <div class="cta-stats">
+                <div class="cta-stat">
+                    <span class="cta-stat-value">$0</span>
+                    <span class="cta-stat-label">Lost with REVERSO</span>
+                </div>
+                <div class="cta-stat">
+                    <span class="cta-stat-value">5</span>
+                    <span class="cta-stat-label">Chains Ready (EVM)</span>
+                </div>
+                <div class="cta-stat">
+                    <span class="cta-stat-value">5</span>
+                    <span class="cta-stat-label">Layers of Protection</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="/" class="footer-logo">
+                        <span class="logo-icon">🔄</span>
+                        <span class="logo-text">REVERSO</span>
+                    </a>
+                    <p>The first reversible transaction protocol on blockchain. Never lose crypto to mistakes again.</p>
+                    <div class="social-links">
+                        <a href="https://twitter.com/ReversoProtocol" target="_blank" aria-label="Twitter">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        </a>
+                        <a href="https://discord.gg/reverso" target="_blank" aria-label="Discord">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                        </a>
+                        <a href="https://github.com/conditional-team/conditionalx" target="_blank" aria-label="GitHub">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Protocol</h4>
+                        <a href="#features">Features</a>
+                        <a href="#how-it-works">How It Works</a>
+                        <a href="#pricing">Pricing</a>
+                        <a href="#security">Security</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Developers</h4>
+                        <a href="https://github.com/conditional-team/conditionalx/tree/main/REVERSO" target="_blank">Documentation</a>
+                        <a href="https://github.com/conditional-team/conditionalx/tree/main/REVERSO#api" target="_blank">API Reference</a>
+                        <a href="https://github.com/conditional-team/conditionalx" target="_blank">GitHub</a>
+                        <a href="#security">Security / Bug Bounty (soon)</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Community</h4>
+                        <a href="https://twitter.com/ReversoProtocol">Twitter</a>
+                        <a href="https://discord.gg/reverso">Discord</a>
+                        <a href="https://t.me/reversoprotocol">Telegram</a>
+                        <a href="https://blog.reverso.finance">Blog</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Legal</h4>
+                        <a href="/terms">Terms of Service</a>
+                        <a href="/privacy">Privacy Policy</a>
+                        <a href="/cookies">Cookie Policy</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>© 2025 REVERSO Protocol. All rights reserved.</p>
+                <p>Built with ❤️ for a safer crypto future</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>

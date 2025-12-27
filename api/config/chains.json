@@ -1,0 +1,65 @@
+[
+  {
+    "name": "Ethereum",
+    "chainId": 1,
+    "rpcEnv": "ETHEREUM_RPC",
+    "defaultRpc": "https://ethereum-rpc.publicnode.com",
+    "explorer": "https://etherscan.io",
+    "contractEnv": "ETHEREUM_VAULT",
+    "contract": "0x0000000000000000000000000000000000000000"
+  },
+  {
+    "name": "Arbitrum",
+    "chainId": 42161,
+    "rpcEnv": "ARBITRUM_RPC",
+    "defaultRpc": "https://arb1.arbitrum.io/rpc",
+    "explorer": "https://arbiscan.io",
+    "contractEnv": "ARBITRUM_VAULT",
+    "contract": "0x0000000000000000000000000000000000000000"
+  },
+  {
+    "name": "Base",
+    "chainId": 8453,
+    "rpcEnv": "BASE_RPC",
+    "defaultRpc": "https://mainnet.base.org",
+    "explorer": "https://basescan.org",
+    "contractEnv": "BASE_VAULT",
+    "contract": "0x0000000000000000000000000000000000000000"
+  },
+  {
+    "name": "Optimism",
+    "chainId": 10,
+    "rpcEnv": "OPTIMISM_RPC",
+    "defaultRpc": "https://mainnet.optimism.io",
+    "explorer": "https://optimistic.etherscan.io",
+    "contractEnv": "OPTIMISM_VAULT",
+    "contract": "0x0000000000000000000000000000000000000000"
+  },
+  {
+    "name": "Polygon",
+    "chainId": 137,
+    "rpcEnv": "POLYGON_RPC",
+    "defaultRpc": "https://polygon-rpc.com",
+    "explorer": "https://polygonscan.com",
+    "contractEnv": "POLYGON_VAULT",
+    "contract": "0x0000000000000000000000000000000000000000"
+  },
+  {
+    "name": "BSC",
+    "chainId": 56,
+    "rpcEnv": "BSC_RPC",
+    "defaultRpc": "https://bsc-dataseed.binance.org",
+    "explorer": "https://bscscan.com",
+    "contractEnv": "BSC_VAULT",
+    "contract": "0x0000000000000000000000000000000000000000"
+  },
+  {
+    "name": "Avalanche",
+    "chainId": 43114,
+    "rpcEnv": "AVALANCHE_RPC",
+    "defaultRpc": "https://api.avax.network/ext/bc/C/rpc",
+    "explorer": "https://snowtrace.io",
+    "contractEnv": "AVALANCHE_VAULT",
+    "contract": "0x0000000000000000000000000000000000000000"
+  }
+]
