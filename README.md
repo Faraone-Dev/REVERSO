@@ -6,13 +6,14 @@
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.20-363636?style=for-the-badge&logo=solidity)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![Chains](https://img.shields.io/badge/Chains-5%20live-orange?style=for-the-badge)
-![Tests](https://img.shields.io/badge/Tests-32%2F32%20passing-brightgreen?style=for-the-badge)
+![Tests](https://img.shields.io/badge/Tests-66%2F66%20passing-brightgreen?style=for-the-badge)
+![Security](https://img.shields.io/badge/Security-3%20Layer-red?style=for-the-badge)
 
 **The First Reversible Transaction Protocol on Blockchain**
 
 *"Never lose crypto to mistakes again."*
 
-### 🌐 [Live Demo](https://conditional-team.github.io/REVERSO) • 📄 [Documentation](#-quick-start) • 🔌 [API](#-enterprise-api) • 🛡️ [Security](#-security)
+### 🌐 [Live Demo](https://conditional-team.github.io/REVERSO) • 📄 [Documentation](#-quick-start) • 🔌 [API](#-enterprise-api) • 🛡️ [Security](#-security-architecture)
 
 </div>
 
@@ -22,14 +23,15 @@
 
 | Component | Status | Details |
 |-----------|--------|---------|
-| 🔐 **Smart Contract** | ✅ Production-ready | 1,119 lines Solidity, OpenZeppelin security |
-| 🧪 **Test Suite** | ✅ 32/32 passing | Full coverage: send, cancel, claim, insurance, rescue |
+| 🔐 **ReversoVault** | ✅ Production-ready | 1,119 lines, core vault with 5-layer protection |
+| 🛡️ **EmergencyGuardian** | ✅ Production-ready | Multi-sig + 24h timelock + instant pause |
+| 👁️ **ReversoMonitor** | ✅ Production-ready | Anomaly detection + auto-pause + Chainlink ready |
+| 🧪 **Test Suite** | ✅ 66/66 passing | Full coverage: vault + security contracts |
 | 🔌 **Enterprise API** | ✅ Hardened | HMAC auth, rate limiting, fraud prevention |
 | 🌐 **Website** | ✅ [Live](https://conditional-team.github.io/REVERSO) | Interactive demo with wallet connection |
 | ⛓️ **Multi-chain** | ✅ Configured | ETH, Arbitrum, Base, Optimism, Polygon |
-| 📝 **Documentation** | ✅ Complete | README, API docs, investor pitch |
 
-**Built in 2 weeks. Production-ready. Seeking strategic investment.**
+**Built in 2 weeks. Production-ready. Enterprise-grade security.**
 
 ---
 
@@ -91,7 +93,7 @@ REVERSO introduces **time-locked reversible transfers** with up to **5 layers of
 | **Triple Recovery** | 2 backup addresses + original sender |
 | **Auto-Refund** | Unclaimed transfers return automatically |
 | **Multi-Token** | ETH + any ERC-20 token |
-| **Multi-Chain** | 5 EVM chains live (ETH, Arbitrum, Base, Optimism, Polygon); altri in arrivo |
+| **Multi-Chain** | 5 EVM chains live (ETH, Arbitrum, Base, Optimism, Polygon) |
 
 ### 💰 Progressive Fee Structure
 
@@ -420,31 +422,31 @@ npm run dev
 
 
 ### API Security (HMAC)
-- Header richiesti sulle rotte protette: `Authorization: Bearer <apiKey>`, `x-reverso-timestamp` (epoch ms, drift <=2m), `x-reverso-nonce` (UUID), `x-reverso-signature` (HMAC-SHA256 di `timestamp.nonce.METHOD.URL.sha256(body)` con `signingSecret`).
-- Rate limiting: 300 req/min per API key + txLimit per piano. CORS: `*` consentito se incluso in allowedOrigins.
 
-### Multi-chain config
-- Fonte unica: [api/config/chains.json](api/config/chains.json) + variabili `.env` per RPC e indirizzi vault (`*_RPC`, `*_VAULT`).
-- Loader TS: [api/src/config/chains.ts](api/src/config/chains.ts), usato in router transfer/admin.
-- Dopo il deploy, aggiorna `.env` con gli indirizzi reali e, se vuoi, explorer API key per la verifica.
+All protected endpoints require these headers:
+- `Authorization: Bearer <apiKey>`
+- `x-reverso-timestamp`: Epoch milliseconds (±5 minutes tolerance)
+- `x-reverso-nonce`: Unique UUID to prevent replay attacks
+- `x-reverso-signature`: HMAC-SHA256 of `timestamp.nonce.METHOD.URL.sha256(body)` signed with `signingSecret`
 
-### Encoding TX
-- `sendETH/ETHPremium`: `(recipient, delay, expiryPeriod, recovery1, recovery2, memo)`
-- `sendToken`: `(token, recipient, amount, delay, expiryPeriod, recovery1, recovery2, memo)`
-- Memo max 256 char; recovery non può essere zero address.
+**Rate Limiting:** 300 req/min per API key + transaction limit per plan.
 
-### Roadmap operativa
-- Audit + bug bounty pubblici.
-- Migrazione API a DB persistente (Postgres/Mongo) per chiavi, trasferimenti, webhooks.
-- Mapping on-chain ID <-> ID API per cancel/claim via backend.
-- SDK client con mappa chain dinamica e fallback RPC.
-### API Security (HMAC)
-- Ogni richiesta protetta richiede header:
-  - `Authorization: Bearer <apiKey>`
-  - `x-reverso-timestamp`: epoch ms (±5 minuti tolleranza)
-  - `x-reverso-nonce`: UUID univoco per evitare replay
-  - `x-reverso-signature`: HMAC-SHA256 di `timestamp.nonce.METHOD.URL.sha256(body)` firmata con `signingSecret` della API key (mostrata una sola volta alla creazione).
-- Le chiavi accettano wildcard `*` in `allowedOrigins` per CORS; rate limit per-key: 300 req/min + txLimit per piano.
+### Multi-Chain Configuration
+
+- Config source: [api/config/chains.json](api/config/chains.json) + `.env` variables for RPC and vault addresses
+- After deployment, update `.env` with actual contract addresses
+
+### Transaction Encoding
+
+```solidity
+// ETH transfers
+sendETH(recipient, delay, expiryPeriod, recovery1, recovery2, memo)
+
+// ERC20 transfers  
+sendToken(token, recipient, amount, delay, expiryPeriod, recovery1, recovery2, memo)
+```
+
+**Note:** Memo max 256 characters; recovery addresses cannot be zero address.
 ```
 
 ---
@@ -462,16 +464,94 @@ npm run dev
 
 ## 🔐 Security
 
+### Security Architecture (3-Contract System)
+
+REVERSO uses a **3-layer security architecture** that provides enterprise-grade protection:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    🏗️ REVERSO SECURITY STACK                    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   ┌─────────────────────────────────────────────────────────┐   │
+│   │                   👁️ ReversoMonitor                     │   │
+│   │  • Anomaly detection (volume spikes, suspicious tx)     │   │
+│   │  • Auto-pause on CRITICAL alerts                        │   │
+│   │  • Watchlist management                                 │   │
+│   │  • Chainlink Automation compatible                      │   │
+│   └─────────────────────┬───────────────────────────────────┘   │
+│                         │ triggers                              │
+│   ┌─────────────────────▼───────────────────────────────────┐   │
+│   │                  🛡️ EmergencyGuardian                   │   │
+│   │  • Multi-signature (2-of-2 for critical actions)       │   │
+│   │  • 24-hour timelock on admin changes                    │   │
+│   │  • Instant emergency pause                              │   │
+│   │  • Recovery system with dual confirmation               │   │
+│   └─────────────────────┬───────────────────────────────────┘   │
+│                         │ owns                                  │
+│   ┌─────────────────────▼───────────────────────────────────┐   │
+│   │                   🔐 ReversoVault                        │   │
+│   │  • Core reversible transfer logic                       │   │
+│   │  • 5-layer user protection                              │   │
+│   │  • Progressive fees + insurance                         │   │
+│   │  • Circuit breaker                                      │   │
+│   └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Contract Details
+
+| Contract | Lines | Purpose |
+|----------|-------|---------|
+| **ReversoVault.sol** | 1,119 | Core vault - reversible transfers, fees, insurance |
+| **EmergencyGuardian.sol** | 401 | Multi-sig owner, timelock, emergency controls |
+| **ReversoMonitor.sol** | 320 | Real-time monitoring, anomaly detection, auto-pause |
+
+### EmergencyGuardian Features
+
+```solidity
+// 🚨 INSTANT - Any guardian can pause immediately
+guardian.emergencyPause("Suspicious activity detected");
+
+// ⏱️ TIMELOCK - Critical actions need 24h + dual confirmation
+guardian.proposeAction(ActionType.CHANGE_TREASURY, newTreasury);
+// ... 24 hours later, DIFFERENT guardian confirms ...
+guardian.confirmAction(actionId);
+guardian.executeAction(actionId);
+
+// 🔐 MULTI-SIG - Two keys required for sensitive operations
+// Primary key: Hot wallet (daily operations)
+// Secondary key: Hardware wallet (backup, confirms critical actions)
+```
+
+### ReversoMonitor Features
+
+```solidity
+// 📊 Automatic anomaly detection
+monitor.recordTransaction(sender, amount);
+// Triggers alerts on:
+// - Single tx > 50 ETH (HIGH alert)
+// - Hourly volume > 100 ETH (HIGH alert)  
+// - Hourly volume > 200 ETH (CRITICAL → auto-pause)
+// - Watchlisted address activity (MEDIUM alert)
+
+// 🤖 Chainlink Automation compatible
+(bool upkeepNeeded, bytes memory data) = monitor.checkUpkeep("");
+```
+
 ### Smart Contract Security
 
 - ✅ ReentrancyGuard on all external functions
 - ✅ Pausable for emergency stops
 - ✅ Circuit breaker (auto-pause on suspicious activity)
-- ✅ Timelock on admin changes (48 hours)
+- ✅ Timelock on admin changes (24 hours via Guardian)
+- ✅ Multi-signature for critical operations
 - ✅ Guardian system for freezing suspicious transfers
 - ✅ OpenZeppelin battle-tested contracts
+- ✅ Anomaly detection with auto-pause
 
-### 5-Layer Protection System
+### 5-Layer User Protection System
 
 ```
 Layer 1: CANCEL
@@ -517,54 +597,55 @@ Layer 5: RESCUE
 | Medium | Up to $5,000 |
 | Low | Up to $1,000 |
 
-### Policy assicurativa (bozza)
+### Insurance Policy
 
-- Copertura valida solo per trasferimenti con `hasInsurance = true` e stato `Claimed` (il destinatario ha incassato).
-- Richiesta: ticket con prova di truffa (screenshot, tx hash, firma del mittente) entro 30 giorni dall’evento.
-- Decisione: comitato sicurezza entro 7 giorni; criteri pubblici (phishing/scam comprovato, non errori di prezzo/mercato).
-- Payout: fino all’intero importo trasferito, limitato al saldo del pool; log on-chain con `InsuranceClaimPaid`.
-- Abusi: segnalazioni false possono portare a ban dell’API key e rifiuto di future richieste.
+| Requirement | Details |
+|-------------|---------|
+| **Eligibility** | Transfers with `hasInsurance = true` and `Claimed` status |
+| **Claim Window** | Within 30 days of the incident |
+| **Evidence Required** | Screenshots, tx hash, sender signature |
+| **Decision Timeline** | Security committee within 7 days |
+| **Coverage** | Up to full transfer amount (limited by pool balance) |
+| **Exclusions** | Price/market errors; only confirmed phishing/scams |
+### UX Guidelines
 
-### UX & gas checklist
-
-- Schermata invio: mostra fee (0.3/0.5/0.7%) + premium (0.2%) e il netto al destinatario.
-- Claim/Cancel: indica finestra temporale, costo gas stimato e pulsante rapido “cancel” finché il lock non è scaduto.
-- Ricezione forzata: consenti “rifiuta”/auto-refund dopo expiry per ridurre griefing.
-- Notifiche: alert su unlock, expiry imminente, auto-refund, rescue.
-- Token: evidenzia allowance richiesta e rischio infinite approvals; preferisci allowance mirate.
-- Mobile: un tap per claim/cancel; fallback per gasless solo se c’è un relayer fidato.
-
+- **Send Screen:** Display fee breakdown (0.3/0.5/0.7% + 0.2% premium) and net amount
+- **Claim/Cancel:** Show time window, estimated gas cost, quick cancel button
+- **Notifications:** Alert on unlock, approaching expiry, auto-refund, rescue events
+- **Token Approvals:** Prefer targeted approvals over infinite approvals
 ---
 
 ## 📁 Project Structure
 
 ```
 REVERSO/
-├── contracts/
-│   ├── ReversoVault.sol      # Main vault contract
+├── 📁 contracts/                    # Solidity smart contracts
+│   ├── ReversoVault.sol             # Core vault (1,119 lines)
+│   ├── EmergencyGuardian.sol        # Multi-sig guardian (401 lines)
+│   ├── ReversoMonitor.sol           # Anomaly detection (320 lines)
 │   └── interfaces/
-│       └── IReversoVault.sol # Interface
-├── api/
+│       └── IReversoVault.sol        # Contract interface
+├── 📁 test/                         # Test suites
+│   ├── ReversoVault.test.ts         # Vault tests (32 tests)
+│   └── SecurityContracts.test.ts    # Guardian + Monitor tests (34 tests)
+├── 📁 api/                          # Enterprise REST API
 │   ├── src/
-│   │   ├── index.ts          # Express server
-│   │   ├── types.ts          # TypeScript types
-│   │   ├── routes/
-│   │   │   ├── auth.ts       # Authentication
-│   │   │   ├── transfer.ts   # Transfer CRUD
-│   │   │   ├── webhook.ts    # Webhooks (Business+)
-│   │   │   └── admin.ts      # Dashboard (Business+)
-│   │   └── middleware/
-│   │       ├── apiKey.ts     # API key validation
-│   │       └── errorHandler.ts
-│   ├── package.json
-│   └── README.md             # API documentation
-├── scripts/
-│   ├── deploy.ts             # Single chain deploy
-│   └── deploy-multichain.ts  # Multi-chain deploy
-├── test/
-│   └── ReversoVault.test.ts
-├── hardhat.config.ts         # 15+ chains configured
-└── README.md                 # This file
+│   │   ├── index.ts                 # Express server
+│   │   ├── routes/                  # Transfer, auth, webhooks, admin
+│   │   └── middleware/              # HMAC, rate limiting, API keys
+│   ├── sdk/                         # JavaScript/TypeScript SDK
+│   └── config/                      # Multi-chain configuration
+├── 📁 website/                      # Production website (Vite)
+│   ├── src/
+│   │   ├── main.js                  # App logic
+│   │   └── styles/                  # CSS
+│   └── index.html                   # Entry point
+├── 📁 scripts/                      # Deploy scripts
+│   ├── deploy.ts                    # Single chain deploy
+│   └── deploy-multichain.ts         # Multi-chain deploy
+├── 📄 hardhat.config.ts             # Multi-chain configuration
+├── 📄 README.md                     # This file
+└── 📄 PITCH_INVESTORS.md            # Investor documentation
 ```
 
 ---
@@ -709,10 +790,12 @@ MIT License - see [LICENSE](LICENSE)
 
 ```
 REVERSO/
-├── 📁 contracts/           # Solidity smart contracts (1,119 lines)
-│   ├── ReversoVault.sol    # Main vault with 5-layer protection
+├── 📁 contracts/           # 3 Solidity smart contracts (1,840 lines total)
+│   ├── ReversoVault.sol    # Core vault with 5-layer protection
+│   ├── EmergencyGuardian   # Multi-sig + timelock + emergency pause
+│   ├── ReversoMonitor      # Anomaly detection + auto-pause
 │   └── interfaces/         # Contract interfaces
-├── 📁 test/                # Hardhat test suite (32 tests)
+├── 📁 test/                # Hardhat test suite (66 tests)
 ├── 📁 api/                 # Enterprise REST API
 │   ├── src/routes/         # Transfer, auth, webhooks, admin
 │   ├── src/middleware/     # HMAC, rate limiting, API keys
@@ -721,7 +804,35 @@ REVERSO/
 ├── 📁 scripts/             # Deploy scripts (single & multi-chain)
 ├── 📄 README.md            # This file
 ├── 📄 PITCH_INVESTORS.md   # Investor documentation
-└── 📄 hardhat.config.ts    # Multi-chain configuration
+└── 📄 hardhat.config.ts    # Multi-chain configuration (15+ chains)
+```
+
+---
+
+## 🔧 Deployment Order
+
+```bash
+# 1. Deploy ReversoVault
+npx hardhat run scripts/deploy.ts --network arbitrum
+# → Save VAULT_ADDRESS
+
+# 2. Deploy EmergencyGuardian (pass secondary wallet address)
+# In Remix: constructor(secondaryWalletAddress)
+# → Save GUARDIAN_ADDRESS
+
+# 3. Transfer Vault ownership to Guardian
+vault.transferOwnership(GUARDIAN_ADDRESS)
+
+# 4. Link Vault to Guardian
+guardian.linkVault(VAULT_ADDRESS)
+
+# 5. (Optional) Deploy ReversoMonitor
+# In Remix: constructor(VAULT_ADDRESS)
+# → Save MONITOR_ADDRESS
+
+# 6. (Optional) Link Monitor to Guardian
+monitor.setGuardian(GUARDIAN_ADDRESS)
+guardian.addEmergencyGuardian(MONITOR_ADDRESS)
 ```
 
 ---
@@ -730,7 +841,7 @@ REVERSO/
 
 ### 🛡️ Built with security-first approach using OpenZeppelin contracts
 
-**32 tests passing** • **5 chains supported** • **Enterprise-ready API**
+**66 tests passing** • **3 security contracts** • **5 chains supported** • **Enterprise-ready API**
 
 ---
 

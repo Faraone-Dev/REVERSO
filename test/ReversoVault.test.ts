@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { time } from "@nomicfoundation/hardhat-network-helpers";
-import { ReversoVault } from "../typechain-types";
+import { ReversoVault, TestToken } from "../typechain-types";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 
 /**
@@ -35,8 +35,8 @@ describe("ReversoVault", function () {
   beforeEach(async function () {
     [owner, sender, recipient, treasury] = await ethers.getSigners();
 
-    const ReversoVault = await ethers.getContractFactory("ReversoVault");
-    reversoVault = await ReversoVault.deploy(treasury.address);
+    const ReversoVaultFactory = await ethers.getContractFactory("ReversoVault");
+    reversoVault = await ReversoVaultFactory.deploy(treasury.address) as unknown as ReversoVault;
     await reversoVault.waitForDeployment();
   });
 
@@ -438,8 +438,8 @@ describe("ReversoVault", function () {
 
   describe("Send Token", function () {
     it("Should handle ERC20 transfers with fee and tracking", async function () {
-      const Token = await ethers.getContractFactory("TestToken");
-      const token = await Token.connect(sender).deploy("Mock", "MOCK", TOKEN_SUPPLY);
+      const TokenFactory = await ethers.getContractFactory("TestToken");
+      const token = await TokenFactory.connect(sender).deploy("Mock", "MOCK", TOKEN_SUPPLY) as unknown as TestToken;
       await token.waitForDeployment();
 
       const feeBps = await reversoVault.calculateFeeBps(TOKEN_AMOUNT);
