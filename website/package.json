@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "REVERSO Protocol - Official Website",
   "type": "module",
-  "homepage": "https://dulcet-caramel-e02ba7.netlify.app/",
+  "homepage": "https://reverso-protocol.netlify.app/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
