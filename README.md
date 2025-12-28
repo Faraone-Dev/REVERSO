@@ -585,8 +585,8 @@ Layer 5: RESCUE
 - Bug bounty program will launch alongside mainnet
 
 **Timeline:**
-- Q1 2025: Internal review + testnet
-- Q2 2025: Professional audit + mainnet
+- Q1 2026: Internal review + testnet
+- Q2 2026: Professional audit + mainnet
 
 ### Bug Bounty
 
@@ -674,7 +674,7 @@ REVERSO/
 
 ## 🗺️ Roadmap
 
-### Phase 1: Foundation (Q1 2025) ✅
+### Phase 1: Foundation (Q4 2025) ✅
 - [x] Core smart contracts
 - [x] Progressive fee structure
 - [x] Insurance system
@@ -682,20 +682,20 @@ REVERSO/
 - [x] Enterprise API
 - [x] Basic documentation
 
-### Phase 2: Launch (Q2 2025)
+### Phase 2: Launch (Q1 2026)
 - [ ] Security audits (OpenZeppelin, Trail of Bits)
 - [ ] Testnet launch on all chains
 - [ ] Mainnet launch (Ethereum, Arbitrum, Base)
 - [ ] SDK release (JavaScript/TypeScript)
 - [ ] Mobile app (React Native)
 
-### Phase 3: Growth (Q3 2025)
+### Phase 3: Growth (Q2 2026)
 - [ ] Cross-chain reversible transfers
 - [ ] Wallet integrations (MetaMask Snap, WalletConnect)
 - [ ] CEX partnerships (Coinbase, Binance)
 - [ ] DAO governance launch
 
-### Phase 4: Ecosystem (Q4 2025)
+### Phase 4: Ecosystem (Q3 2026)
 - [ ] REVERSO token launch
 - [ ] Fiat on-ramp with reversibility
 - [ ] Insurance protocol integration (Nexus Mutual)
@@ -849,6 +849,6 @@ guardian.addEmergencyGuardian(MONITOR_ADDRESS)
 
 *REVERSO Protocol - Because everyone deserves a second chance*
 
-**© 2024-2025 REVERSO Protocol**
+**© 2024-2026 REVERSO Protocol**
 
 </div>

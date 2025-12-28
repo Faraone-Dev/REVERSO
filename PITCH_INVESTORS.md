@@ -342,10 +342,10 @@ curl -X POST https://api.reverso.finance/api/v1/transfers \
 
 | Phase | Timeline | Milestones |
 |-------|----------|------------|
-| **Audit & Launch** | Q1 2025 | Security audit, testnet launch, first 100 users |
-| **Growth** | Q2 2025 | Mainnet launch, 500 users, 2 wallet integrations |
-| **Scale** | Q3 2025 | 2,000 users, API revenue, CEX partnership |
-| **Expansion** | Q4 2025 | 5,000 users, additional chains, mobile app |
+| **Audit & Launch** | Q1 2026 | Security audit, testnet launch, first 100 users |
+| **Growth** | Q2 2026 | Mainnet launch, 500 users, 2 wallet integrations |
+| **Scale** | Q3 2026 | 2,000 users, API revenue, CEX partnership |
+| **Expansion** | Q4 2026 | 5,000 users, additional chains, mobile app |
 
 ---
 
