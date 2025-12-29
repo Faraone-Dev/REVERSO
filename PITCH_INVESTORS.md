@@ -18,7 +18,7 @@ REVERSO is the first **non-custodial reversible transaction protocol** for EVM c
 |--------|-------|
 | **Problem Size** | $3.8B+ lost annually |
 | **Solution** | Time-locked reversible transfers |
-| **Product Status** | MVP complete, 32/32 tests passing |
+| **Product Status** | MVP complete, 66/66 tests passing |
 | **Chains Supported** | 5 live (ETH, Arbitrum, Base, Optimism, Polygon) |
 | **Revenue Model** | 0.3-0.7% fees + 0.2% insurance + API subscriptions |
 | **Ask** | $50,000 |
@@ -244,8 +244,8 @@ curl -X POST https://api.reverso.finance/api/v1/transfers \
 
 | Component | Status | Details |
 |-----------|--------|---------|
-| **Smart Contract** | ✅ Production-ready | 1,119 lines, OpenZeppelin security |
-| **Test Suite** | ✅ 32/32 passing | Full coverage: send, cancel, claim, insurance, rescue |
+| **Smart Contract** | ✅ Production-ready | ~1,800 lines (3 contracts), OpenZeppelin security |
+| **Test Suite** | ✅ 66/66 passing | Full coverage: send, cancel, claim, insurance, rescue |
 | **API Backend** | ✅ Hardened | HMAC auth, rate limiting, fraud checks |
 | **Website/Demo** | ✅ Complete | 960+ lines, responsive, demo mode |
 | **Multi-chain** | ✅ Configured | ETH, Arbitrum, Base, Optimism, Polygon |
@@ -314,7 +314,7 @@ curl -X POST https://api.reverso.finance/api/v1/transfers \
 
 | Category | Amount | Purpose |
 |----------|--------|---------|
-| **Security Audit** | $15,000 | Professional smart contract audit (Code4rena/Sherlock) |
+| **Security Audit** | $15,000 | Professional smart contract audit (via Optimism Audit Grant) |
 | **Enterprise Partnerships** | $15,000 | Integration with 2-3 exchanges/wallets |
 | **Go-to-Market** | $10,000 | Developer relations, content, conference presence |
 | **Infrastructure** | $5,000 | Premium RPC, monitoring, hosting |
@@ -325,6 +325,38 @@ curl -X POST https://api.reverso.finance/api/v1/transfers \
 - Product is already built (0 dev cost in this round)
 - Solo founder = minimal overhead
 - Focus is 100% on audit, partnerships, and growth
+
+---
+
+## 🛡️ Security Audit Strategy
+
+### Optimism Audit Grant Program
+
+We're applying for the **Optimism Foundation Audit Grant** - a program that subsidizes security audits for Superchain projects. The grant covers audit costs through whitelisted Audit Service Providers (ASPs).
+
+### Target Auditors (Optimism-Approved)
+
+| Auditor | Why Them | Contact |
+|---------|----------|---------|
+| **Cyfrin** | Founded by Patrick Collins, excellent Solidity expertise, fast turnaround | will@cyfrin.io |
+| **Pashov Audit Group** | Top independent auditor, cost-effective, high quality | pashovkrum@gmail.com |
+| **Sherlock** | Contest-based model, community of auditors, competitive pricing | chris@sherlock.xyz |
+| **Code4rena/Zenith** | Decentralized audit contests, broad coverage | bytes032@code4rena.com |
+| **OpenZeppelin** | Premium tier, we already use their libraries extensively | sales@openzeppelin.com |
+
+### Audit Scope
+
+| Contract | Lines | Focus Areas |
+|----------|-------|-------------|
+| **ReversoVault.sol** | ~1,000 | Transfer logic, fee calculations, insurance claims, reentrancy |
+| **EmergencyGuardian.sol** | ~400 | Multi-sig logic, timelock, emergency pause |
+| **ReversoMonitor.sol** | ~380 | Anomaly detection thresholds, circuit breaker triggers |
+
+**Pre-Audit Security:**
+- ✅ 66/66 tests passing
+- ✅ OpenZeppelin patterns (ReentrancyGuard, Pausable, SafeERC20, Ownable)
+- ✅ 48h timelock on admin changes
+- ✅ Circuit breaker for suspicious activity
 
 ---
 

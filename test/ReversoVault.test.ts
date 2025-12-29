@@ -511,4 +511,326 @@ describe("ReversoVault", function () {
       expect(victimBalanceAfter - victimBalanceBefore).to.be.closeTo(payout, ethers.parseEther("0.0001"));
     });
   });
+
+  // ═══════════════════════════════════════════════════════════════
+  //                      SEND ETH SIMPLE
+  // ═══════════════════════════════════════════════════════════════
+
+  describe("Send ETH Simple", function () {
+    it("Should create transfer with default parameters", async function () {
+      await reversoVault.connect(sender).sendETHSimple(
+        recipient.address,
+        "Simple transfer",
+        { value: ONE_ETH }
+      );
+
+      const transfer = await reversoVault.getTransfer(1);
+      expect(transfer.sender).to.equal(sender.address);
+      expect(transfer.recipient).to.equal(recipient.address);
+      expect(transfer.status).to.equal(0); // Pending
+      expect(transfer.recoveryAddress1).to.equal(sender.address);
+      expect(transfer.recoveryAddress2).to.equal(sender.address);
+    });
+
+    it("Should use 24 hour default delay", async function () {
+      await reversoVault.connect(sender).sendETHSimple(
+        recipient.address,
+        "Simple transfer",
+        { value: ONE_ETH }
+      );
+      
+      const transfer = await reversoVault.getTransfer(1);
+      // Check that unlock is 24 hours from creation
+      expect(transfer.unlockAt - transfer.createdAt).to.equal(BigInt(ONE_DAY));
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  //                      REFUND EXPIRED
+  // ═══════════════════════════════════════════════════════════════
+
+  describe("Refund Expired", function () {
+    it("Should refund expired transfer to sender", async function () {
+      // expiresAt = unlockAt + expiryPeriod = (createdAt + delay) + expiryPeriod
+      const delay = ONE_HOUR;
+      const expiryPeriod = ONE_DAY * 7;
+      // Total time to expiry from creation: delay + expiryPeriod
+      
+      await reversoVault.connect(sender).sendETH(
+        recipient.address,
+        delay,
+        expiryPeriod,
+        sender.address,
+        sender.address,
+        "Will expire",
+        { value: ONE_ETH }
+      );
+
+      // Fast forward past expiry (delay + expiryPeriod + 1)
+      await time.increase(delay + expiryPeriod + 1);
+
+      const senderBalanceBefore = await ethers.provider.getBalance(sender.address);
+      await reversoVault.connect(owner).refundExpired(1);
+      const senderBalanceAfter = await ethers.provider.getBalance(sender.address);
+
+      const transfer = await reversoVault.getTransfer(1);
+      expect(transfer.status).to.equal(3); // Refunded
+      expect(senderBalanceAfter).to.be.greaterThan(senderBalanceBefore);
+    });
+
+    it("Should reject refund before expiry", async function () {
+      await reversoVault.connect(sender).sendETH(
+        recipient.address,
+        ONE_HOUR,
+        ONE_DAY * 7,
+        sender.address,
+        sender.address,
+        "Not expired yet",
+        { value: ONE_ETH }
+      );
+
+      await expect(
+        reversoVault.connect(owner).refundExpired(1)
+      ).to.be.revertedWithCustomError(reversoVault, "TransferNotExpired");
+    });
+
+    it("Should emit TransferRefunded event", async function () {
+      const delay = ONE_HOUR;
+      const expiryPeriod = ONE_DAY * 7;
+      
+      await reversoVault.connect(sender).sendETH(
+        recipient.address,
+        delay,
+        expiryPeriod,
+        sender.address,
+        sender.address,
+        "Will expire",
+        { value: ONE_ETH }
+      );
+
+      await time.increase(delay + expiryPeriod + 1);
+
+      await expect(reversoVault.connect(owner).refundExpired(1))
+        .to.emit(reversoVault, "TransferRefunded");
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  //                      BATCH REFUND EXPIRED
+  // ═══════════════════════════════════════════════════════════════
+
+  describe("Batch Refund Expired", function () {
+    it("Should refund multiple expired transfers", async function () {
+      const delay = ONE_HOUR;
+      const expiryPeriod = ONE_DAY * 7;
+      
+      // Create 3 transfers
+      for (let i = 0; i < 3; i++) {
+        await reversoVault.connect(sender).sendETH(
+          recipient.address,
+          delay,
+          expiryPeriod,
+          sender.address,
+          sender.address,
+          `Transfer ${i}`,
+          { value: ethers.parseEther("0.1") }
+        );
+      }
+
+      await time.increase(delay + expiryPeriod + 1);
+
+      await reversoVault.connect(owner).batchRefundExpired([1, 2, 3]);
+
+      for (let i = 1; i <= 3; i++) {
+        const transfer = await reversoVault.getTransfer(i);
+        expect(transfer.status).to.equal(3); // Refunded
+      }
+    });
+
+    it("Should skip non-expired transfers in batch", async function () {
+      const delay = ONE_HOUR;
+      const shortExpiryPeriod = ONE_DAY * 7;
+      const longExpiryPeriod = ONE_DAY * 30;
+      
+      // Create transfer with shorter expiry
+      await reversoVault.connect(sender).sendETH(
+        recipient.address,
+        delay,
+        shortExpiryPeriod,
+        sender.address,
+        sender.address,
+        "Will expire first",
+        { value: ONE_ETH }
+      );
+
+      // Create non-expired transfer with longer expiry
+      await reversoVault.connect(sender).sendETH(
+        recipient.address,
+        delay,
+        longExpiryPeriod,
+        sender.address,
+        sender.address,
+        "Won't expire yet",
+        { value: ONE_ETH }
+      );
+
+      // Fast forward past first expiry but before second
+      await time.increase(delay + shortExpiryPeriod + 1);
+
+      // Batch refund - should only refund first one
+      await reversoVault.connect(owner).batchRefundExpired([1, 2]);
+
+      const transfer1 = await reversoVault.getTransfer(1);
+      const transfer2 = await reversoVault.getTransfer(2);
+      expect(transfer1.status).to.equal(3); // Refunded
+      expect(transfer2.status).to.equal(0); // Still Pending
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  //                      FREEZE TRANSFER
+  // ═══════════════════════════════════════════════════════════════
+
+  describe("Freeze Transfer", function () {
+    it("Should allow guardian to freeze transfer and refund to sender", async function () {
+      await reversoVault.connect(sender).sendETH(
+        recipient.address,
+        ONE_DAY,
+        ONE_DAY * 7,
+        sender.address,
+        sender.address,
+        "Suspicious transfer",
+        { value: ONE_ETH }
+      );
+
+      // Set owner as guardian
+      await reversoVault.connect(owner).setGuardian(owner.address, true);
+
+      const senderBalanceBefore = await ethers.provider.getBalance(sender.address);
+      await reversoVault.connect(owner).freezeTransfer(1, "Suspected fraud");
+      const senderBalanceAfter = await ethers.provider.getBalance(sender.address);
+
+      const transfer = await reversoVault.getTransfer(1);
+      expect(transfer.status).to.equal(2); // Cancelled (freeze = cancel + refund)
+      expect(senderBalanceAfter).to.be.greaterThan(senderBalanceBefore);
+    });
+
+    it("Should reject freeze from non-guardian", async function () {
+      await reversoVault.connect(sender).sendETH(
+        recipient.address,
+        ONE_DAY,
+        ONE_DAY * 7,
+        sender.address,
+        sender.address,
+        "Normal transfer",
+        { value: ONE_ETH }
+      );
+
+      await expect(
+        reversoVault.connect(sender).freezeTransfer(1, "Trying to freeze")
+      ).to.be.revertedWithCustomError(reversoVault, "NotGuardian");
+    });
+
+    it("Should emit TransferFrozen event", async function () {
+      await reversoVault.connect(sender).sendETH(
+        recipient.address,
+        ONE_DAY,
+        ONE_DAY * 7,
+        sender.address,
+        sender.address,
+        "Will be frozen",
+        { value: ONE_ETH }
+      );
+
+      await reversoVault.connect(owner).setGuardian(owner.address, true);
+
+      await expect(reversoVault.connect(owner).freezeTransfer(1, "Fraud detected"))
+        .to.emit(reversoVault, "TransferFrozen")
+        .withArgs(1, owner.address, "Fraud detected");
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  //                      MANUAL REFUND
+  // ═══════════════════════════════════════════════════════════════
+
+  describe("Manual Refund", function () {
+    it("Should allow owner to manually refund ETH", async function () {
+      // First send some ETH to vault via a transfer that gets cancelled
+      await reversoVault.connect(sender).sendETH(
+        recipient.address,
+        ONE_DAY,
+        ONE_DAY * 7,
+        sender.address,
+        sender.address,
+        "Will be manually refunded",
+        { value: ONE_ETH }
+      );
+
+      const transfer = await reversoVault.getTransfer(1);
+      const amountInVault = transfer.amount;
+
+      const recipientBalanceBefore = await ethers.provider.getBalance(recipient.address);
+      
+      // Manual refund (transferId, to, token, amount, reason)
+      await reversoVault.connect(owner).manualRefund(
+        1, 
+        recipient.address, 
+        ethers.ZeroAddress, // ETH
+        amountInVault,
+        "Manual refund test"
+      );
+      
+      const recipientBalanceAfter = await ethers.provider.getBalance(recipient.address);
+      expect(recipientBalanceAfter - recipientBalanceBefore).to.equal(amountInVault);
+    });
+
+    it("Should reject manual refund from non-owner", async function () {
+      await reversoVault.connect(sender).sendETH(
+        recipient.address,
+        ONE_DAY,
+        ONE_DAY * 7,
+        sender.address,
+        sender.address,
+        "Normal transfer",
+        { value: ONE_ETH }
+      );
+
+      await expect(
+        reversoVault.connect(sender).manualRefund(
+          1, 
+          sender.address, 
+          ethers.ZeroAddress,
+          ethers.parseEther("0.5"),
+          "Trying to refund"
+        )
+      ).to.be.revertedWithCustomError(reversoVault, "OwnableUnauthorizedAccount");
+    });
+
+    it("Should emit ManualRefundIssued event", async function () {
+      await reversoVault.connect(sender).sendETH(
+        recipient.address,
+        ONE_DAY,
+        ONE_DAY * 7,
+        sender.address,
+        sender.address,
+        "Will have manual refund",
+        { value: ONE_ETH }
+      );
+
+      const transfer = await reversoVault.getTransfer(1);
+      const refundAmount = transfer.amount;
+
+      await expect(
+        reversoVault.connect(owner).manualRefund(
+          1,
+          sender.address,
+          ethers.ZeroAddress,
+          refundAmount,
+          "Test manual refund"
+        )
+      ).to.emit(reversoVault, "ManualRefundIssued")
+        .withArgs(1, sender.address, refundAmount, "Test manual refund");
+    });
+  });
 });

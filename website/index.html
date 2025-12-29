@@ -74,11 +74,11 @@
         <div class="hero-content">
             <div class="hero-badge">
                 <span class="badge-dot"></span>
-                Demo UI - Multi-chain ready (ETH, Arbitrum, Base, Polygon, Optimism)
+                Live on Sepolia Testnet · Multi-chain ready (ETH, Arbitrum, Base, Polygon, Optimism)
             </div>
             <div class="hero-badge secondary">
                 <span class="badge-dot"></span>
-                Audit scheduled (Q1 2026) · Mainnet gated until audit; safe demo available
+                Contract: <a href="https://sepolia.etherscan.io/address/0x3D1f9d1cEaf350885A91f7Fb05c99a78Bc544ED8" target="_blank" style="color: #00ff88;">0x3D1f...ED8</a> · Audit scheduled Q1 2026
             </div>
             
             <h1 class="hero-title">
@@ -282,21 +282,23 @@
                     
                     <p class="app-note">
                         🔒 You can cancel this transfer anytime during the lock period
-                        <br>🧪 Demo mode: transactions here are simulated, no on-chain broadcast.
                     </p>
                 </div>
                 
                 <!-- Active Transfers -->
                 <div class="transfers-panel">
-                    <h3>Your Active Transfers</h3>
+                    <div class="transfers-header">
+                        <h3>Your Transfers</h3>
+                        <button class="btn btn-ghost btn-sm" onclick="loadUserTransfers()">↻ Refresh</button>
+                    </div>
                     <div class="transfers-list" id="transfersList">
                         <div class="no-transfers">
                             <span>📭</span>
                             <p>No active transfers</p>
-                            <small>Your reversible transfers will appear here</small>
+                            <small>Connect wallet to view your transfers</small>
                         </div>
                     </div>
-                    <small class="hint-text">Tip: premendo “Cancel” durante il lock la transazione viene annullata e i fondi tornano al mittente.</small>
+                    <small class="hint-text">• Cancel: refund during lock period • Claim: receive after unlock</small>
                 </div>
             </div>
         </div>

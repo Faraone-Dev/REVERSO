@@ -6,7 +6,7 @@
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.20-363636?style=for-the-badge&logo=solidity)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![Chains](https://img.shields.io/badge/Chains-5%20live-orange?style=for-the-badge)
-![Tests](https://img.shields.io/badge/Tests-66%2F66%20passing-brightgreen?style=for-the-badge)
+![Tests](https://img.shields.io/badge/Tests-79%2F79%20passing-brightgreen?style=for-the-badge)
 ![Security](https://img.shields.io/badge/Security-3%20Layer-red?style=for-the-badge)
 
 **The First Reversible Transaction Protocol on Blockchain**
@@ -23,10 +23,10 @@
 
 | Component | Status | Details |
 |-----------|--------|---------|
-| 🔐 **ReversoVault** | ✅ Production-ready | 1,119 lines, core vault with 5-layer protection |
+| 🔐 **ReversoVault** | ✅ Production-ready | 1,173 lines, core vault with 5-layer protection |
 | 🛡️ **EmergencyGuardian** | ✅ Production-ready | Multi-sig + 24h timelock + instant pause |
 | 👁️ **ReversoMonitor** | ✅ Production-ready | Anomaly detection + auto-pause + Chainlink ready |
-| 🧪 **Test Suite** | ✅ 66/66 passing | Full coverage: vault + security contracts |
+| 🧪 **Test Suite** | ✅ 79/79 passing | Full coverage: vault + security + all functions |
 | 🔌 **Enterprise API** | ✅ Hardened | HMAC auth, rate limiting, fraud prevention |
 | 🌐 **Website** | ✅ [Live](https://reverso-protocol.netlify.app/) | Interactive demo with wallet connection |
 | ⛓️ **Multi-chain** | ✅ Configured | ETH, Arbitrum, Base, Optimism, Polygon |
@@ -179,6 +179,152 @@ npx hardhat run scripts/deploy.ts --network sepolia
 # Deploy multichain (usa config hardhat)
 npx hardhat run scripts/deploy-multichain.ts
 ```
+
+---
+
+## 🌐 Testnet Deployment & Live Tests (Sepolia)
+
+### 📍 Deployed Contracts
+
+| Contract | Address | Network | Status |
+|----------|---------|---------|--------|
+| **ReversoVault v1** | `0x2F5c8E09FBf360777153dd6F7F636077890e61DF` | Sepolia | ✅ [Verified](https://sepolia.etherscan.io/address/0x2F5c8E09FBf360777153dd6F7F636077890e61DF#code) |
+| **ReversoVault v2** | `0x3D1f9d1cEaf350885A91f7Fb05c99a78Bc544ED8` | Sepolia | ✅ Deployed |
+| **TestToken (TTK)** | `0x72E847D973f9b215C7F561CD059CBd7a1601Fe3C` | Sepolia | ✅ [Verified](https://sepolia.etherscan.io/address/0x72E847D973f9b215C7F561CD059CBd7a1601Fe3C#code) |
+| **Treasury** | `0x6a5729177bF2AE13351F43af0999767B59d9b059` | Sepolia | ✅ Receives fees |
+
+**Deploy Date:** December 29, 2025
+
+### ✅ Live Testnet Tests Passed
+
+#### Test 1: sendETH() - Reversible Transfer Creation
+| | |
+|--|--|
+| **TX Hash** | [`0x3176b0d6...`](https://sepolia.etherscan.io/tx/0x3176b0d65b3d4b5d4fc6f23f9fad6b76ffdf58ae5b42ee0558b4b79dda0cbc84) |
+| **Amount Sent** | 0.001 ETH |
+| **Amount After Fee** | 0.000997 ETH (0.3% fee) |
+| **Recipient** | `0x...dEaD` (burn address for test) |
+| **Delay** | 1 hour |
+| **Memo** | "Test REVERSO" |
+| **Gas Used** | 383,452 |
+| **Status** | ✅ **SUCCESS** - Transfer created with status `Pending` |
+
+#### Test 2: cancel() - Reversal & Refund
+| | |
+|--|--|
+| **TX Hash** | [`0x3c4fcf76...`](https://sepolia.etherscan.io/tx/0x3c4fcf76e41c93a56980fdbcbc2f3975d23012291a2838a8fb2a53c5410e692e) |
+| **Transfer ID** | 1 |
+| **Action** | Cancel pending transfer |
+| **Gas Used** | 64,138 |
+| **Result** | ✅ **SUCCESS** - Funds returned to sender, status changed to `Cancelled` |
+
+#### Test 3: sendETH() - Additional Transfer Test
+| | |
+|--|--|
+| **TX Hash** | [`0x325757b3...`](https://sepolia.etherscan.io/tx/0x325757b3f4d90f19eebf) |
+| **Transfer ID** | 3 |
+| **Gas Used** | 332,176 |
+| **Status** | ✅ **SUCCESS** - Then cancelled to recover funds |
+
+#### Test 4: sendETHPremium() - Transfer with Insurance (+0.2%)
+| | |
+|--|--|
+| **TX Hash** | [`0x824265692f...`](https://sepolia.etherscan.io/tx/0x824265692f710929bc67) |
+| **Transfer ID** | 4 |
+| **Amount After Fees** | 0.000995 ETH (0.5% fee + 0.2% insurance) |
+| **Has Insurance** | ✅ `true` |
+| **Insurance Pool** | Increased by +0.000002 ETH |
+| **Gas Used** | 358,128 |
+| **Status** | ✅ **SUCCESS** - Premium transfer with insurance flag, then cancelled |
+
+#### Test 5: cancel() - Multiple Cancel Tests
+| | |
+|--|--|
+| **Tested** | Cancel on transfers #3 and #4 |
+| **Gas Used** | ~64,000 |
+| **Result** | ✅ **SUCCESS** - All cancelled transfers refunded correctly |
+
+#### Test 6: sendToken() - ERC20 Reversible Transfer
+| | |
+|--|--|
+| **Token** | TestToken (TTK) - [`0x72E847D9...`](https://sepolia.etherscan.io/address/0x72E847D973f9b215C7F561CD059CBd7a1601Fe3C#code) |
+| **Vault** | [`0x3D1f9d1c...`](https://sepolia.etherscan.io/address/0x3D1f9d1cEaf350885A91f7Fb05c99a78Bc544ED8) |
+| **Approve TX** | `0xac3168a9...` |
+| **sendToken TX** | `0x3ecacf50...` |
+| **Amount** | 100 TTK |
+| **Gas Used** | 433,095 |
+| **Cancel TX** | `0x91d099ab...` (67,951 gas) |
+| **Status** | ✅ **SUCCESS** - ERC20 transfer created, cancelled, tokens refunded |
+
+### 📊 Test Summary
+
+```
+═══════════════════════════════════════════════════════════════
+              🌐 SEPOLIA TESTNET - LIVE TESTS
+═══════════════════════════════════════════════════════════════
+
+✅ Test 1: sendETH()        → PASSED (383,452 gas)
+   └── 0.001 ETH sent with 1h delay, 0.3% fee collected
+
+✅ Test 2: cancel()         → PASSED (64,138 gas)  
+   └── Funds returned to sender, status = Cancelled
+
+✅ Test 3: sendETH()        → PASSED (332,176 gas)
+   └── Additional transfer test, cancelled to recover
+
+✅ Test 4: sendETHPremium() → PASSED (358,128 gas)
+   └── Insurance flag set, pool increased +0.000002 ETH
+
+✅ Test 5: cancel()         → PASSED (multiple)
+   └── All pending transfers successfully cancelled
+
+✅ Test 6: sendToken()      → PASSED (433,095 gas)
+   └── ERC20 (TestToken) transfer + cancel working
+
+✅ Test 7: claim()          → PASSED (190,303 gas)
+   └── Recipient claimed after 1h unlock period!
+
+═══════════════════════════════════════════════════════════════
+                    7/7 TESTS PASSED ✅
+═══════════════════════════════════════════════════════════════
+```
+
+#### Test 7: claim() - Recipient Claims After Unlock
+| | |
+|--|--|
+| **TX Hash** | [`0x3e866e52...`](https://sepolia.etherscan.io/tx/0x3e866e52bfae77b3526a5e9f928b6f5b2946e45e9c6bbb8d90b9031f658bea63) |
+| **Vault** | [`0x3D1f9d1c...`](https://sepolia.etherscan.io/address/0x3D1f9d1cEaf350885A91f7Fb05c99a78Bc544ED8) |
+| **Transfer ID** | 2 |
+| **Claimer** | `0xb9279e38f6eab17f986E7133C60a46DE527628e3` (receiver wallet) |
+| **Amount Claimed** | 0.001994 ETH |
+| **Wait Time** | 1 hour (unlock period) |
+| **Gas Used** | 190,303 |
+| **Status** | ✅ **SUCCESS** - Transfer status changed to `Claimed`, funds transferred to recipient |
+
+### 🔜 Pending Tests (Time-Dependent)
+
+| Test | Function | Description | Status |
+|------|----------|-------------|--------|
+| 8 | `refundExpired()` | Auto-refund after expiry | ⏳ Requires 7+ days |
+| 9 | `recoverToBackup()` | Recovery address claim | ⏳ Requires expiry |
+| 10 | `freezeTransfer()` | Guardian blocks suspicious transfer | ⏳ Requires Guardian setup |
+| 11 | `rescueAbandoned()` | Rescue funds after 90+ days | ❌ Not feasible on testnet |
+
+**Note:** Tests 8-11 sono verificati nei test Hardhat locali (vedi sezione sotto). Su testnet richiedono tempi reali troppo lunghi.
+
+### 🔑 Test Wallets
+
+| Wallet | Address | Purpose |
+|--------|---------|---------|
+| **Sender** | `0x6a5729177bF2AE13351F43af0999767B59d9b059` | Deploys contracts, sends transfers |
+| **Receiver** | `0xb9279e38f6eab17f986E7133C60a46DE527628e3` | Claims transfers (for claim() test) |
+| **Treasury** | `0x6a5729177bF2AE13351F43af0999767B59d9b059` | Receives protocol fees |
+
+### ⚠️ Test Notes
+
+- **claim()**: Cannot send to self (`_recipient != msg.sender` check). Using 2nd wallet as recipient.
+- **Time-dependent tests**: Testnet doesn't allow time manipulation. Must wait real time.
+- **rescueAbandoned()**: Requires 90+ days - verified in local Hardhat tests only.
 
 ---
 
@@ -795,7 +941,7 @@ REVERSO/
 │   ├── EmergencyGuardian   # Multi-sig + timelock + emergency pause
 │   ├── ReversoMonitor      # Anomaly detection + auto-pause
 │   └── interfaces/         # Contract interfaces
-├── 📁 test/                # Hardhat test suite (66 tests)
+├── 📁 test/                # Hardhat test suite (79 tests)
 ├── 📁 api/                 # Enterprise REST API
 │   ├── src/routes/         # Transfer, auth, webhooks, admin
 │   ├── src/middleware/     # HMAC, rate limiting, API keys
@@ -841,7 +987,7 @@ guardian.addEmergencyGuardian(MONITOR_ADDRESS)
 
 ### 🛡️ Built with security-first approach using OpenZeppelin contracts
 
-**66 tests passing** • **3 security contracts** • **5 chains supported** • **Enterprise-ready API**
+**79 tests passing** • **3 security contracts** • **5 chains supported** • **Enterprise-ready API**
 
 ---
 

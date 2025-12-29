@@ -1892,12 +1892,46 @@ section {
     color: var(--text-secondary);
 }
 
+/* Transfers Header */
+.transfers-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.transfers-header h3 {
+    margin: 0;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+}
+
 /* Transfer Item */
 .transfer-item {
     padding: 16px;
     background: var(--bg-surface);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
+    transition: all var(--transition-normal);
+}
+
+.transfer-item:hover {
+    border-color: var(--primary);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+}
+
+.transfer-item.completed {
+    opacity: 0.7;
+    border-color: var(--primary);
+}
+
+.transfer-item.cancelled,
+.transfer-item.refunded {
+    opacity: 0.6;
+    border-color: #ff6b6b;
 }
 
 .transfer-item-header {
@@ -1916,13 +1950,41 @@ section {
     color: #ffa500;
 }
 
-.transfer-item-status.claimable {
+.transfer-item-status.claimable,
+.transfer-item-status.completed {
+    color: var(--primary);
+}
+
+.transfer-item-status.cancelled,
+.transfer-item-status.refunded {
+    color: #ff6b6b;
+}
+
+.transfer-item-status.frozen {
+    color: #00d4ff;
+}
+
+.transfer-item-badge {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.transfer-item-badge.sent {
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+}
+
+.transfer-item-badge.received {
+    background: rgba(0, 255, 136, 0.2);
     color: var(--primary);
 }
 
 .transfer-item-time {
     font-size: 0.85rem;
     color: var(--text-muted);
+    margin-bottom: 8px;
 }
 
 .transfer-item-amount {
@@ -1942,12 +2004,35 @@ section {
 .transfer-item-actions {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
 }
 
 .transfer-item-actions .btn {
     flex: 1;
+    min-width: 100px;
     padding: 10px;
     font-size: 0.85rem;
+}
+
+.transfer-item-actions .btn-claim {
+    background: var(--gradient-primary);
+    color: var(--bg-dark);
+    font-weight: 700;
+}
+
+.transfer-item-actions .btn-cancel {
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.transfer-item-actions .btn-cancel:hover {
+    background: rgba(255, 107, 107, 0.3);
+}
+
+.transfer-item-actions .btn-details {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
 }
 
 /* Responsive APP */

@@ -8,32 +8,137 @@
 // ==========================================
 const REVERSO_CONFIG = {
     contracts: {
-        1: '0x...', // Ethereum Mainnet
-        42161: '0x...', // Arbitrum
-        8453: '0x...', // Base
-        137: '0x...', // Polygon
-        10: '0x...', // Optimism
+        1: '0x...', // Ethereum Mainnet (TBD)
+        11155111: '0x3D1f9d1cEaf350885A91f7Fb05c99a78Bc544ED8', // Sepolia Testnet
+        42161: '0x...', // Arbitrum (TBD)
+        8453: '0x...', // Base (TBD)
+        137: '0x...', // Polygon (TBD)
+        10: '0x...', // Optimism (TBD)
     },
     rpcUrls: {
         1: 'https://eth.llamarpc.com',
+        11155111: 'https://ethereum-sepolia-rpc.publicnode.com',
         42161: 'https://arb1.arbitrum.io/rpc',
         8453: 'https://mainnet.base.org',
         137: 'https://polygon-rpc.com',
+        10: 'https://mainnet.optimism.io',
+    },
+    chainNames: {
+        1: 'Ethereum',
+        11155111: 'Sepolia',
+        42161: 'Arbitrum',
+        8453: 'Base',
+        137: 'Polygon',
+        10: 'Optimism',
     }
 };
 
-const DEMO_MODE = true;
+// ReversoVault ABI (minimal for sendETH, cancel, claim)
+const VAULT_ABI = [
+    {
+        "inputs": [
+            {"name": "_recipient", "type": "address"},
+            {"name": "_delay", "type": "uint256"},
+            {"name": "_expiryPeriod", "type": "uint256"},
+            {"name": "_recoveryAddress1", "type": "address"},
+            {"name": "_recoveryAddress2", "type": "address"},
+            {"name": "_memo", "type": "string"}
+        ],
+        "name": "sendETH",
+        "outputs": [{"name": "transferId", "type": "uint256"}],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {"name": "_recipient", "type": "address"},
+            {"name": "_delay", "type": "uint256"},
+            {"name": "_expiryPeriod", "type": "uint256"},
+            {"name": "_recoveryAddress1", "type": "address"},
+            {"name": "_recoveryAddress2", "type": "address"},
+            {"name": "_memo", "type": "string"}
+        ],
+        "name": "sendETHPremium",
+        "outputs": [{"name": "transferId", "type": "uint256"}],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [{"name": "_transferId", "type": "uint256"}],
+        "name": "cancel",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{"name": "_transferId", "type": "uint256"}],
+        "name": "claim",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{"name": "_transferId", "type": "uint256"}],
+        "name": "getTransfer",
+        "outputs": [
+            {"components": [
+                {"name": "sender", "type": "address"},
+                {"name": "recipient", "type": "address"},
+                {"name": "token", "type": "address"},
+                {"name": "amount", "type": "uint256"},
+                {"name": "createdAt", "type": "uint256"},
+                {"name": "unlockAt", "type": "uint256"},
+                {"name": "expiresAt", "type": "uint256"},
+                {"name": "recoveryAddress1", "type": "address"},
+                {"name": "recoveryAddress2", "type": "address"},
+                {"name": "memo", "type": "string"},
+                {"name": "status", "type": "uint8"},
+                {"name": "hasInsurance", "type": "bool"}
+            ], "name": "", "type": "tuple"}
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{"name": "_user", "type": "address"}],
+        "name": "getSentTransfers",
+        "outputs": [{"name": "", "type": "uint256[]"}],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{"name": "_user", "type": "address"}],
+        "name": "getReceivedTransfers",
+        "outputs": [{"name": "", "type": "uint256[]"}],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "transferCount",
+        "outputs": [{"name": "", "type": "uint256"}],
+        "stateMutability": "view",
+        "type": "function"
+    }
+];
+
+// Production mode - set to false for real transactions
+const DEMO_MODE = false;
 
 // App State
 let appState = {
     connected: false,
     address: null,
-    chainId: 1,
+    chainId: 11155111, // Default to Sepolia
     selectedToken: 'ETH',
-    selectedDelay: 86400,
+    selectedDelay: 3600, // 1 hour default
+    selectedExpiry: 604800, // 7 days default
     withInsurance: false,
     balance: '0',
-    transfers: []
+    transfers: [],
+    provider: null,
+    signer: null,
+    contract: null
 };
 
 // ==========================================
@@ -173,8 +278,8 @@ async function handleSend() {
     // Get form values
     const amount = document.getElementById('sendAmount')?.value;
     const recipient = document.getElementById('recipientAddress')?.value;
-    const recovery1 = document.getElementById('recovery1')?.value || '0x0000000000000000000000000000000000000000';
-    const recovery2 = document.getElementById('recovery2')?.value || '0x0000000000000000000000000000000000000000';
+    const recovery1 = document.getElementById('recovery1')?.value || ethers.ZeroAddress;
+    const recovery2 = document.getElementById('recovery2')?.value || ethers.ZeroAddress;
     
     // Validation
     if (!amount || parseFloat(amount) <= 0) {
@@ -187,12 +292,18 @@ async function handleSend() {
         return;
     }
     
+    // Check if contract is available
+    if (!appState.contract) {
+        showNotification(`ReversoVault not deployed on ${REVERSO_CONFIG.chainNames[appState.chainId] || 'this network'}. Please switch to Sepolia.`, 'error');
+        return;
+    }
+    
     try {
         sendBtn.disabled = true;
         sendBtnText.innerHTML = '<span class="loading-spinner"></span> Preparing Transaction...';
         
-        // Demo mode: always simulate, never broadcast on-chain
-        await simulateTransaction(amount, recipient, DEMO_MODE);
+        // Execute real transaction
+        await executeReversoTransaction(amount, recipient, recovery1, recovery2);
         
         sendBtnText.textContent = 'Send Reversible Transaction';
         sendBtn.disabled = false;
@@ -206,63 +317,169 @@ async function handleSend() {
 }
 
 // ==========================================
-// Simulate Transaction (Demo)
+// Execute Real Reverso Transaction
 // ==========================================
-async function simulateTransaction(amount, recipient, forceDemo = false) {
-    // Show preparing
-    showNotification('Preparing transaction...', 'info');
-    await sleep(1000);
-
-    if (forceDemo || typeof window.ethereum === 'undefined') {
-        // Demo path: no on-chain transaction
-        showNotification('Demo: transaction simulated. No funds were moved.', 'success');
-        
-        // Add to transfers list
-        addTransferToList({
-            id: Date.now(),
-            amount: amount,
-            token: appState.selectedToken,
-            recipient: recipient,
-            delay: appState.selectedDelay,
-            timestamp: Date.now(),
-            status: 'pending'
-        });
-        
-        return;
-    }
+async function executeReversoTransaction(amount, recipient, recovery1, recovery2) {
+    showNotification('Preparing reversible transaction...', 'info');
     
     try {
-        // Request transaction (disabled in demo, guarded above)
-        const txHash = await window.ethereum.request({
-            method: 'eth_sendTransaction',
-            params: [{
-                from: appState.address,
-                to: recipient,
-                value: '0x' + BigInt(Math.floor(parseFloat(amount) * 1e18)).toString(16),
-                data: '0x'
-            }]
-        });
+        const amountWei = ethers.parseEther(amount);
+        const delay = appState.selectedDelay; // in seconds
+        const expiryPeriod = 7 * 24 * 60 * 60; // 7 days minimum
         
-        showNotification(`Transaction sent! Hash: ${txHash.slice(0, 10)}...`, 'success');
+        // Get fee estimate
+        const feeDetails = await appState.contract.calculateFee(amountWei, false); // false = no insurance
+        const totalWithFee = feeDetails.totalAmount;
+        
+        console.log('📊 Transaction Details:');
+        console.log('   Amount:', ethers.formatEther(amountWei), 'ETH');
+        console.log('   Fee:', ethers.formatEther(feeDetails.fee), 'ETH');
+        console.log('   Total:', ethers.formatEther(totalWithFee), 'ETH');
+        console.log('   Delay:', delay, 'seconds');
+        console.log('   Recipient:', recipient);
+        
+        showNotification('Please confirm the transaction in your wallet...', 'info');
+        
+        // Call sendETH on the contract
+        const tx = await appState.contract.sendETH(
+            recipient,
+            delay,
+            expiryPeriod,
+            recovery1,
+            recovery2,
+            { value: totalWithFee }
+        );
+        
+        showNotification(`Transaction submitted! Waiting for confirmation...`, 'info');
+        console.log('📤 TX Hash:', tx.hash);
+        
+        // Wait for confirmation
+        const receipt = await tx.wait();
+        
+        // Parse TransferCreated event
+        let transferId = null;
+        for (const log of receipt.logs) {
+            try {
+                const parsed = appState.contract.interface.parseLog({
+                    topics: log.topics,
+                    data: log.data
+                });
+                if (parsed?.name === 'TransferCreated') {
+                    transferId = parsed.args.transferId;
+                    console.log('✅ Transfer Created! ID:', transferId.toString());
+                }
+            } catch (e) {
+                // Not our event, skip
+            }
+        }
+        
+        // Get explorer URL
+        const explorerUrl = getExplorerUrl(appState.chainId, tx.hash);
+        
+        showNotification(
+            `✅ Reversible transfer created! <a href="${explorerUrl}" target="_blank">View on Explorer</a>`,
+            'success'
+        );
         
         // Add to transfers list
         addTransferToList({
-            id: Date.now(),
+            id: transferId?.toString() || Date.now().toString(),
             amount: amount,
-            token: appState.selectedToken,
+            token: 'ETH',
             recipient: recipient,
-            delay: appState.selectedDelay,
+            delay: delay,
             timestamp: Date.now(),
             status: 'pending',
-            txHash: txHash
+            txHash: tx.hash,
+            unlockAt: Date.now() + (delay * 1000)
         });
         
+        // Clear form
+        document.getElementById('sendAmount').value = '';
+        document.getElementById('recipientAddress').value = '';
+        
     } catch (error) {
-        if (error.code === 4001) {
+        console.error('Transaction error:', error);
+        
+        if (error.code === 'ACTION_REJECTED' || error.code === 4001) {
             showNotification('Transaction rejected by user', 'error');
+        } else if (error.message?.includes('insufficient funds')) {
+            showNotification('Insufficient funds for transaction + gas', 'error');
+        } else if (error.message?.includes('InvalidDelay')) {
+            showNotification('Delay must be between 1 hour and 30 days', 'error');
+        } else if (error.message?.includes('InvalidExpiryPeriod')) {
+            showNotification('Expiry period must be at least 7 days', 'error');
+        } else if (error.message?.includes('InvalidAmount')) {
+            showNotification('Amount must be greater than 0', 'error');
         } else {
             throw error;
         }
+    }
+}
+
+// Get block explorer URL
+function getExplorerUrl(chainId, txHash) {
+    const explorers = {
+        1: 'https://etherscan.io/tx/',
+        11155111: 'https://sepolia.etherscan.io/tx/',
+        42161: 'https://arbiscan.io/tx/',
+        10: 'https://optimistic.etherscan.io/tx/',
+        137: 'https://polygonscan.com/tx/',
+        8453: 'https://basescan.org/tx/'
+    };
+    return (explorers[chainId] || 'https://etherscan.io/tx/') + txHash;
+}
+
+// Load user's transfers from contract
+async function loadUserTransfers() {
+    if (!appState.contract || !appState.address) return;
+    
+    try {
+        // Get sent and received transfers
+        const [sentIds, receivedIds] = await Promise.all([
+            appState.contract.getSentTransfers(appState.address),
+            appState.contract.getReceivedTransfers(appState.address)
+        ]);
+        
+        console.log('📋 Sent transfers:', sentIds.length);
+        console.log('📋 Received transfers:', receivedIds.length);
+        
+        // Combine and dedupe
+        const allIds = [...new Set([...sentIds, ...receivedIds])];
+        
+        // Fetch transfer details
+        appState.transfers = [];
+        for (const id of allIds.slice(-20)) { // Last 20 transfers
+            try {
+                const transfer = await appState.contract.getTransfer(id);
+                appState.transfers.push({
+                    id: id.toString(),
+                    amount: ethers.formatEther(transfer.amount),
+                    token: transfer.token === ethers.ZeroAddress ? 'ETH' : 'TOKEN',
+                    tokenAddress: transfer.token,
+                    sender: transfer.sender,
+                    recipient: transfer.recipient,
+                    status: ['Pending', 'Completed', 'Cancelled', 'Refunded', 'Frozen'][transfer.status],
+                    statusCode: Number(transfer.status),
+                    unlockAt: Number(transfer.unlockAt) * 1000,
+                    expiresAt: Number(transfer.expiresAt) * 1000,
+                    createdAt: Number(transfer.createdAt) * 1000,
+                    delay: Number(transfer.unlockAt) - Number(transfer.createdAt),
+                    isSender: transfer.sender.toLowerCase() === appState.address.toLowerCase(),
+                    isReceiver: transfer.recipient.toLowerCase() === appState.address.toLowerCase()
+                });
+            } catch (e) {
+                console.error('Failed to load transfer', id.toString(), e);
+            }
+        }
+        
+        // Sort by creation time, newest first
+        appState.transfers.sort((a, b) => b.createdAt - a.createdAt);
+        
+        renderTransfersList();
+        
+    } catch (error) {
+        console.error('Failed to load transfers:', error);
     }
 }
 
@@ -290,36 +507,67 @@ function renderTransfersList() {
     }
     
     container.innerHTML = appState.transfers.map(t => {
-        const timeRemaining = calculateTimeRemaining(t.timestamp, t.delay);
+        const timeRemaining = calculateTimeRemaining(t.unlockAt || t.timestamp + t.delay * 1000);
         const shortRecipient = `${t.recipient.slice(0, 6)}...${t.recipient.slice(-4)}`;
+        const shortSender = t.sender ? `${t.sender.slice(0, 6)}...${t.sender.slice(-4)}` : '';
+        
+        // Determine status display
+        let statusClass = t.statusCode !== undefined ? ['pending', 'completed', 'cancelled', 'refunded', 'frozen'][t.statusCode] : t.status;
+        let statusText = t.status || 'Pending';
+        
+        const now = Date.now();
+        const isClaimable = t.statusCode === 0 && t.unlockAt && now >= t.unlockAt;
+        const isPending = t.statusCode === 0 && t.unlockAt && now < t.unlockAt;
+        const isExpired = t.statusCode === 0 && t.expiresAt && now >= t.expiresAt;
+        
+        // Determine which buttons to show
+        let actionButtons = '';
+        if (t.statusCode === 0) { // Pending
+            if (t.isSender && !isExpired) {
+                actionButtons += `<button class="btn btn-cancel" onclick="handleCancel('${t.id}')">Cancel & Refund</button>`;
+            }
+            if (t.isReceiver && isClaimable && !isExpired) {
+                actionButtons += `<button class="btn btn-claim" onclick="handleClaim('${t.id}')">Claim Funds</button>`;
+            }
+        }
+        actionButtons += `<button class="btn btn-details" onclick="viewTransfer('${t.id}')">Details</button>`;
         
         return `
-            <div class="transfer-item" data-id="${t.id}">
+            <div class="transfer-item ${statusClass}" data-id="${t.id}">
                 <div class="transfer-item-header">
-                    <span class="transfer-item-status ${t.status}">${t.status === 'pending' ? '● Reversible' : '✓ Claimable'}</span>
-                    <span class="transfer-item-time">${timeRemaining}</span>
+                    <span class="transfer-item-status ${statusClass}">
+                        ${isPending ? '⏳ Locked' : isClaimable ? '✅ Claimable' : isExpired ? '⏰ Expired' : statusText}
+                    </span>
+                    <span class="transfer-item-badge ${t.isSender ? 'sent' : 'received'}">
+                        ${t.isSender ? '↗ Sent' : '↘ Received'}
+                    </span>
                 </div>
                 <div class="transfer-item-amount">${t.amount} ${t.token}</div>
-                <div class="transfer-item-to">To: ${shortRecipient}</div>
+                <div class="transfer-item-to">
+                    ${t.isSender ? `To: ${shortRecipient}` : `From: ${shortSender}`}
+                </div>
+                <div class="transfer-item-time">${isPending ? timeRemaining : ''}</div>
                 <div class="transfer-item-actions">
-                    <button class="btn btn-cancel" onclick="cancelTransfer(${t.id})">Cancel</button>
-                    <button class="btn btn-details" onclick="viewTransfer(${t.id})">Details</button>
+                    ${actionButtons}
                 </div>
             </div>
         `;
     }).join('');
 }
 
-function calculateTimeRemaining(timestamp, delaySeconds) {
-    const endTime = timestamp + (delaySeconds * 1000);
-    const remaining = endTime - Date.now();
+function calculateTimeRemaining(unlockTimestamp) {
+    const remaining = unlockTimestamp - Date.now();
     
-    if (remaining <= 0) return 'Claimable';
+    if (remaining <= 0) return 'Unlocked';
     
-    const hours = Math.floor(remaining / (1000 * 60 * 60));
+    const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
     
+    if (days > 0) {
+        return `${days}d ${hours}h ${minutes}m remaining`;
+    }
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} remaining`;
 }
 
@@ -330,32 +578,127 @@ setInterval(() => {
     }
 }, 1000);
 
-// Transfer actions
-window.cancelTransfer = function(id) {
-    const transfer = appState.transfers.find(t => t.id === id);
+// Expose loadUserTransfers globally for refresh button
+window.loadUserTransfers = loadUserTransfers;
+
+// Cancel Transfer (real contract call)
+window.handleCancel = async function(transferId) {
+    if (!appState.contract) {
+        showNotification('Contract not connected', 'error');
+        return;
+    }
+    
+    const transfer = appState.transfers.find(t => t.id === transferId);
     if (!transfer) return;
     
-    showNotification(`Cancelling transfer of ${transfer.amount} ${transfer.token}...`, 'info');
-    
-    // Simulate cancellation
-    setTimeout(() => {
-        appState.transfers = appState.transfers.filter(t => t.id !== id);
-        renderTransfersList();
-        showNotification('Transfer cancelled! Funds returned to your wallet.', 'success');
-    }, 1500);
+    try {
+        showNotification(`Cancelling transfer of ${transfer.amount} ${transfer.token}...`, 'info');
+        
+        const tx = await appState.contract.cancel(transferId);
+        showNotification('Transaction submitted, waiting for confirmation...', 'info');
+        
+        await tx.wait();
+        
+        const explorerUrl = getExplorerUrl(appState.chainId, tx.hash);
+        showNotification(
+            `✅ Transfer cancelled! Funds refunded. <a href="${explorerUrl}" target="_blank">View TX</a>`,
+            'success'
+        );
+        
+        // Reload transfers
+        await loadUserTransfers();
+        
+    } catch (error) {
+        console.error('Cancel error:', error);
+        if (error.code === 'ACTION_REJECTED') {
+            showNotification('Transaction rejected', 'error');
+        } else if (error.message?.includes('TransferAlreadyClaimed')) {
+            showNotification('Transfer already claimed', 'error');
+        } else if (error.message?.includes('NotSender')) {
+            showNotification('Only sender can cancel', 'error');
+        } else {
+            showNotification('Failed to cancel transfer', 'error');
+        }
+    }
 };
 
-window.viewTransfer = function(id) {
-    const transfer = appState.transfers.find(t => t.id === id);
+// Claim Transfer (real contract call)
+window.handleClaim = async function(transferId) {
+    if (!appState.contract) {
+        showNotification('Contract not connected', 'error');
+        return;
+    }
+    
+    const transfer = appState.transfers.find(t => t.id === transferId);
     if (!transfer) return;
     
-    alert(`Transfer Details:\n\nAmount: ${transfer.amount} ${transfer.token}\nTo: ${transfer.recipient}\nLock Period: ${formatDelay(transfer.delay)}\nStatus: ${transfer.status}\n${transfer.txHash ? 'TX: ' + transfer.txHash : ''}`);
+    try {
+        showNotification(`Claiming ${transfer.amount} ${transfer.token}...`, 'info');
+        
+        const tx = await appState.contract.claim(transferId, {
+            gasLimit: 300000 // Ensure enough gas
+        });
+        showNotification('Transaction submitted, waiting for confirmation...', 'info');
+        
+        await tx.wait();
+        
+        const explorerUrl = getExplorerUrl(appState.chainId, tx.hash);
+        showNotification(
+            `✅ Funds claimed successfully! <a href="${explorerUrl}" target="_blank">View TX</a>`,
+            'success'
+        );
+        
+        // Reload transfers
+        await loadUserTransfers();
+        
+    } catch (error) {
+        console.error('Claim error:', error);
+        if (error.code === 'ACTION_REJECTED') {
+            showNotification('Transaction rejected', 'error');
+        } else if (error.message?.includes('TransferStillLocked')) {
+            showNotification('Transfer is still locked', 'error');
+        } else if (error.message?.includes('NotRecipient')) {
+            showNotification('Only recipient can claim', 'error');
+        } else if (error.message?.includes('TransferExpired')) {
+            showNotification('Transfer has expired', 'error');
+        } else {
+            showNotification('Failed to claim transfer', 'error');
+        }
+    }
+};
+
+window.viewTransfer = function(transferId) {
+    const transfer = appState.transfers.find(t => t.id === transferId);
+    if (!transfer) return;
+    
+    const unlockDate = transfer.unlockAt ? new Date(transfer.unlockAt).toLocaleString() : 'N/A';
+    const expiryDate = transfer.expiresAt ? new Date(transfer.expiresAt).toLocaleString() : 'N/A';
+    const createdDate = transfer.createdAt ? new Date(transfer.createdAt).toLocaleString() : 'N/A';
+    
+    const details = `
+Transfer Details
+================
+ID: ${transfer.id}
+Amount: ${transfer.amount} ${transfer.token}
+Status: ${transfer.status}
+
+From: ${transfer.sender || 'You'}
+To: ${transfer.recipient}
+
+Created: ${createdDate}
+Unlocks: ${unlockDate}
+Expires: ${expiryDate}
+
+${transfer.txHash ? 'TX: ' + transfer.txHash : ''}
+    `.trim();
+    
+    alert(details);
 };
 
 function formatDelay(seconds) {
-    if (seconds < 3600) return `${seconds / 60} minutes`;
-    if (seconds < 86400) return `${seconds / 3600} hours`;
-    return `${seconds / 86400} days`;
+    if (seconds < 3600) return `${Math.round(seconds / 60)} minutes`;
+    if (seconds < 86400) return `${Math.round(seconds / 3600)} hours`;
+    return `${Math.round(seconds / 86400)} days`;
 }
 
 // ==========================================
@@ -543,6 +886,8 @@ function initMobileNav() {
 // ==========================================
 // Wallet Connection
 // ==========================================
+// Wallet Connection (with ethers.js)
+// ==========================================
 async function initWalletConnect() {
     const connectBtn = document.getElementById('connectWallet');
     if (!connectBtn) return;
@@ -554,6 +899,7 @@ async function initWalletConnect() {
                 method: 'eth_accounts' 
             });
             if (accounts.length > 0) {
+                await setupProvider();
                 updateWalletButton(connectBtn, accounts[0]);
             }
         } catch (e) {
@@ -581,6 +927,7 @@ async function initWalletConnect() {
             });
             
             if (accounts.length > 0) {
+                await setupProvider();
                 updateWalletButton(connectBtn, accounts[0]);
                 showNotification('Wallet connected successfully!', 'success');
             }
@@ -601,16 +948,65 @@ async function initWalletConnect() {
     
     // Listen for account changes
     if (typeof window.ethereum !== 'undefined') {
-        window.ethereum.on('accountsChanged', (accounts) => {
+        window.ethereum.on('accountsChanged', async (accounts) => {
             if (accounts.length === 0) {
+                appState.connected = false;
+                appState.address = null;
+                appState.provider = null;
+                appState.signer = null;
+                appState.contract = null;
                 connectBtn.innerHTML = `
                     <span class="wallet-dot"></span>
                     Connect Wallet
                 `;
             } else {
+                await setupProvider();
                 updateWalletButton(connectBtn, accounts[0]);
             }
         });
+        
+        // Listen for chain changes
+        window.ethereum.on('chainChanged', async (chainId) => {
+            appState.chainId = parseInt(chainId, 16);
+            if (appState.connected) {
+                await setupProvider();
+                showNotification(`Switched to ${REVERSO_CONFIG.chainNames[appState.chainId] || 'Unknown Network'}`, 'info');
+            }
+        });
+    }
+}
+
+// Setup ethers provider, signer, and contract
+async function setupProvider() {
+    if (typeof window.ethereum === 'undefined') return;
+    
+    try {
+        // Use ethers.js BrowserProvider for modern ethers v6
+        appState.provider = new ethers.BrowserProvider(window.ethereum);
+        appState.signer = await appState.provider.getSigner();
+        appState.address = await appState.signer.getAddress();
+        
+        const network = await appState.provider.getNetwork();
+        appState.chainId = Number(network.chainId);
+        
+        // Get contract address for current chain
+        const contractAddress = REVERSO_CONFIG.contracts[appState.chainId];
+        
+        if (contractAddress && contractAddress !== '0x...') {
+            appState.contract = new ethers.Contract(contractAddress, VAULT_ABI, appState.signer);
+            console.log(`✅ Connected to ReversoVault on ${REVERSO_CONFIG.chainNames[appState.chainId]}`);
+        } else {
+            appState.contract = null;
+            console.log(`⚠️ No contract deployed on ${REVERSO_CONFIG.chainNames[appState.chainId] || 'this network'}`);
+        }
+        
+        // Load user transfers
+        if (appState.contract) {
+            await loadUserTransfers();
+        }
+        
+    } catch (error) {
+        console.error('Failed to setup provider:', error);
     }
 }
 
@@ -637,23 +1033,19 @@ function updateWalletButton(btn, address) {
 }
 
 async function updateBalance(address) {
-    if (typeof window.ethereum === 'undefined') return;
+    if (!appState.provider) return;
     
     try {
-        const balance = await window.ethereum.request({
-            method: 'eth_getBalance',
-            params: [address, 'latest']
-        });
+        const balance = await appState.provider.getBalance(address);
+        appState.balance = ethers.formatEther(balance);
         
-        const balanceETH = parseInt(balance, 16) / 1e18;
-        appState.balance = balanceETH.toFixed(4);
-        
-        const balanceEl = document.getElementById('userBalance');
-        if (balanceEl) {
-            balanceEl.textContent = appState.balance;
+        // Update UI if element exists
+        const balanceDisplay = document.getElementById('walletBalance');
+        if (balanceDisplay) {
+            balanceDisplay.textContent = `${parseFloat(appState.balance).toFixed(4)} ETH`;
         }
-    } catch (e) {
-        console.error('Balance fetch error:', e);
+    } catch (error) {
+        console.error('Failed to get balance:', error);
     }
 }
 

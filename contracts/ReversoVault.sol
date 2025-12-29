@@ -94,16 +94,24 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
     /// @notice Timelock for admin changes (48 hours)
     uint256 public constant ADMIN_TIMELOCK = 48 hours;
 
-    /// @notice Circuit breaker: max withdrawals per hour before auto-pause
+    /// @notice Circuit breaker: max withdrawals per hour before alert
     uint256 public maxWithdrawalsPerHour = 100;
 
-    /// @notice Circuit breaker: max value per hour before auto-pause
+    /// @notice Circuit breaker: max value per hour before alert
     uint256 public maxValuePerHour = 1000 ether;
 
     /// @notice Withdrawal tracking for circuit breaker
     uint256 public withdrawalsThisHour;
     uint256 public valueWithdrawnThisHour;
     uint256 public currentHourStart;
+
+    /// @notice Per-address rate limiting (anti-DoS)
+    uint256 public constant MAX_CLAIMS_PER_ADDRESS_PER_HOUR = 10;
+    mapping(address => uint256) public addressClaimsThisHour;
+    mapping(address => uint256) public addressHourStart;
+
+    /// @notice Alert threshold for high volume (% of TVL)
+    uint256 public alertThresholdBps = 2000; // 20% of TVL triggers alert
 
     /// @notice Pending admin changes (timelock)
     struct PendingChange {
@@ -178,6 +186,8 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
     event AdminChangeQueued(bytes32 changeId, address newValue, uint256 executeAfter);
     event AdminChangeExecuted(bytes32 changeId, address newValue);
     event CircuitBreakerTriggered(uint256 withdrawals, uint256 value);
+    event HighVolumeAlert(address indexed triggeredBy, uint256 withdrawals, uint256 value, uint256 tvlPercent);
+    event AddressRateLimited(address indexed addr, uint256 claimsThisHour);
     event AbandonedFundsRescued(uint256 indexed transferId, address token, uint256 amount);
     event ManualRefundIssued(uint256 indexed transferId, address indexed to, uint256 amount, string reason);
     event InsurancePurchased(uint256 indexed transferId, uint256 premiumPaid);
@@ -204,6 +214,7 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
     error TimelockNotExpired();
     error ChangeNotQueued();
     error CircuitBreakerActive();
+    error AddressRateLimitedError(address addr, uint256 claims);
     error InsufficientFee();
 
     // ═══════════════════════════════════════════════════════════════
@@ -606,6 +617,9 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
      * @param _transferId ID of the transfer to claim
      */
     function claim(uint256 _transferId) external nonReentrant {
+        // Per-address rate limit (prevents single address DoS)
+        _checkAddressRateLimit();
+        
         Transfer storage transfer = transfers[_transferId];
         
         if (transfer.sender == address(0)) revert TransferNotFound();
@@ -613,6 +627,9 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
         if (transfer.status != TransferStatus.Pending) revert TransferNotPending();
         if (block.timestamp < transfer.unlockAt) revert TransferStillLocked();
         if (block.timestamp > transfer.expiresAt) revert TransferNotExpired();
+
+        // Circuit breaker check (alert only, no auto-pause)
+        _checkCircuitBreaker(transfer.amount);
 
         // Update status
         transfer.status = TransferStatus.Claimed;
@@ -727,8 +744,29 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
     // ═══════════════════════════════════════════════════════════════
 
     /**
-     * @notice Check and update circuit breaker
-     * @dev Auto-pauses if too many withdrawals in one hour
+     * @notice Check per-address rate limit
+     * @dev Prevents single address from spamming claims (DoS protection)
+     */
+    function _checkAddressRateLimit() internal {
+        // Reset counter if new hour for this address
+        if (block.timestamp >= addressHourStart[msg.sender] + 1 hours) {
+            addressClaimsThisHour[msg.sender] = 0;
+            addressHourStart[msg.sender] = block.timestamp;
+        }
+        
+        addressClaimsThisHour[msg.sender]++;
+        
+        // Block if address exceeds limit (only affects this address, not others)
+        if (addressClaimsThisHour[msg.sender] > MAX_CLAIMS_PER_ADDRESS_PER_HOUR) {
+            emit AddressRateLimited(msg.sender, addressClaimsThisHour[msg.sender]);
+            revert AddressRateLimitedError(msg.sender, addressClaimsThisHour[msg.sender]);
+        }
+    }
+
+    /**
+     * @notice Check and update circuit breaker (ALERT ONLY, no auto-pause)
+     * @dev Emits alert for Guardian to review - prevents DoS via flash loan
+     * @param _amount The withdrawal amount
      */
     function _checkCircuitBreaker(uint256 _amount) internal {
         // Reset counter if new hour
@@ -741,11 +779,18 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
         withdrawalsThisHour++;
         valueWithdrawnThisHour += _amount;
         
-        // Trigger circuit breaker if limits exceeded
+        // Calculate TVL percentage
+        uint256 ethTvl = totalValueLocked[address(0)];
+        uint256 tvlPercent = ethTvl > 0 ? (valueWithdrawnThisHour * 10000) / ethTvl : 0;
+        
+        // ALERT ONLY - Guardian decides whether to pause
+        // This prevents flash loan DoS attacks
         if (withdrawalsThisHour > maxWithdrawalsPerHour || 
-            valueWithdrawnThisHour > maxValuePerHour) {
-            _pause();
+            valueWithdrawnThisHour > maxValuePerHour ||
+            tvlPercent > alertThresholdBps) {
+            emit HighVolumeAlert(msg.sender, withdrawalsThisHour, valueWithdrawnThisHour, tvlPercent);
             emit CircuitBreakerTriggered(withdrawalsThisHour, valueWithdrawnThisHour);
+            // NO AUTO-PAUSE - Guardian reviews and decides
         }
     }
 
@@ -945,6 +990,15 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
     function setCircuitBreakerLimits(uint256 _maxWithdrawals, uint256 _maxValue) external onlyOwner {
         maxWithdrawalsPerHour = _maxWithdrawals;
         maxValuePerHour = _maxValue;
+    }
+
+    /**
+     * @notice Update alert threshold (% of TVL that triggers alert)
+     * @param _thresholdBps Threshold in basis points (e.g., 2000 = 20%)
+     */
+    function setAlertThreshold(uint256 _thresholdBps) external onlyOwner {
+        require(_thresholdBps <= 10000, "Cannot exceed 100%");
+        alertThresholdBps = _thresholdBps;
     }
 
     /**
