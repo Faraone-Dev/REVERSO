@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "REVERSO Protocol - Official Website",
   "type": "module",
-  "homepage": "https://reverso-protocol.netlify.app/",
+  "homepage": "https://teamreverso.netlify.app/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
