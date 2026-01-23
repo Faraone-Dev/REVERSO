@@ -1,0 +1,456 @@
+'npx hardhat clean' running (wd: C:\Users\Utente\Desktop\project\REVERSO)
+'npx hardhat clean --global' running (wd: C:\Users\Utente\Desktop\project\REVERSO)
+'npx hardhat compile --force' running (wd: C:\Users\Utente\Desktop\project\REVERSO)
+INFO:Detectors:
+Reentrancy in ReversoVault.batchRefundExpired(uint256[]) (contracts/ReversoVault.sol#725-756):
+	External calls:
+	- (success,None) = refundTo.call{gas: RECOVERY_GAS_LIMIT,value: transfer.amount}() (contracts/ReversoVault.sol#742)
+	- (success,None) = transfer.sender.call{value: transfer.amount}() (contracts/ReversoVault.sol#745)
+	State variables written after the call(s):
+	- totalValueLocked[transfer.token] -= transfer.amount (contracts/ReversoVault.sol#735)
+	ReversoVault.totalValueLocked (contracts/ReversoVault.sol#146) can be used in cross function reentrancies:
+	- ReversoVault.freezeTransfer(uint256,string) (contracts/ReversoVault.sol#822-843)
+	- ReversoVault.totalValueLocked (contracts/ReversoVault.sol#146)
+	- ReversoVault.withdrawExcessInsurance() (contracts/ReversoVault.sol#1089-1098)
+	- transfer.status = TransferStatus.Refunded (contracts/ReversoVault.sol#734)
+	ReversoVault.transfers (contracts/ReversoVault.sol#137) can be used in cross function reentrancies:
+	- ReversoVault.canCancel(uint256) (contracts/ReversoVault.sol#881-885)
+	- ReversoVault.canClaim(uint256) (contracts/ReversoVault.sol#892-897)
+	- ReversoVault.freezeTransfer(uint256,string) (contracts/ReversoVault.sol#822-843)
+	- ReversoVault.getTimeRemaining(uint256) (contracts/ReversoVault.sol#915-919)
+	- ReversoVault.getTimeToExpiry(uint256) (contracts/ReversoVault.sol#926-930)
+	- ReversoVault.getTransfer(uint256) (contracts/ReversoVault.sol#854-856)
+	- ReversoVault.getTransferStatusString(uint256) (contracts/ReversoVault.sol#937-948)
+	- ReversoVault.isExpired(uint256) (contracts/ReversoVault.sol#904-908)
+	- ReversoVault.transfers (contracts/ReversoVault.sol#137)
+Reentrancy in ReversoVault.rescueAbandoned(uint256) (contracts/ReversoVault.sol#1110-1151):
+	External calls:
+	- sent = _trySendFunds(t.recoveryAddress1,t.token,t.amount) (contracts/ReversoVault.sol#1122)
+		- (success,None) = _to.call{gas: 50000,value: _amount}() (contracts/ReversoVault.sol#966)
+		- result = IERC20(_token).transfer(_to,_amount) (contracts/ReversoVault.sol#969-973)
+	- sent = _trySendFunds(t.recoveryAddress2,t.token,t.amount) (contracts/ReversoVault.sol#1124)
+		- (success,None) = _to.call{gas: 50000,value: _amount}() (contracts/ReversoVault.sol#966)
+		- result = IERC20(_token).transfer(_to,_amount) (contracts/ReversoVault.sol#969-973)
+	- sent = _trySendFunds(t.sender,t.token,t.amount) (contracts/ReversoVault.sol#1127)
+		- (success,None) = _to.call{gas: 50000,value: _amount}() (contracts/ReversoVault.sol#966)
+		- result = IERC20(_token).transfer(_to,_amount) (contracts/ReversoVault.sol#969-973)
+	External calls sending eth:
+	- sent = _trySendFunds(t.recoveryAddress1,t.token,t.amount) (contracts/ReversoVault.sol#1122)
+		- (success,None) = _to.call{gas: 50000,value: _amount}() (contracts/ReversoVault.sol#966)
+	- sent = _trySendFunds(t.recoveryAddress2,t.token,t.amount) (contracts/ReversoVault.sol#1124)
+		- (success,None) = _to.call{gas: 50000,value: _amount}() (contracts/ReversoVault.sol#966)
+	- sent = _trySendFunds(t.sender,t.token,t.amount) (contracts/ReversoVault.sol#1127)
+		- (success,None) = _to.call{gas: 50000,value: _amount}() (contracts/ReversoVault.sol#966)
+	State variables written after the call(s):
+	- t.status = TransferStatus.Refunded (contracts/ReversoVault.sol#1132)
+	ReversoVault.transfers (contracts/ReversoVault.sol#137) can be used in cross function reentrancies:
+	- ReversoVault.canCancel(uint256) (contracts/ReversoVault.sol#881-885)
+	- ReversoVault.canClaim(uint256) (contracts/ReversoVault.sol#892-897)
+	- ReversoVault.freezeTransfer(uint256,string) (contracts/ReversoVault.sol#822-843)
+	- ReversoVault.getTimeRemaining(uint256) (contracts/ReversoVault.sol#915-919)
+	- ReversoVault.getTimeToExpiry(uint256) (contracts/ReversoVault.sol#926-930)
+	- ReversoVault.getTransfer(uint256) (contracts/ReversoVault.sol#854-856)
+	- ReversoVault.getTransferStatusString(uint256) (contracts/ReversoVault.sol#937-948)
+	- ReversoVault.isExpired(uint256) (contracts/ReversoVault.sol#904-908)
+	- ReversoVault.transfers (contracts/ReversoVault.sol#137)
+	- t.status = TransferStatus.Refunded (contracts/ReversoVault.sol#1140)
+	ReversoVault.transfers (contracts/ReversoVault.sol#137) can be used in cross function reentrancies:
+	- ReversoVault.canCancel(uint256) (contracts/ReversoVault.sol#881-885)
+	- ReversoVault.canClaim(uint256) (contracts/ReversoVault.sol#892-897)
+	- ReversoVault.freezeTransfer(uint256,string) (contracts/ReversoVault.sol#822-843)
+	- ReversoVault.getTimeRemaining(uint256) (contracts/ReversoVault.sol#915-919)
+	- ReversoVault.getTimeToExpiry(uint256) (contracts/ReversoVault.sol#926-930)
+	- ReversoVault.getTransfer(uint256) (contracts/ReversoVault.sol#854-856)
+	- ReversoVault.getTransferStatusString(uint256) (contracts/ReversoVault.sol#937-948)
+	- ReversoVault.isExpired(uint256) (contracts/ReversoVault.sol#904-908)
+	- ReversoVault.transfers (contracts/ReversoVault.sol#137)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+INFO:Detectors:
+ReversoVault.refundExpired(uint256) (contracts/ReversoVault.sol#663-718) ignores return value by IERC20(transfer.token).transfer(transfer.recoveryAddress1,transfer.amount) (contracts/ReversoVault.sol#705-714)
+ReversoVault.refundExpired(uint256) (contracts/ReversoVault.sol#663-718) ignores return value by IERC20(transfer.token).transfer(transfer.recoveryAddress2,transfer.amount) (contracts/ReversoVault.sol#708-713)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+INFO:Detectors:
+ReversoVault.canCancel(uint256) (contracts/ReversoVault.sol#881-885) uses a dangerous strict equality:
+	- transfer.status == TransferStatus.Pending && block.timestamp < transfer.unlockAt (contracts/ReversoVault.sol#883-884)
+ReversoVault.canClaim(uint256) (contracts/ReversoVault.sol#892-897) uses a dangerous strict equality:
+	- transfer.status == TransferStatus.Pending && block.timestamp >= transfer.unlockAt && block.timestamp <= transfer.expiresAt (contracts/ReversoVault.sol#894-896)
+ReversoVault.getTransferStatusString(uint256) (contracts/ReversoVault.sol#937-948) uses a dangerous strict equality:
+	- transfer.status == TransferStatus.Claimed (contracts/ReversoVault.sol#940)
+ReversoVault.getTransferStatusString(uint256) (contracts/ReversoVault.sol#937-948) uses a dangerous strict equality:
+	- transfer.status == TransferStatus.Cancelled (contracts/ReversoVault.sol#941)
+ReversoVault.getTransferStatusString(uint256) (contracts/ReversoVault.sol#937-948) uses a dangerous strict equality:
+	- transfer.status == TransferStatus.Refunded (contracts/ReversoVault.sol#942)
+ReversoVault.isExpired(uint256) (contracts/ReversoVault.sol#904-908) uses a dangerous strict equality:
+	- transfer.status == TransferStatus.Pending && block.timestamp > transfer.expiresAt (contracts/ReversoVault.sol#906-907)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+INFO:Detectors:
+ReversoVault.refundExpired(uint256).success (contracts/ReversoVault.sol#680) is a local variable never initialized
+ReversoVault.refundExpired(uint256).refundTo (contracts/ReversoVault.sol#679) is a local variable never initialized
+ReversoMonitor._checkAnomalies(address,uint256).reason (contracts/ReversoMonitor.sol#165) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+INFO:Detectors:
+ReversoVault.setGuardian(address,bool)._status (contracts/ReversoVault.sol#996) shadows:
+	- ReentrancyGuard._status (node_modules/@openzeppelin/contracts/utils/ReentrancyGuard.sol#40) (state variable)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+INFO:Detectors:
+ReversoMonitor.transferOwnership(address) (contracts/ReversoMonitor.sol#379-382) should emit an event for: 
+	- owner = _newOwner (contracts/ReversoMonitor.sol#381) 
+	- owner = _newOwner (contracts/ReversoMonitor.sol#381) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-access-control
+INFO:Detectors:
+ReversoVault.batchRefundExpired(uint256[]) (contracts/ReversoVault.sol#725-756) has external calls inside a loop: (success,None) = refundTo.call{gas: RECOVERY_GAS_LIMIT,value: transfer.amount}() (contracts/ReversoVault.sol#742)
+ReversoVault.batchRefundExpired(uint256[]) (contracts/ReversoVault.sol#725-756) has external calls inside a loop: (success,None) = transfer.sender.call{value: transfer.amount}() (contracts/ReversoVault.sol#745)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+INFO:Detectors:
+Reentrancy in EmergencyGuardian.emergencyPause(string) (contracts/EmergencyGuardian.sol#187-192):
+	External calls:
+	- vault.pause() (contracts/EmergencyGuardian.sol#188)
+	State variables written after the call(s):
+	- emergencyMode = true (contracts/EmergencyGuardian.sol#189)
+Reentrancy in EmergencyGuardian.executeAction(uint256) (contracts/EmergencyGuardian.sol#249-282):
+	External calls:
+	- vault.unpause() (contracts/EmergencyGuardian.sol#264)
+	State variables written after the call(s):
+	- emergencyMode = false (contracts/EmergencyGuardian.sol#265)
+Reentrancy in ReversoVault.rescueAbandoned(uint256) (contracts/ReversoVault.sol#1110-1151):
+	External calls:
+	- sent = _trySendFunds(t.recoveryAddress1,t.token,t.amount) (contracts/ReversoVault.sol#1122)
+		- (success,None) = _to.call{gas: 50000,value: _amount}() (contracts/ReversoVault.sol#966)
+		- result = IERC20(_token).transfer(_to,_amount) (contracts/ReversoVault.sol#969-973)
+	- sent = _trySendFunds(t.recoveryAddress2,t.token,t.amount) (contracts/ReversoVault.sol#1124)
+		- (success,None) = _to.call{gas: 50000,value: _amount}() (contracts/ReversoVault.sol#966)
+		- result = IERC20(_token).transfer(_to,_amount) (contracts/ReversoVault.sol#969-973)
+	- sent = _trySendFunds(t.sender,t.token,t.amount) (contracts/ReversoVault.sol#1127)
+		- (success,None) = _to.call{gas: 50000,value: _amount}() (contracts/ReversoVault.sol#966)
+		- result = IERC20(_token).transfer(_to,_amount) (contracts/ReversoVault.sol#969-973)
+	External calls sending eth:
+	- sent = _trySendFunds(t.recoveryAddress1,t.token,t.amount) (contracts/ReversoVault.sol#1122)
+		- (success,None) = _to.call{gas: 50000,value: _amount}() (contracts/ReversoVault.sol#966)
+	- sent = _trySendFunds(t.recoveryAddress2,t.token,t.amount) (contracts/ReversoVault.sol#1124)
+		- (success,None) = _to.call{gas: 50000,value: _amount}() (contracts/ReversoVault.sol#966)
+	- sent = _trySendFunds(t.sender,t.token,t.amount) (contracts/ReversoVault.sol#1127)
+		- (success,None) = _to.call{gas: 50000,value: _amount}() (contracts/ReversoVault.sol#966)
+	State variables written after the call(s):
+	- totalValueLocked[t.token] -= t.amount (contracts/ReversoVault.sol#1134)
+	- totalValueLocked[t.token] -= t.amount (contracts/ReversoVault.sol#1141)
+Reentrancy in ReversoVault.sendETHPremium(address,uint256,uint256,address,address,string) (contracts/ReversoVault.sol#520-593):
+	External calls:
+	- (feeSuccess,None) = treasury.call{value: baseFee}() (contracts/ReversoVault.sol#572)
+	State variables written after the call(s):
+	- insurancePool += insurancePremium (contracts/ReversoVault.sol#579)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+INFO:Detectors:
+Reentrancy in ReversoMonitor._triggerAutoPause(string) (contracts/ReversoMonitor.sol#223-230):
+	External calls:
+	- IEmergencyGuardian(guardian).emergencyPause(reason) (contracts/ReversoMonitor.sol#224-229)
+	Event emitted after the call(s):
+	- AlertTriggered(AlertLevel.CRITICAL,Auto-pause failed - manual intervention required) (contracts/ReversoMonitor.sol#228)
+	- AutoPauseTriggered(reason) (contracts/ReversoMonitor.sol#225)
+Reentrancy in EmergencyGuardian.emergencyPause(string) (contracts/EmergencyGuardian.sol#187-192):
+	External calls:
+	- vault.pause() (contracts/EmergencyGuardian.sol#188)
+	Event emitted after the call(s):
+	- EmergencyModeChanged(true) (contracts/EmergencyGuardian.sol#191)
+	- EmergencyPauseTriggered(msg.sender,reason) (contracts/EmergencyGuardian.sol#190)
+Reentrancy in ReversoVault.freezeTransfer(uint256,string) (contracts/ReversoVault.sol#822-843):
+	External calls:
+	- (success,None) = transfer.sender.call{value: transfer.amount}() (contracts/ReversoVault.sol#835)
+	Event emitted after the call(s):
+	- TransferCancelled(_transferId,transfer.sender,transfer.amount) (contracts/ReversoVault.sol#842)
+	- TransferFrozen(_transferId,msg.sender,_reason) (contracts/ReversoVault.sol#841)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+INFO:Detectors:
+EmergencyGuardian.executeAction(uint256) (contracts/EmergencyGuardian.sol#249-282) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < action.executeAfter (contracts/EmergencyGuardian.sol#255)
+EmergencyGuardian.getAction(uint256) (contracts/EmergencyGuardian.sol#337-361) uses timestamp for comparisons
+	Dangerous comparisons:
+	- (action.actionType,action.target,action.executeAfter,action.executed,action.cancelled,action.proposedBy,action.confirmedBy,! action.executed && ! action.cancelled && action.confirmedBy != address(0) && block.timestamp >= action.executeAfter) (contracts/EmergencyGuardian.sol#348-360)
+EmergencyGuardian.getTimelockRemaining(uint256) (contracts/EmergencyGuardian.sol#366-370) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= action.executeAfter (contracts/EmergencyGuardian.sol#368)
+ReversoMonitor.recordTransaction(address,uint256) (contracts/ReversoMonitor.sol#138-158) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= lastHourReset + 3600 (contracts/ReversoMonitor.sol#140)
+ReversoMonitor.healthCheck() (contracts/ReversoMonitor.sol#367-373) uses timestamp for comparisons
+	Dangerous comparisons:
+	- (vault != address(0),guardian != address(0),lastHourReset > 0) (contracts/ReversoMonitor.sol#368-372)
+ReversoVault.cancel(uint256) (contracts/ReversoVault.sol#600-621) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= transfer.unlockAt (contracts/ReversoVault.sol#606)
+ReversoVault.claim(uint256) (contracts/ReversoVault.sol#628-656) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < transfer.unlockAt (contracts/ReversoVault.sol#637)
+	- block.timestamp > transfer.expiresAt (contracts/ReversoVault.sol#638)
+ReversoVault.refundExpired(uint256) (contracts/ReversoVault.sol#663-718) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp <= transfer.expiresAt (contracts/ReversoVault.sol#668)
+ReversoVault.batchRefundExpired(uint256[]) (contracts/ReversoVault.sol#725-756) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp <= transfer.expiresAt (contracts/ReversoVault.sol#732)
+ReversoVault._checkAddressRateLimit() (contracts/ReversoVault.sol#766-780) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= addressHourStart[msg.sender] + 3600 (contracts/ReversoVault.sol#768)
+ReversoVault._checkCircuitBreaker(uint256) (contracts/ReversoVault.sol#787-811) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= currentHourStart + 3600 (contracts/ReversoVault.sol#789)
+ReversoVault.canCancel(uint256) (contracts/ReversoVault.sol#881-885) uses timestamp for comparisons
+	Dangerous comparisons:
+	- transfer.status == TransferStatus.Pending && block.timestamp < transfer.unlockAt (contracts/ReversoVault.sol#883-884)
+ReversoVault.canClaim(uint256) (contracts/ReversoVault.sol#892-897) uses timestamp for comparisons
+	Dangerous comparisons:
+	- transfer.status == TransferStatus.Pending && block.timestamp >= transfer.unlockAt && block.timestamp <= transfer.expiresAt (contracts/ReversoVault.sol#894-896)
+ReversoVault.isExpired(uint256) (contracts/ReversoVault.sol#904-908) uses timestamp for comparisons
+	Dangerous comparisons:
+	- transfer.status == TransferStatus.Pending && block.timestamp > transfer.expiresAt (contracts/ReversoVault.sol#906-907)
+ReversoVault.getTimeRemaining(uint256) (contracts/ReversoVault.sol#915-919) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= transfer.unlockAt (contracts/ReversoVault.sol#917)
+ReversoVault.getTimeToExpiry(uint256) (contracts/ReversoVault.sol#926-930) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= transfer.expiresAt (contracts/ReversoVault.sol#928)
+ReversoVault.getTransferStatusString(uint256) (contracts/ReversoVault.sol#937-948) uses timestamp for comparisons
+	Dangerous comparisons:
+	- transfer.status == TransferStatus.Claimed (contracts/ReversoVault.sol#940)
+	- transfer.status == TransferStatus.Cancelled (contracts/ReversoVault.sol#941)
+	- transfer.status == TransferStatus.Refunded (contracts/ReversoVault.sol#942)
+	- block.timestamp < transfer.unlockAt (contracts/ReversoVault.sol#945)
+	- block.timestamp > transfer.expiresAt (contracts/ReversoVault.sol#946)
+ReversoVault.payInsuranceClaim(uint256,address,uint256,string) (contracts/ReversoVault.sol#1056-1076) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(t.hasInsurance,Transfer did not have insurance) (contracts/ReversoVault.sol#1063)
+	- require(bool,string)(t.status == TransferStatus.Claimed,Transfer not claimed) (contracts/ReversoVault.sol#1064)
+ReversoVault.rescueAbandoned(uint256) (contracts/ReversoVault.sol#1110-1151) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp > t.expiresAt + RESCUE_PERIOD,Not abandoned yet - wait 90 days after expiry) (contracts/ReversoVault.sol#1116-1119)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+INFO:Detectors:
+SafeERC20._callOptionalReturn(IERC20,bytes) (node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#173-191) uses assembly
+	- INLINE ASM (node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#176-186)
+SafeERC20._callOptionalReturnBool(IERC20,bytes) (node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#201-211) uses assembly
+	- INLINE ASM (node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#205-209)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+4 different versions of Solidity are used:
+	- Version constraint ^0.8.20 is used by:
+		-^0.8.20 (node_modules/@openzeppelin/contracts/access/Ownable.sol#4)
+		-^0.8.20 (node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+		-^0.8.20 (node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#4)
+		-^0.8.20 (node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+		-^0.8.20 (node_modules/@openzeppelin/contracts/utils/Pausable.sol#4)
+		-^0.8.20 (node_modules/@openzeppelin/contracts/utils/ReentrancyGuard.sol#4)
+		-^0.8.20 (contracts/EmergencyGuardian.sol#2)
+		-^0.8.20 (contracts/ReversoMonitor.sol#2)
+		-^0.8.20 (contracts/ReversoVault.sol#2)
+		-^0.8.20 (contracts/interfaces/IReversoVault.sol#2)
+		-^0.8.20 (contracts/mocks/TestToken.sol#2)
+	- Version constraint >=0.6.2 is used by:
+		->=0.6.2 (node_modules/@openzeppelin/contracts/interfaces/IERC1363.sol#4)
+		->=0.6.2 (node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+	- Version constraint >=0.4.16 is used by:
+		->=0.4.16 (node_modules/@openzeppelin/contracts/interfaces/IERC165.sol#4)
+		->=0.4.16 (node_modules/@openzeppelin/contracts/interfaces/IERC20.sol#4)
+		->=0.4.16 (node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+		->=0.4.16 (node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol#4)
+	- Version constraint >=0.8.4 is used by:
+		->=0.8.4 (node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol#3)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+EmergencyGuardian.executeAction(uint256) (contracts/EmergencyGuardian.sol#249-282) has a high cyclomatic complexity (12).
+ReversoMonitor._checkAnomalies(address,uint256) (contracts/ReversoMonitor.sol#163-218) has a high cyclomatic complexity (12).
+ReversoVault.refundExpired(uint256) (contracts/ReversoVault.sol#663-718) has a high cyclomatic complexity (12).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+INFO:Detectors:
+Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.20 (node_modules/@openzeppelin/contracts/access/Ownable.sol#4)
+	- ^0.8.20 (node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+	- ^0.8.20 (node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#4)
+	- ^0.8.20 (node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+	- ^0.8.20 (node_modules/@openzeppelin/contracts/utils/Pausable.sol#4)
+	- ^0.8.20 (node_modules/@openzeppelin/contracts/utils/ReentrancyGuard.sol#4)
+	- ^0.8.20 (contracts/EmergencyGuardian.sol#2)
+	- ^0.8.20 (contracts/ReversoMonitor.sol#2)
+	- ^0.8.20 (contracts/ReversoVault.sol#2)
+	- ^0.8.20 (contracts/interfaces/IReversoVault.sol#2)
+	- ^0.8.20 (contracts/mocks/TestToken.sol#2)
+Version constraint >=0.6.2 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- MissingSideEffectsOnSelectorAccess
+	- AbiReencodingHeadOverflowWithStaticArrayCleanup
+	- DirtyBytesArrayToStorage
+	- NestedCalldataArrayAbiReencodingSizeValidation
+	- ABIDecodeTwoDimensionalArrayMemory
+	- KeccakCaching
+	- EmptyByteArrayCopy
+	- DynamicArrayCleanup
+	- MissingEscapingInFormatting
+	- ArraySliceDynamicallyEncodedBaseType
+	- ImplicitConstructorCallvalueCheck
+	- TupleAssignmentMultiStackSlotComponents
+	- MemoryArrayCreationOverflow.
+It is used by:
+	- >=0.6.2 (node_modules/@openzeppelin/contracts/interfaces/IERC1363.sol#4)
+	- >=0.6.2 (node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+Version constraint >=0.4.16 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- DirtyBytesArrayToStorage
+	- ABIDecodeTwoDimensionalArrayMemory
+	- KeccakCaching
+	- EmptyByteArrayCopy
+	- DynamicArrayCleanup
+	- ImplicitConstructorCallvalueCheck
+	- TupleAssignmentMultiStackSlotComponents
+	- MemoryArrayCreationOverflow
+	- privateCanBeOverridden
+	- SignedArrayStorageCopy
+	- ABIEncoderV2StorageArrayWithMultiSlotElement
+	- DynamicConstructorArgumentsClippedABIV2
+	- UninitializedFunctionPointerInConstructor_0.4.x
+	- IncorrectEventSignatureInLibraries_0.4.x
+	- ExpExponentCleanup
+	- NestedArrayFunctionCallDecoder
+	- ZeroFunctionSelector.
+It is used by:
+	- >=0.4.16 (node_modules/@openzeppelin/contracts/interfaces/IERC165.sol#4)
+	- >=0.4.16 (node_modules/@openzeppelin/contracts/interfaces/IERC20.sol#4)
+	- >=0.4.16 (node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+	- >=0.4.16 (node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol#4)
+Version constraint >=0.8.4 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess
+	- AbiReencodingHeadOverflowWithStaticArrayCleanup
+	- DirtyBytesArrayToStorage
+	- DataLocationChangeInInternalOverride
+	- NestedCalldataArrayAbiReencodingSizeValidation
+	- SignedImmutables.
+It is used by:
+	- >=0.8.4 (node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol#3)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Low level call in ReversoVault.sendETH(address,uint256,uint256,address,address,string) (contracts/ReversoVault.sol#291-358):
+	- (feeSuccess,None) = treasury.call{value: fee}() (contracts/ReversoVault.sol#343)
+Low level call in ReversoVault.sendETHSimple(address,string) (contracts/ReversoVault.sol#366-418):
+	- (feeSuccess,None) = treasury.call{value: fee}() (contracts/ReversoVault.sol#403)
+Low level call in ReversoVault.sendETHPremium(address,uint256,uint256,address,address,string) (contracts/ReversoVault.sol#520-593):
+	- (feeSuccess,None) = treasury.call{value: baseFee}() (contracts/ReversoVault.sol#572)
+Low level call in ReversoVault.cancel(uint256) (contracts/ReversoVault.sol#600-621):
+	- (success,None) = msg.sender.call{value: transfer.amount}() (contracts/ReversoVault.sol#614)
+Low level call in ReversoVault.claim(uint256) (contracts/ReversoVault.sol#628-656):
+	- (success,None) = msg.sender.call{value: transfer.amount}() (contracts/ReversoVault.sol#649)
+Low level call in ReversoVault.refundExpired(uint256) (contracts/ReversoVault.sol#663-718):
+	- (success,None) = transfer.recoveryAddress1.call{gas: RECOVERY_GAS_LIMIT,value: transfer.amount}() (contracts/ReversoVault.sol#685)
+	- (success,None) = transfer.recoveryAddress2.call{gas: RECOVERY_GAS_LIMIT,value: transfer.amount}() (contracts/ReversoVault.sol#692)
+	- (success,None) = transfer.sender.call{value: transfer.amount}() (contracts/ReversoVault.sol#698)
+Low level call in ReversoVault.batchRefundExpired(uint256[]) (contracts/ReversoVault.sol#725-756):
+	- (success,None) = refundTo.call{gas: RECOVERY_GAS_LIMIT,value: transfer.amount}() (contracts/ReversoVault.sol#742)
+	- (success,None) = transfer.sender.call{value: transfer.amount}() (contracts/ReversoVault.sol#745)
+Low level call in ReversoVault.freezeTransfer(uint256,string) (contracts/ReversoVault.sol#822-843):
+	- (success,None) = transfer.sender.call{value: transfer.amount}() (contracts/ReversoVault.sol#835)
+Low level call in ReversoVault._trySendFunds(address,address,uint256) (contracts/ReversoVault.sol#961-975):
+	- (success,None) = _to.call{gas: 50000,value: _amount}() (contracts/ReversoVault.sol#966)
+Low level call in ReversoVault.payInsuranceClaim(uint256,address,uint256,string) (contracts/ReversoVault.sol#1056-1076):
+	- (success,None) = address(_to).call{value: _amount}() (contracts/ReversoVault.sol#1072)
+Low level call in ReversoVault.withdrawExcessInsurance() (contracts/ReversoVault.sol#1089-1098):
+	- (success,None) = treasury.call{value: excess}() (contracts/ReversoVault.sol#1096)
+Low level call in ReversoVault.rescueAbandoned(uint256) (contracts/ReversoVault.sol#1110-1151):
+	- (success,None) = address(treasury).call{value: t.amount}() (contracts/ReversoVault.sol#1144)
+Low level call in ReversoVault.manualRefund(uint256,address,address,uint256,string) (contracts/ReversoVault.sol#1162-1182):
+	- (success,None) = address(_to).call{value: _amount}() (contracts/ReversoVault.sol#1174)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+INFO:Detectors:
+EmergencyGuardian (contracts/EmergencyGuardian.sol#39-400) should inherit from IEmergencyGuardian (contracts/ReversoMonitor.sol#28-30)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-inheritance
+INFO:Detectors:
+Parameter EmergencyGuardian.linkVault(address)._vault (contracts/EmergencyGuardian.sol#172) is not in mixedCase
+Parameter EmergencyGuardian.proposeAction(EmergencyGuardian.ActionType,address)._actionType (contracts/EmergencyGuardian.sol#210) is not in mixedCase
+Parameter EmergencyGuardian.proposeAction(EmergencyGuardian.ActionType,address)._target (contracts/EmergencyGuardian.sol#211) is not in mixedCase
+Parameter EmergencyGuardian.confirmAction(uint256)._actionId (contracts/EmergencyGuardian.sol#233) is not in mixedCase
+Parameter EmergencyGuardian.executeAction(uint256)._actionId (contracts/EmergencyGuardian.sol#249) is not in mixedCase
+Parameter EmergencyGuardian.cancelAction(uint256)._actionId (contracts/EmergencyGuardian.sol#288) is not in mixedCase
+Parameter EmergencyGuardian.addEmergencyGuardian(address)._guardian (contracts/EmergencyGuardian.sol#307) is not in mixedCase
+Parameter EmergencyGuardian.removeEmergencyGuardian(address)._guardian (contracts/EmergencyGuardian.sol#319) is not in mixedCase
+Parameter EmergencyGuardian.getAction(uint256)._actionId (contracts/EmergencyGuardian.sol#337) is not in mixedCase
+Parameter EmergencyGuardian.getTimelockRemaining(uint256)._actionId (contracts/EmergencyGuardian.sol#366) is not in mixedCase
+Parameter EmergencyGuardian.isGuardian(address)._addr (contracts/EmergencyGuardian.sol#394) is not in mixedCase
+Parameter ReversoMonitor.setGuardian(address)._guardian (contracts/ReversoMonitor.sol#124) is not in mixedCase
+Parameter ReversoMonitor.setMaxVolumePerHour(uint256)._maxVolume (contracts/ReversoMonitor.sol#267) is not in mixedCase
+Parameter ReversoMonitor.setMaxTransactionsPerHour(uint256)._maxTx (contracts/ReversoMonitor.sol#272) is not in mixedCase
+Parameter ReversoMonitor.setSuspiciousThreshold(uint256)._threshold (contracts/ReversoMonitor.sol#277) is not in mixedCase
+Parameter ReversoMonitor.setAuthorizedKeeper(address,bool)._keeper (contracts/ReversoMonitor.sol#282) is not in mixedCase
+Parameter ReversoMonitor.setAuthorizedKeeper(address,bool)._authorized (contracts/ReversoMonitor.sol#282) is not in mixedCase
+Parameter ReversoMonitor.addToWatchlist(address,string)._addr (contracts/ReversoMonitor.sol#291) is not in mixedCase
+Parameter ReversoMonitor.addToWatchlist(address,string)._reason (contracts/ReversoMonitor.sol#291) is not in mixedCase
+Parameter ReversoMonitor.removeFromWatchlist(address)._addr (contracts/ReversoMonitor.sol#299) is not in mixedCase
+Parameter ReversoMonitor.getAddressStats(address)._addr (contracts/ReversoMonitor.sol#340) is not in mixedCase
+Parameter ReversoMonitor.transferOwnership(address)._newOwner (contracts/ReversoMonitor.sol#379) is not in mixedCase
+Parameter ReversoVault.calculateFeeBps(uint256)._amount (contracts/ReversoVault.sol#248) is not in mixedCase
+Parameter ReversoVault.calculateFee(uint256)._amount (contracts/ReversoVault.sol#263) is not in mixedCase
+Parameter ReversoVault.calculateInsurancePremium(uint256)._amount (contracts/ReversoVault.sol#273) is not in mixedCase
+Parameter ReversoVault.sendETH(address,uint256,uint256,address,address,string)._recipient (contracts/ReversoVault.sol#292) is not in mixedCase
+Parameter ReversoVault.sendETH(address,uint256,uint256,address,address,string)._delay (contracts/ReversoVault.sol#293) is not in mixedCase
+Parameter ReversoVault.sendETH(address,uint256,uint256,address,address,string)._expiryPeriod (contracts/ReversoVault.sol#294) is not in mixedCase
+Parameter ReversoVault.sendETH(address,uint256,uint256,address,address,string)._recoveryAddress1 (contracts/ReversoVault.sol#295) is not in mixedCase
+Parameter ReversoVault.sendETH(address,uint256,uint256,address,address,string)._recoveryAddress2 (contracts/ReversoVault.sol#296) is not in mixedCase
+Parameter ReversoVault.sendETH(address,uint256,uint256,address,address,string)._memo (contracts/ReversoVault.sol#297) is not in mixedCase
+Parameter ReversoVault.sendETHSimple(address,string)._recipient (contracts/ReversoVault.sol#367) is not in mixedCase
+Parameter ReversoVault.sendETHSimple(address,string)._memo (contracts/ReversoVault.sol#368) is not in mixedCase
+Parameter ReversoVault.sendToken(address,address,uint256,uint256,uint256,address,address,string)._token (contracts/ReversoVault.sol#433) is not in mixedCase
+Parameter ReversoVault.sendToken(address,address,uint256,uint256,uint256,address,address,string)._recipient (contracts/ReversoVault.sol#434) is not in mixedCase
+Parameter ReversoVault.sendToken(address,address,uint256,uint256,uint256,address,address,string)._amount (contracts/ReversoVault.sol#435) is not in mixedCase
+Parameter ReversoVault.sendToken(address,address,uint256,uint256,uint256,address,address,string)._delay (contracts/ReversoVault.sol#436) is not in mixedCase
+Parameter ReversoVault.sendToken(address,address,uint256,uint256,uint256,address,address,string)._expiryPeriod (contracts/ReversoVault.sol#437) is not in mixedCase
+Parameter ReversoVault.sendToken(address,address,uint256,uint256,uint256,address,address,string)._recoveryAddress1 (contracts/ReversoVault.sol#438) is not in mixedCase
+Parameter ReversoVault.sendToken(address,address,uint256,uint256,uint256,address,address,string)._recoveryAddress2 (contracts/ReversoVault.sol#439) is not in mixedCase
+Parameter ReversoVault.sendToken(address,address,uint256,uint256,uint256,address,address,string)._memo (contracts/ReversoVault.sol#440) is not in mixedCase
+Parameter ReversoVault.sendETHPremium(address,uint256,uint256,address,address,string)._recipient (contracts/ReversoVault.sol#521) is not in mixedCase
+Parameter ReversoVault.sendETHPremium(address,uint256,uint256,address,address,string)._delay (contracts/ReversoVault.sol#522) is not in mixedCase
+Parameter ReversoVault.sendETHPremium(address,uint256,uint256,address,address,string)._expiryPeriod (contracts/ReversoVault.sol#523) is not in mixedCase
+Parameter ReversoVault.sendETHPremium(address,uint256,uint256,address,address,string)._recoveryAddress1 (contracts/ReversoVault.sol#524) is not in mixedCase
+Parameter ReversoVault.sendETHPremium(address,uint256,uint256,address,address,string)._recoveryAddress2 (contracts/ReversoVault.sol#525) is not in mixedCase
+Parameter ReversoVault.sendETHPremium(address,uint256,uint256,address,address,string)._memo (contracts/ReversoVault.sol#526) is not in mixedCase
+Parameter ReversoVault.cancel(uint256)._transferId (contracts/ReversoVault.sol#600) is not in mixedCase
+Parameter ReversoVault.claim(uint256)._transferId (contracts/ReversoVault.sol#628) is not in mixedCase
+Parameter ReversoVault.refundExpired(uint256)._transferId (contracts/ReversoVault.sol#663) is not in mixedCase
+Parameter ReversoVault.batchRefundExpired(uint256[])._transferIds (contracts/ReversoVault.sol#725) is not in mixedCase
+Parameter ReversoVault.freezeTransfer(uint256,string)._transferId (contracts/ReversoVault.sol#822) is not in mixedCase
+Parameter ReversoVault.freezeTransfer(uint256,string)._reason (contracts/ReversoVault.sol#822) is not in mixedCase
+Parameter ReversoVault.getTransfer(uint256)._transferId (contracts/ReversoVault.sol#854) is not in mixedCase
+Parameter ReversoVault.getSentTransfers(address)._user (contracts/ReversoVault.sol#863) is not in mixedCase
+Parameter ReversoVault.getReceivedTransfers(address)._user (contracts/ReversoVault.sol#872) is not in mixedCase
+Parameter ReversoVault.canCancel(uint256)._transferId (contracts/ReversoVault.sol#881) is not in mixedCase
+Parameter ReversoVault.canClaim(uint256)._transferId (contracts/ReversoVault.sol#892) is not in mixedCase
+Parameter ReversoVault.isExpired(uint256)._transferId (contracts/ReversoVault.sol#904) is not in mixedCase
+Parameter ReversoVault.getTimeRemaining(uint256)._transferId (contracts/ReversoVault.sol#915) is not in mixedCase
+Parameter ReversoVault.getTimeToExpiry(uint256)._transferId (contracts/ReversoVault.sol#926) is not in mixedCase
+Parameter ReversoVault.getTransferStatusString(uint256)._transferId (contracts/ReversoVault.sol#937) is not in mixedCase
+Parameter ReversoVault.setTreasury(address)._newTreasury (contracts/ReversoVault.sol#981) is not in mixedCase
+Parameter ReversoVault.setGuardian(address,bool)._guardian (contracts/ReversoVault.sol#996) is not in mixedCase
+Parameter ReversoVault.setGuardian(address,bool)._status (contracts/ReversoVault.sol#996) is not in mixedCase
+Parameter ReversoVault.setCircuitBreakerLimits(uint256,uint256)._maxWithdrawals (contracts/ReversoVault.sol#1006) is not in mixedCase
+Parameter ReversoVault.setCircuitBreakerLimits(uint256,uint256)._maxValue (contracts/ReversoVault.sol#1006) is not in mixedCase
+Parameter ReversoVault.setAlertThreshold(uint256)._thresholdBps (contracts/ReversoVault.sol#1016) is not in mixedCase
+Parameter ReversoVault.isGuardian(address)._addr (contracts/ReversoVault.sol#1040) is not in mixedCase
+Parameter ReversoVault.payInsuranceClaim(uint256,address,uint256,string)._originalTransferId (contracts/ReversoVault.sol#1057) is not in mixedCase
+Parameter ReversoVault.payInsuranceClaim(uint256,address,uint256,string)._to (contracts/ReversoVault.sol#1058) is not in mixedCase
+Parameter ReversoVault.payInsuranceClaim(uint256,address,uint256,string)._amount (contracts/ReversoVault.sol#1059) is not in mixedCase
+Parameter ReversoVault.payInsuranceClaim(uint256,address,uint256,string)._reason (contracts/ReversoVault.sol#1060) is not in mixedCase
+Parameter ReversoVault.rescueAbandoned(uint256)._transferId (contracts/ReversoVault.sol#1110) is not in mixedCase
+Parameter ReversoVault.manualRefund(uint256,address,address,uint256,string)._originalTransferId (contracts/ReversoVault.sol#1163) is not in mixedCase
+Parameter ReversoVault.manualRefund(uint256,address,address,uint256,string)._to (contracts/ReversoVault.sol#1164) is not in mixedCase
+Parameter ReversoVault.manualRefund(uint256,address,address,uint256,string)._token (contracts/ReversoVault.sol#1165) is not in mixedCase
+Parameter ReversoVault.manualRefund(uint256,address,address,uint256,string)._amount (contracts/ReversoVault.sol#1166) is not in mixedCase
+Parameter ReversoVault.manualRefund(uint256,address,address,uint256,string)._reason (contracts/ReversoVault.sol#1167) is not in mixedCase
+Function IReversoVault.MIN_DELAY() (contracts/interfaces/IReversoVault.sol#167) is not in mixedCase
+Function IReversoVault.MAX_DELAY() (contracts/interfaces/IReversoVault.sol#168) is not in mixedCase
+Function IReversoVault.DEFAULT_EXPIRY() (contracts/interfaces/IReversoVault.sol#169) is not in mixedCase
+Function IReversoVault.MIN_EXPIRY() (contracts/interfaces/IReversoVault.sol#170) is not in mixedCase
+Function IReversoVault.RESCUE_PERIOD() (contracts/interfaces/IReversoVault.sol#171) is not in mixedCase
+Function IReversoVault.MAX_BATCH_SIZE() (contracts/interfaces/IReversoVault.sol#172) is not in mixedCase
+Function IReversoVault.RECOVERY_GAS_LIMIT() (contracts/interfaces/IReversoVault.sol#173) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+INFO:Detectors:
+ReversoMonitor.vault (contracts/ReversoMonitor.sol#39) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+INFO:Slither:. analyzed (21 contracts with 100 detectors), 154 result(s) found

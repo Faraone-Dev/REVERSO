@@ -1,0 +1,35 @@
+'npx hardhat clean' running (wd: C:\Users\Utente\Desktop\project\REVERSO)
+'npx hardhat clean --global' running (wd: C:\Users\Utente\Desktop\project\REVERSO)
+'npx hardhat compile --force' running (wd: C:\Users\Utente\Desktop\project\REVERSO)
+
+Compiled with Builder
+Total number of contracts in source files: 7
+Number of contracts in dependencies: 13
+Number of contracts in tests       : 1
+Source lines of code (SLOC) in source files: 1246
+Source lines of code (SLOC) in dependencies: 396
+Source lines of code (SLOC) in tests       : 7
+Number of  assembly lines: 0
+Number of optimization issues: 1
+Number of informational issues: 110
+Number of low issues: 30
+Number of medium issues: 9
+Number of high issues: 4
+
+Use: Openzeppelin-Ownable, Openzeppelin-ERC20
+ERCs: ERC165, ERC1363, ERC20
+
++----------------------+-------------+------+------------+--------------+--------------------+
+| Name                 | # functions | ERCS | ERC20 info | Complex code | Features           |
++----------------------+-------------+------+------------+--------------+--------------------+
+| IReversoVault        | 8           |      |            | No           |                    |
+| EmergencyGuardian    | 28          |      |            | Yes          |                    |
+| IReversoVaultMonitor | 1           |      |            | No           |                    |
+| IEmergencyGuardian   | 1           |      |            | No           |                    |
+| ReversoMonitor       | 20          |      |            | Yes          |                    |
+| ReversoVault         | 58          |      |            | Yes          | Receive ETH        |
+|                      |             |      |            |              | Send ETH           |
+|                      |             |      |            |              | Tokens interaction |
+| IReversoVault        | 39          |      |            | No           | Receive ETH        |
++----------------------+-------------+------+------------+--------------+--------------------+
+. analyzed (21 contracts)
