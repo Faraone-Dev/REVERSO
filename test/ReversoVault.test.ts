@@ -647,6 +647,14 @@ describe("ReversoVault", function () {
       }
     });
 
+    it("Should reject batch larger than MAX_BATCH_SIZE", async function () {
+      // Create array with 51 IDs (exceeds MAX_BATCH_SIZE of 50)
+      const tooManyIds = Array.from({ length: 51 }, (_, i) => i + 1);
+      
+      await expect(reversoVault.connect(owner).batchRefundExpired(tooManyIds))
+        .to.be.revertedWithCustomError(reversoVault, "BatchTooLarge");
+    });
+
     it("Should skip non-expired transfers in batch", async function () {
       const delay = ONE_HOUR;
       const shortExpiryPeriod = ONE_DAY * 7;

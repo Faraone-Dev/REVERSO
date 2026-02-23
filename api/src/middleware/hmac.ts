@@ -4,7 +4,7 @@ import { AuthenticatedRequest } from './apiKey';
 
 // Replay protection store: apiKeyId -> Set of recent nonces
 const nonceStore: Map<string, Set<string>> = new Map();
-const MAX_DRIFT_MS = 2 * 60 * 1000; // 2 minutes
+const MAX_DRIFT_MS = 60 * 1000; // 60 seconds - tight window for security
 
 function safeJsonStringify(body: any): string {
   try {
