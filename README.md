@@ -3,11 +3,12 @@
 <div align="center">
 
 ![REVERSO](https://img.shields.io/badge/REVERSO-Protocol-blue?style=for-the-badge)
+![Mainnet](https://img.shields.io/badge/Ethereum_Mainnet-LIVE-brightgreen?style=for-the-badge&logo=ethereum)
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.20-363636?style=for-the-badge&logo=solidity)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
-![Chains](https://img.shields.io/badge/Chains-5%20live-orange?style=for-the-badge)
-![Tests](https://img.shields.io/badge/Tests-13%2C000%2B%20passing-brightgreen?style=for-the-badge)
-![Security](https://img.shields.io/badge/Security-3%20Layer-red?style=for-the-badge)
+![Verified](https://img.shields.io/badge/Etherscan-Verified-blue?style=for-the-badge)
+![Tests](https://img.shields.io/badge/Tests-95%20passing-brightgreen?style=for-the-badge)
+![Security](https://img.shields.io/badge/Security-3%20Contract%20Stack-red?style=for-the-badge)
 ![API](https://img.shields.io/badge/Enterprise%20API-Ready-blue?style=for-the-badge)
 
 **The First Reversible Transaction Protocol on Blockchain**
@@ -24,15 +25,15 @@
 
 | Component | Status | Details |
 |-----------|--------|---------|
-| 🔐 **ReversoVault** | ✅ Production-ready | 1,173 lines, core vault with 5-layer protection |
-| 🛡️ **EmergencyGuardian** | ✅ Production-ready | Multi-sig + 24h timelock + instant pause |
-| 👁️ **ReversoMonitor** | ✅ Production-ready | Anomaly detection + auto-pause + Chainlink ready |
-| 🧪 **Test Suite** | ✅ 13,000+ executions | 80 unit tests + 13,000 fuzz runs + Slither analysis |
+| 🔐 **ReversoVault** | ✅ **Deployed on Ethereum** | [Verified on Etherscan](https://etherscan.io/address/0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085#code) — 1,194 lines, 5-layer protection |
+| 🛡️ **EmergencyGuardian** | ✅ **Deployed on Ethereum** | [Verified on Etherscan](https://etherscan.io/address/0x7F1CB513B7A582A11f3057F104D561E9A9126A7d#code) — Multi-sig + 24h timelock |
+| 👁️ **ReversoMonitor** | ✅ **Deployed on Ethereum** | [Verified on Etherscan](https://etherscan.io/address/0x152935935E86ab06ce75b6871c500f6Eb57f5332#code) — Anomaly detection + auto-pause |
+| 🧪 **Test Suite** | ✅ 95 tests passing | Unit tests + integration tests + security tests |
 | 🔌 **Enterprise API** | ✅ Hardened | HMAC auth, rate limiting, fraud prevention |
 | 🌐 **Website** | ✅ [Live](https://reverso-protocol.netlify.app/) | Interactive demo with wallet connection |
-| ⛓️ **Multi-chain** | ✅ Configured | ETH, Arbitrum, Base, Optimism, Polygon |
+| ⛓️ **Multi-chain** | ✅ Ethereum Live | Arbitrum, Base, Optimism, Polygon configured |
 
-**Built in 2 weeks. Production-ready. Enterprise-grade security.**
+> **All 3 contracts deployed, wired, and source-code verified on Ethereum Mainnet.**
 
 ---
 
@@ -135,11 +136,11 @@ Example: 10 ETH with insurance
 
 | Chain | Status | Chain ID |
 |-------|--------|----------|
-| Ethereum | ✅ Live | 1 |
-| Arbitrum | ✅ Live | 42161 |
-| Base | ✅ Live | 8453 |
-| Optimism | ✅ Live | 10 |
-| Polygon | ✅ Live | 137 |
+| Ethereum | ✅ **Deployed & Verified** | 1 |
+| Arbitrum | 🔧 Configured | 42161 |
+| Base | 🔧 Configured | 8453 |
+| Optimism | 🔧 Configured | 10 |
+| Polygon | 🔧 Configured | 137 |
 | Avalanche | 🔜 Planned | 43114 |
 | BSC | 🔜 Planned | 56 |
 | zkSync Era | 🔜 Planned | 324 |
@@ -183,18 +184,28 @@ npx hardhat run scripts/deploy-multichain.ts
 
 ---
 
-## 🚀 Ethereum Mainnet Deployment
+## 🚀 Ethereum Mainnet — Live Deployment
+
+> **Full protocol stack deployed and verified on Ethereum Mainnet.** All contracts are source-code verified on Etherscan, ownership has been transferred to the EmergencyGuardian multi-sig, and the monitoring layer is active.
 
 ### 📍 Production Contracts
 
-| Contract | Address | Network | Status |
-|----------|---------|---------|--------|
-| **ReversoVault** | `0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085` | Ethereum | ✅ [Etherscan](https://etherscan.io/address/0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085) |
-| **EmergencyGuardian** | `0x7F1CB513B7A582A11f3057F104D561E9A9126A7d` | Ethereum | ✅ [Etherscan](https://etherscan.io/address/0x7F1CB513B7A582A11f3057F104D561E9A9126A7d) |
-| **ReversoMonitor** | `0x152935935E86ab06ce75b6871c500f6Eb57f5332` | Ethereum | ✅ [Etherscan](https://etherscan.io/address/0x152935935E86ab06ce75b6871c500f6Eb57f5332) |
-| **Treasury** | `0x8d6102f3DFcB83Bcf77C46d24cDD2A8F416C9242` | Ethereum | ✅ Receives fees |
+| Contract | Address | Etherscan | Role |
+|----------|---------|-----------|------|
+| 🔐 **ReversoVault** | `0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085` | [✅ Verified Source](https://etherscan.io/address/0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085#code) | Core vault — reversible transfers, fees, insurance |
+| 🛡️ **EmergencyGuardian** | `0x7F1CB513B7A582A11f3057F104D561E9A9126A7d` | [✅ Verified Source](https://etherscan.io/address/0x7F1CB513B7A582A11f3057F104D561E9A9126A7d#code) | Multi-sig owner of Vault — timelock + emergency pause |
+| 👁️ **ReversoMonitor** | `0x152935935E86ab06ce75b6871c500f6Eb57f5332` | [✅ Verified Source](https://etherscan.io/address/0x152935935E86ab06ce75b6871c500f6Eb57f5332#code) | Anomaly detection — auto-pause on critical alerts |
+| 💰 **Treasury** | `0x8d6102f3DFcB83Bcf77C46d24cDD2A8F416C9242` | [View](https://etherscan.io/address/0x8d6102f3DFcB83Bcf77C46d24cDD2A8F416C9242) | Receives protocol fees |
 
-**Deploy Date:** July 11, 2025 &nbsp;|&nbsp; **Block:** 24520800
+### 🔗 Contract Wiring (On-Chain)
+
+```
+ReversoVault.owner()     → EmergencyGuardian  ✅
+EmergencyGuardian.vault  → ReversoVault        ✅
+ReversoMonitor.guardian  → EmergencyGuardian  ✅
+```
+
+**Deploy Block:** [24520800](https://etherscan.io/block/24520800) · **Compiler:** Solidity 0.8.20 · **Optimizer:** 200 runs
 
 ---
 
@@ -746,9 +757,10 @@ Layer 5: RESCUE
 - Professional security audit planned before mainnet launch
 - Bug bounty program will launch alongside mainnet
 
-**Timeline:**
-- Q1 2026: Internal review + testnet
-- Q2 2026: Professional audit + mainnet
+**Current Status:**
+- ✅ Ethereum Mainnet deployed (all 3 contracts verified on Etherscan)
+- ✅ Internal review + testnet completed (Sepolia)
+- 🔜 Professional audit planned (OpenZeppelin / Trail of Bits)
 
 ### Bug Bounty
 
@@ -845,9 +857,10 @@ REVERSO/
 - [x] Basic documentation
 
 ### Phase 2: Launch (Q1 2026)
+- [x] Ethereum Mainnet deployment (3 contracts verified)
+- [x] Testnet validation (Sepolia — 7/7 live tests passed)
 - [ ] Security audits (OpenZeppelin, Trail of Bits)
-- [ ] Testnet launch on all chains
-- [ ] Mainnet launch (Ethereum, Arbitrum, Base)
+- [ ] L2 deployments (Arbitrum, Base, Optimism)
 - [ ] SDK release (JavaScript/TypeScript)
 - [ ] Mobile app (React Native)
 
@@ -972,45 +985,48 @@ REVERSO/
 
 ---
 
-## 🔧 Deployment Order
+## 🔧 Deployment
+
+### One-Command Full Stack Deploy
+
+```bash
+# Deploy all 3 contracts + wire them together automatically
+npx hardhat run scripts/deploy-stack.ts --network ethereum
+```
+
+This script performs all 6 steps automatically:
+1. Deploy **ReversoVault** (treasury address from `.env`)
+2. Deploy **EmergencyGuardian** (secondary guardian from `.env`)
+3. `vault.transferOwnership(guardian)` — guardian becomes vault owner
+4. `guardian.linkVault(vault)` — guardian knows which vault to protect
+5. Deploy **ReversoMonitor** (vault address as constructor arg)
+6. `monitor.setGuardian(guardian)` — monitor can trigger guardian alerts
+
+### Manual Step-by-Step
 
 ```bash
 # 1. Deploy ReversoVault
-npx hardhat run scripts/deploy.ts --network arbitrum
-# → Save VAULT_ADDRESS
+npx hardhat run scripts/deploy.ts --network ethereum
 
-# 2. Deploy EmergencyGuardian (pass secondary wallet address)
-# In Remix: constructor(secondaryWalletAddress)
-# → Save GUARDIAN_ADDRESS
-
-# 3. Transfer Vault ownership to Guardian
-vault.transferOwnership(GUARDIAN_ADDRESS)
-
-# 4. Link Vault to Guardian
-guardian.linkVault(VAULT_ADDRESS)
-
-# 5. (Optional) Deploy ReversoMonitor
-# In Remix: constructor(VAULT_ADDRESS)
-# → Save MONITOR_ADDRESS
-
-# 6. (Optional) Link Monitor to Guardian
-monitor.setGuardian(GUARDIAN_ADDRESS)
-guardian.addEmergencyGuardian(MONITOR_ADDRESS)
+# 2-6. The deploy-stack.ts script handles wiring automatically.
+#      See scripts/deploy-stack.ts for the full deployment flow.
 ```
 
 ---
 
 <div align="center">
 
-### 🛡️ Built with security-first approach using OpenZeppelin contracts
+### 🛡️ Deployed on Ethereum Mainnet — All Contracts Verified on Etherscan
 
-**13,000+ tests passing** • **3 security contracts** • **5 chains supported** • **Enterprise REST API**
+**[ReversoVault](https://etherscan.io/address/0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085#code)** · **[EmergencyGuardian](https://etherscan.io/address/0x7F1CB513B7A582A11f3057F104D561E9A9126A7d#code)** · **[ReversoMonitor](https://etherscan.io/address/0x152935935E86ab06ce75b6871c500f6Eb57f5332#code)**
+
+95 tests passing · 3-contract security stack · Enterprise REST API
 
 ---
 
 **Built with ❤️ for a safer crypto future**
 
-*REVERSO Protocol - Because everyone deserves a second chance*
+*REVERSO Protocol — Because everyone deserves a second chance.*
 
 **© 2024-2026 REVERSO Protocol**
 
