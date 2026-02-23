@@ -44,6 +44,7 @@ const config: HardhatUserConfig = {
       url: process.env.ETHEREUM_RPC || "https://ethereum-rpc.publicnode.com",
       chainId: 1,
       accounts: [PRIVATE_KEY],
+      gasPrice: 200000000, // 0.2 gwei — forza gas price basso
     },
     arbitrum: {
       url: process.env.ARBITRUM_RPC || "https://arb1.arbitrum.io/rpc",

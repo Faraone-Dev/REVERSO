@@ -183,6 +183,21 @@ npx hardhat run scripts/deploy-multichain.ts
 
 ---
 
+## 🚀 Ethereum Mainnet Deployment
+
+### 📍 Production Contracts
+
+| Contract | Address | Network | Status |
+|----------|---------|---------|--------|
+| **ReversoVault** | `0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085` | Ethereum | ✅ [Etherscan](https://etherscan.io/address/0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085) |
+| **EmergencyGuardian** | `0x7F1CB513B7A582A11f3057F104D561E9A9126A7d` | Ethereum | ✅ [Etherscan](https://etherscan.io/address/0x7F1CB513B7A582A11f3057F104D561E9A9126A7d) |
+| **ReversoMonitor** | `0x152935935E86ab06ce75b6871c500f6Eb57f5332` | Ethereum | ✅ [Etherscan](https://etherscan.io/address/0x152935935E86ab06ce75b6871c500f6Eb57f5332) |
+| **Treasury** | `0x8d6102f3DFcB83Bcf77C46d24cDD2A8F416C9242` | Ethereum | ✅ Receives fees |
+
+**Deploy Date:** July 11, 2025 &nbsp;|&nbsp; **Block:** 24520800
+
+---
+
 ## 🌐 Testnet Deployment & Live Tests (Sepolia)
 
 ### 📍 Deployed Contracts
