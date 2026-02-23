@@ -8,7 +8,7 @@
 // ==========================================
 const REVERSO_CONFIG = {
     contracts: {
-        1: '0x...', // Ethereum Mainnet (TBD)
+        1: '0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085', // Ethereum Mainnet
         11155111: '0x3D1f9d1cEaf350885A91f7Fb05c99a78Bc544ED8', // Sepolia Testnet
         42161: '0x...', // Arbitrum (TBD)
         8453: '0x...', // Base (TBD)
