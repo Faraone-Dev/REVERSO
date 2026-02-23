@@ -169,6 +169,8 @@ interface IReversoVault {
     function DEFAULT_EXPIRY() external view returns (uint256);
     function MIN_EXPIRY() external view returns (uint256);
     function RESCUE_PERIOD() external view returns (uint256);
+    function MAX_BATCH_SIZE() external view returns (uint256);
+    function RECOVERY_GAS_LIMIT() external view returns (uint256);
     function maxWithdrawalsPerHour() external view returns (uint256);
     function maxValuePerHour() external view returns (uint256);
 }

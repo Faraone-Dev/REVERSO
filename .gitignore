@@ -9,6 +9,8 @@ cache/
 typechain-types/
 coverage/
 coverage.json
+out/
+broadcast/
 
 # Environment
 .env
@@ -37,6 +39,10 @@ yarn-error.log*
 # Misc
 *.tgz
 .tsbuildinfo
+
+# Local analysis / one-off outputs
+sky-audit.md
+learned_patterns.json
 
 # Local Netlify folder
 .netlify

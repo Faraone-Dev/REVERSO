@@ -91,6 +91,12 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
     /// @dev 90 days after expiry = ~4 months total from creation
     uint256 public constant RESCUE_PERIOD = 90 days;
 
+    /// @notice Maximum transfers per batch operation (DoS prevention)
+    uint256 public constant MAX_BATCH_SIZE = 50;
+
+    /// @notice Gas limit for recovery address calls (prevents malicious contracts)
+    uint256 public constant RECOVERY_GAS_LIMIT = 50000;
+
     /// @notice Timelock for admin changes (48 hours)
     uint256 public constant ADMIN_TIMELOCK = 48 hours;
 
@@ -192,6 +198,8 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
     event ManualRefundIssued(uint256 indexed transferId, address indexed to, uint256 amount, string reason);
     event InsurancePurchased(uint256 indexed transferId, uint256 premiumPaid);
     event InsuranceClaimPaid(uint256 indexed transferId, address indexed to, uint256 amount, string reason);
+    event CircuitBreakerLimitsUpdated(uint256 maxWithdrawals, uint256 maxValue);
+    event AlertThresholdUpdated(uint256 oldThreshold, uint256 newThreshold);
 
     // ═══════════════════════════════════════════════════════════════
     //                            ERRORS
@@ -216,6 +224,7 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
     error CircuitBreakerActive();
     error AddressRateLimitedError(address addr, uint256 claims);
     error InsufficientFee();
+    error BatchTooLarge();
 
     // ═══════════════════════════════════════════════════════════════
     //                          CONSTRUCTOR
@@ -442,13 +451,15 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
         address recovery1 = _recoveryAddress1 == address(0) ? msg.sender : _recoveryAddress1;
         address recovery2 = _recoveryAddress2 == address(0) ? msg.sender : _recoveryAddress2;
 
-        // Calculate PROGRESSIVE fee based on amount
-        // Note: For tokens, fee tier is based on token amount, not USD value
-        uint256 fee = (_amount * calculateFeeBps(_amount)) / 10000;
-        uint256 amountAfterFee = _amount - fee;
-
-        // Transfer tokens to vault
+        // Transfer tokens to vault - check actual received for fee-on-transfer tokens
+        uint256 balanceBefore = IERC20(_token).balanceOf(address(this));
         IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
+        uint256 actualReceived = IERC20(_token).balanceOf(address(this)) - balanceBefore;
+
+        // Calculate PROGRESSIVE fee based on ACTUAL received amount
+        // Note: For tokens, fee tier is based on token amount, not USD value
+        uint256 fee = (actualReceived * calculateFeeBps(actualReceived)) / 10000;
+        uint256 amountAfterFee = actualReceived - fee;
 
         // Send fee to treasury
         if (fee > 0) {
@@ -666,21 +677,26 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
         totalValueLocked[transfer.token] -= transfer.amount;
 
         // TRIPLE FALLBACK: Try recovery1 → recovery2 → sender
+        // Uses gas limit on recovery addresses to prevent malicious contract DoS
         address refundTo;
         bool success;
         
         if (transfer.token == address(0)) {
-            // Try recovery address 1
-            (success, ) = transfer.recoveryAddress1.call{value: transfer.amount}("");
+            // Try recovery address 1 (with gas limit for safety)
+            if (transfer.recoveryAddress1 != address(0)) {
+                (success, ) = transfer.recoveryAddress1.call{value: transfer.amount, gas: RECOVERY_GAS_LIMIT}("");
+            }
             if (success) {
                 refundTo = transfer.recoveryAddress1;
             } else {
-                // Try recovery address 2
-                (success, ) = transfer.recoveryAddress2.call{value: transfer.amount}("");
+                // Try recovery address 2 (with gas limit for safety)
+                if (transfer.recoveryAddress2 != address(0)) {
+                    (success, ) = transfer.recoveryAddress2.call{value: transfer.amount, gas: RECOVERY_GAS_LIMIT}("");
+                }
                 if (success) {
                     refundTo = transfer.recoveryAddress2;
                 } else {
-                    // Final fallback: original sender
+                    // Final fallback: original sender (no gas limit - must succeed)
                     (success, ) = transfer.sender.call{value: transfer.amount}("");
                     require(success, "All refund attempts failed");
                     refundTo = transfer.sender;
@@ -705,10 +721,11 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
 
     /**
      * @notice Batch refund multiple expired transfers
-     * @dev Useful for cleaning up old transfers
-     * @param _transferIds Array of transfer IDs to refund
+     * @dev Useful for cleaning up old transfers. Limited to MAX_BATCH_SIZE to prevent DoS.
+     * @param _transferIds Array of transfer IDs to refund (max 50)
      */
     function batchRefundExpired(uint256[] calldata _transferIds) external nonReentrant {
+        if (_transferIds.length > MAX_BATCH_SIZE) revert BatchTooLarge();
         for (uint256 i = 0; i < _transferIds.length; i++) {
             Transfer storage transfer = transfers[_transferIds[i]];
             
@@ -720,10 +737,11 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
             totalValueLocked[transfer.token] -= transfer.amount;
 
             // Use recovery1 as primary for batch (gas optimization)
-            address refundTo = transfer.recoveryAddress1;
+            // Apply gas limit to prevent malicious contract DoS
+            address refundTo = transfer.recoveryAddress1 != address(0) ? transfer.recoveryAddress1 : transfer.sender;
             
             if (transfer.token == address(0)) {
-                (bool success, ) = refundTo.call{value: transfer.amount}("");
+                (bool success, ) = refundTo.call{value: transfer.amount, gas: RECOVERY_GAS_LIMIT}("");
                 if (!success) {
                     // Fallback to sender
                     (success, ) = transfer.sender.call{value: transfer.amount}("");
@@ -803,7 +821,7 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
      * @param _transferId ID of the transfer to freeze
      * @param _reason Reason for freezing
      */
-    function freezeTransfer(uint256 _transferId, string calldata _reason) external {
+    function freezeTransfer(uint256 _transferId, string calldata _reason) external nonReentrant {
         if (!guardians[msg.sender]) revert NotGuardian();
         
         Transfer storage transfer = transfers[_transferId];
@@ -990,6 +1008,7 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
     function setCircuitBreakerLimits(uint256 _maxWithdrawals, uint256 _maxValue) external onlyOwner {
         maxWithdrawalsPerHour = _maxWithdrawals;
         maxValuePerHour = _maxValue;
+        emit CircuitBreakerLimitsUpdated(_maxWithdrawals, _maxValue);
     }
 
     /**
@@ -998,7 +1017,9 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
      */
     function setAlertThreshold(uint256 _thresholdBps) external onlyOwner {
         require(_thresholdBps <= 10000, "Cannot exceed 100%");
+        uint256 oldThreshold = alertThresholdBps;
         alertThresholdBps = _thresholdBps;
+        emit AlertThresholdUpdated(oldThreshold, _thresholdBps);
     }
 
     /**
@@ -1067,7 +1088,7 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
      * @notice Withdraw excess from insurance pool to treasury
      * @dev Only withdraw if pool is overfunded (keep 20% of TVL as reserve)
      */
-    function withdrawExcessInsurance() external onlyOwner {
+    function withdrawExcessInsurance() external onlyOwner nonReentrant {
         uint256 requiredReserve = (totalValueLocked[address(0)] * 20) / 100; // 20% reserve
         require(insurancePool > requiredReserve, "Pool at minimum reserve");
         
@@ -1088,7 +1109,7 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
      *      Funds go to treasury so we can manually refund users who contact us
      * @param _transferId The transfer ID to rescue
      */
-    function rescueAbandoned(uint256 _transferId) external nonReentrant {
+    function rescueAbandoned(uint256 _transferId) external onlyOwner nonReentrant {
         Transfer storage t = transfers[_transferId];
         if (t.sender == address(0)) revert TransferNotFound();
         if (t.status != TransferStatus.Pending) revert TransferNotPending();
