@@ -27,10 +27,14 @@ async function main() {
   console.log(`🏦 Treasury: ${treasuryAddress}`);
   console.log(`🧰 Secondary guardian: ${secondaryGuardian}\n`);
 
+  // Nonce management — some RPCs (Base) have caching issues
+  let nonce = await ethers.provider.getTransactionCount(deployer.address, "pending");
+  console.log(`🔢 Starting nonce: ${nonce}\n`);
+
   // 1) Deploy Vault
   console.log("📦 Deploying ReversoVault...");
   const ReversoVault = await ethers.getContractFactory("ReversoVault");
-  const vault = await ReversoVault.deploy(treasuryAddress);
+  const vault = await ReversoVault.deploy(treasuryAddress, { nonce: nonce++ });
   await vault.waitForDeployment();
   const vaultAddress = await vault.getAddress();
   console.log(`✅ ReversoVault: ${vaultAddress}`);
@@ -38,34 +42,34 @@ async function main() {
   // 2) Deploy Guardian
   console.log("\n📦 Deploying EmergencyGuardian...");
   const EmergencyGuardian = await ethers.getContractFactory("EmergencyGuardian");
-  const guardian = await EmergencyGuardian.deploy(secondaryGuardian);
+  const guardian = await EmergencyGuardian.deploy(secondaryGuardian, { nonce: nonce++ });
   await guardian.waitForDeployment();
   const guardianAddress = await guardian.getAddress();
   console.log(`✅ EmergencyGuardian: ${guardianAddress}`);
 
   // 3) Transfer Vault ownership to Guardian
   console.log("\n🔐 Transferring ReversoVault ownership to EmergencyGuardian...");
-  const transferTx = await vault.transferOwnership(guardianAddress);
+  const transferTx = await vault.transferOwnership(guardianAddress, { nonce: nonce++ });
   await transferTx.wait();
   console.log(`✅ Ownership transferred (tx=${transferTx.hash})`);
 
   // 4) Link Vault in Guardian
   console.log("\n🔗 Linking vault in EmergencyGuardian...");
-  const linkTx = await guardian.linkVault(vaultAddress);
+  const linkTx = await guardian.linkVault(vaultAddress, { nonce: nonce++ });
   await linkTx.wait();
   console.log(`✅ Vault linked (tx=${linkTx.hash})`);
 
   // 5) Deploy Monitor
   console.log("\n📦 Deploying ReversoMonitor...");
   const ReversoMonitor = await ethers.getContractFactory("ReversoMonitor");
-  const monitor = await ReversoMonitor.deploy(vaultAddress);
+  const monitor = await ReversoMonitor.deploy(vaultAddress, { nonce: nonce++ });
   await monitor.waitForDeployment();
   const monitorAddress = await monitor.getAddress();
   console.log(`✅ ReversoMonitor: ${monitorAddress}`);
 
   // 6) Link Guardian in Monitor
   console.log("\n👁️  Setting guardian in ReversoMonitor...");
-  const setGuardianTx = await monitor.setGuardian(guardianAddress);
+  const setGuardianTx = await monitor.setGuardian(guardianAddress, { nonce: nonce++ });
   await setGuardianTx.wait();
   console.log(`✅ Monitor guardian set (tx=${setGuardianTx.hash})`);
 

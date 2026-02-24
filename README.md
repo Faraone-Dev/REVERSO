@@ -3,7 +3,7 @@
 <div align="center">
 
 ![REVERSO](https://img.shields.io/badge/REVERSO-Protocol-blue?style=for-the-badge)
-![Mainnet](https://img.shields.io/badge/Ethereum_Mainnet-LIVE-brightgreen?style=for-the-badge&logo=ethereum)
+![Mainnet](https://img.shields.io/badge/5_Chains-LIVE-brightgreen?style=for-the-badge&logo=ethereum)
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.20-363636?style=for-the-badge&logo=solidity)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![Verified](https://img.shields.io/badge/Etherscan-Verified-blue?style=for-the-badge)
@@ -31,9 +31,9 @@
 | 🧪 **Test Suite** | ✅ 95 tests passing | Unit tests + integration tests + security tests |
 | 🔌 **Enterprise API** | ✅ Hardened | HMAC auth, rate limiting, fraud prevention |
 | 🌐 **Website** | ✅ [Live](https://reverso-protocol.netlify.app/) | Interactive demo with wallet connection |
-| ⛓️ **Multi-chain** | ✅ Ethereum Live | Arbitrum, Base, Optimism, Polygon configured |
+| ⛓️ **Multi-chain** | ✅ **5 Chains Live** | Ethereum, BSC, Base, Arbitrum, Polygon |
 
-> **All 3 contracts deployed, wired, and source-code verified on Ethereum Mainnet.**
+> **All 3 contracts deployed and wired on 5 chains: Ethereum, BSC, Base, Arbitrum, Polygon.**
 
 ---
 
@@ -95,7 +95,7 @@ REVERSO introduces **time-locked reversible transfers** with up to **5 layers of
 | **Triple Recovery** | 2 backup addresses + original sender |
 | **Auto-Refund** | Unclaimed transfers return automatically |
 | **Multi-Token** | ETH + any ERC-20 token |
-| **Multi-Chain** | 5 EVM chains live (ETH, Arbitrum, Base, Optimism, Polygon) |
+| **Multi-Chain** | ETH, BSC, Base, Arbitrum, Polygon — all live |
 
 ### 💰 Progressive Fee Structure
 
@@ -137,12 +137,12 @@ Example: 10 ETH with insurance
 | Chain | Status | Chain ID |
 |-------|--------|----------|
 | Ethereum | ✅ **Deployed & Verified** | 1 |
-| Arbitrum | 🔧 Configured | 42161 |
-| Base | 🔧 Configured | 8453 |
+| BSC | ✅ **Deployed** | 56 |
+| Base | ✅ **Deployed** | 8453 |
+| Arbitrum | ✅ **Deployed** | 42161 |
+| Polygon | ✅ **Deployed** | 137 |
 | Optimism | 🔧 Configured | 10 |
-| Polygon | 🔧 Configured | 137 |
 | Avalanche | 🔜 Planned | 43114 |
-| BSC | 🔜 Planned | 56 |
 | zkSync Era | 🔜 Planned | 324 |
 | Linea | 🔜 Planned | 59144 |
 | Scroll | 🔜 Planned | 534352 |
@@ -195,7 +195,45 @@ npx hardhat run scripts/deploy-multichain.ts
 | 🔐 **ReversoVault** | `0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085` | [✅ Verified Source](https://etherscan.io/address/0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085#code) | Core vault — reversible transfers, fees, insurance |
 | 🛡️ **EmergencyGuardian** | `0x7F1CB513B7A582A11f3057F104D561E9A9126A7d` | [✅ Verified Source](https://etherscan.io/address/0x7F1CB513B7A582A11f3057F104D561E9A9126A7d#code) | Multi-sig owner of Vault — timelock + emergency pause |
 | 👁️ **ReversoMonitor** | `0x152935935E86ab06ce75b6871c500f6Eb57f5332` | [✅ Verified Source](https://etherscan.io/address/0x152935935E86ab06ce75b6871c500f6Eb57f5332#code) | Anomaly detection — auto-pause on critical alerts |
-| 💰 **Treasury** | `0x8d6102f3DFcB83Bcf77C46d24cDD2A8F416C9242` | [View](https://etherscan.io/address/0x8d6102f3DFcB83Bcf77C46d24cDD2A8F416C9242) | Receives protocol fees |
+| 💰 **Treasury** | `0x211a8C2d4f5924d4378162b48bC759a3E3e57dD8` | [View](https://etherscan.io/address/0x211a8C2d4f5924d4378162b48bC759a3E3e57dD8) | Receives protocol fees |
+
+---
+
+## 🌐 Multi-Chain Deployments
+
+> **Deployed February 24, 2026.** Same 3-contract stack on every chain.
+
+### BSC (BNB Smart Chain)
+
+| Contract | Address |
+|----------|---------|
+| 🔐 **ReversoVault** | `0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322` |
+| 🛡️ **EmergencyGuardian** | `0x7C962938cce85737eB25147667279117f40dE23a` |
+| 👁️ **ReversoMonitor** | `0x1610DA56f09555a388AB8a095F180A2069FDA4F1` |
+
+### Base
+
+| Contract | Address |
+|----------|---------|
+| 🔐 **ReversoVault** | `0x1610DA56f09555a388AB8a095F180A2069FDA4F1` |
+| 🛡️ **EmergencyGuardian** | `0x038516Fd2EbF5AC7c6E4A85858CDaF908F4650C9` |
+| 👁️ **ReversoMonitor** | `0xA8854b60A3c150BA0b4FB7418eD7b15d577a129b` |
+
+### Arbitrum
+
+| Contract | Address |
+|----------|---------|
+| 🔐 **ReversoVault** | `0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322` |
+| 🛡️ **EmergencyGuardian** | `0x7C962938cce85737eB25147667279117f40dE23a` |
+| 👁️ **ReversoMonitor** | `0x1610DA56f09555a388AB8a095F180A2069FDA4F1` |
+
+### Polygon
+
+| Contract | Address |
+|----------|---------|
+| 🔐 **ReversoVault** | `0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322` |
+| 🛡️ **EmergencyGuardian** | `0x7C962938cce85737eB25147667279117f40dE23a` |
+| 👁️ **ReversoMonitor** | `0x1610DA56f09555a388AB8a095F180A2069FDA4F1` |
 
 ### 🔗 Contract Wiring (On-Chain)
 
