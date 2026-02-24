@@ -119,16 +119,16 @@ Example: 10 ETH with insurance
 ├── Base fee: 0.05 ETH (0.5%)
 ├── Insurance: 0.02 ETH (0.2%)
 ├── Total cost: 0.07 ETH (0.7%)
-└── Protection: copertura soggetta a policy/pool ✓
+└── Protection: coverage subject to policy/pool ✓
 ```
 
 ### 🏢 Enterprise Payroll & Stipends (API)
 
-- Paga stipendi, compensi e rimborsi con una finestra di lock: se c’è un errore puoi annullare prima che il destinatario incassi.
-- HMAC/nonce/timestamp sull’API: le chiavi restano lato server, niente bearer in frontend.
-- Recovery addresses e auto-refund: se il dipendente non reclama, i fondi tornano automaticamente.
-- Opzione insurance (+0.2%) per coprire frodi/claim errati.
-- Rate limiting e audit-first rollout: mainnet gated finché l’audit esterno non è completato.
+- Pay salaries, stipends and reimbursements with a lock window — cancel before the recipient claims if something goes wrong.
+- HMAC/nonce/timestamp API auth: keys stay server-side, no bearer tokens in frontend.
+- Recovery addresses and auto-refund: if the recipient doesn't claim, funds return automatically.
+- Optional insurance (+0.2%) to cover fraud or erroneous claims.
+- Rate limiting and audit-first rollout: mainnet gated until external audit is completed.
 
 ---
 
