@@ -3,7 +3,7 @@
 <div align="center">
 
 ![REVERSO](https://img.shields.io/badge/REVERSO-Protocol-blue?style=for-the-badge)
-![Mainnet](https://img.shields.io/badge/5_Chains-LIVE-brightgreen?style=for-the-badge&logo=ethereum)
+![Mainnet](https://img.shields.io/badge/7_Chains-LIVE-brightgreen?style=for-the-badge&logo=ethereum)
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.20-363636?style=for-the-badge&logo=solidity)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![Verified](https://img.shields.io/badge/Etherscan-Verified-blue?style=for-the-badge)
@@ -31,9 +31,9 @@
 | 🧪 **Test Suite** | ✅ 95 tests passing | Unit tests + integration tests + security tests |
 | 🔌 **Enterprise API** | ✅ Hardened | HMAC auth, rate limiting, fraud prevention |
 | 🌐 **Website** | ✅ [Live](https://reverso-protocol.netlify.app/) | Interactive demo with wallet connection |
-| ⛓️ **Multi-chain** | ✅ **5 Chains Live** | Ethereum, BSC, Base, Arbitrum, Polygon |
+| ⛓️ **Multi-chain** | ✅ **7 Chains Live** | Ethereum, BSC, Base, Arbitrum, Polygon, Optimism, Avalanche |
 
-> **All 3 contracts deployed and wired on 5 chains: Ethereum, BSC, Base, Arbitrum, Polygon.**
+> **All 3 contracts deployed and wired on 7 chains: Ethereum, BSC, Base, Arbitrum, Polygon, Optimism, Avalanche.**
 
 ---
 
@@ -95,7 +95,7 @@ REVERSO introduces **time-locked reversible transfers** with up to **5 layers of
 | **Triple Recovery** | 2 backup addresses + original sender |
 | **Auto-Refund** | Unclaimed transfers return automatically |
 | **Multi-Token** | ETH + any ERC-20 token |
-| **Multi-Chain** | ETH, BSC, Base, Arbitrum, Polygon — all live |
+| **Multi-Chain** | ETH, BSC, Base, Arbitrum, Polygon, Optimism, Avalanche — all live |
 
 ### 💰 Progressive Fee Structure
 
@@ -234,6 +234,18 @@ npx hardhat run scripts/deploy-multichain.ts
 | 🔐 **ReversoVault** | `0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322` |
 | 🛡️ **EmergencyGuardian** | `0x7C962938cce85737eB25147667279117f40dE23a` |
 | 👁️ **ReversoMonitor** | `0x1610DA56f09555a388AB8a095F180A2069FDA4F1` |
+
+### Optimism
+
+| Contract | Address |
+|----------|---------|
+| 🔐 **ReversoVault** | `0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322` |
+
+### Avalanche (C-Chain)
+
+| Contract | Address |
+|----------|---------|
+| 🔐 **ReversoVault** | `0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322` |
 
 ### 🔗 Contract Wiring (On-Chain)
 
@@ -898,7 +910,7 @@ REVERSO/
 - [x] Ethereum Mainnet deployment (3 contracts verified)
 - [x] Testnet validation (Sepolia — 7/7 live tests passed)
 - [ ] Security audits (OpenZeppelin, Trail of Bits)
-- [ ] L2 deployments (Arbitrum, Base, Optimism)
+- [x] Multi-chain deployments (BSC, Base, Arbitrum, Polygon, Optimism, Avalanche)
 - [ ] SDK release (JavaScript/TypeScript)
 - [ ] Mobile app (React Native)
 

@@ -71,6 +71,22 @@ const CHAIN_TARGETS: ChainTarget[] = [
     amountHuman: "5 POL",
     rpcUrl: process.env.POLYGON_RPC || "https://polygon-bor-rpc.publicnode.com",
   },
+  {
+    name: "Optimism",
+    chainId: 10,
+    symbol: "ETH",
+    amountWei: ethers.parseEther("0.0005").toString(),  // 0.0005 ETH (~$0.91)
+    amountHuman: "0.0005 ETH",
+    rpcUrl: process.env.OPTIMISM_RPC || "https://mainnet.optimism.io",
+  },
+  {
+    name: "Avalanche",
+    chainId: 43114,
+    symbol: "AVAX",
+    amountWei: ethers.parseEther("0.05").toString(),    // 0.05 AVAX (~$1.00)
+    amountHuman: "0.05 AVAX",
+    rpcUrl: process.env.AVALANCHE_RPC || "https://api.avax.network/ext/bc/C/rpc",
+  },
 ];
 
 // ═══════════════════════════════════════════════════════════════
