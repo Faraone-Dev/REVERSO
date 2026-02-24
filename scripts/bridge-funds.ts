@@ -181,7 +181,7 @@ async function main() {
   const privateKey = process.env.PRIVATE_KEY;
   if (!privateKey) throw new Error("PRIVATE_KEY non trovata in .env");
 
-  const ethRpc = process.env.ETHEREUM_RPC || "https://eth-mainnet.g.alchemy.com/v2/ZBUzT4ZR4-2EL3DaHs4P4";
+  const ethRpc = process.env.ETHEREUM_RPC || "https://ethereum-rpc.publicnode.com";
   const ethProvider = new ethers.JsonRpcProvider(ethRpc);
   const wallet = new ethers.Wallet(privateKey, ethProvider);
 
