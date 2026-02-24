@@ -11,6 +11,11 @@ coverage/
 coverage.json
 out/
 broadcast/
+website/dist/
+
+# Foundry libraries (installed via forge install)
+**/lib/forge-std/
+**/lib/openzeppelin-contracts/
 
 # Environment
 .env
