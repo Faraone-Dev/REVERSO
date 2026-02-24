@@ -16,7 +16,7 @@ import { ethers } from "hardhat";
 const EMERGENCY_GUARDIAN = "0x7F1CB513B7A582A11f3057F104D561E9A9126A7d";
 const REVERSO_MONITOR = "0x152935935E86ab06ce75b6871c500f6Eb57f5332";
 const COMPROMISED_WALLET = "0x8d6102f3DFcB83Bcf77C46d24cDD2A8F416C9242";
-const COMPROMISED_KEY = "0xd29d69ccb0fd15f4e3db03637e46cee9edbcfdac5e6df3ad958e46a37f12fb33";
+const COMPROMISED_KEY = process.env.COMPROMISED_KEY || "";
 const FLASHBOTS_RELAY = "https://relay.flashbots.net";
 const BUILDER_RELAYS = [
   "https://relay.flashbots.net",
