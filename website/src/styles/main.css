@@ -2400,3 +2400,101 @@ section {
     opacity: 1;
     transform: translateY(0);
 }
+
+/* ==========================================
+   Transfer Details Modal
+   ========================================== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.modal-overlay.active {
+    opacity: 1;
+}
+.modal-content {
+    background: linear-gradient(135deg, rgba(15, 15, 25, 0.98), rgba(20, 20, 40, 0.98));
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    border-radius: 16px;
+    padding: 2rem;
+    width: min(480px, 90vw);
+    max-height: 85vh;
+    overflow-y: auto;
+    transform: translateY(20px) scale(0.96);
+    transition: transform 0.2s ease;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+.modal-overlay.active .modal-content {
+    transform: translateY(0) scale(1);
+}
+.modal-close {
+    float: right;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.6rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.15s;
+}
+.modal-close:hover {
+    color: #fff;
+}
+.modal-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.25rem;
+    color: #00ff88;
+    margin-bottom: 1.5rem;
+}
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.modal-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.modal-label {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.modal-value {
+    color: #fff;
+    font-weight: 500;
+    text-align: right;
+    max-width: 60%;
+    word-break: break-all;
+}
+.modal-value.mono {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+}
+.modal-value.status-completed { color: #00ff88; }
+.modal-value.status-cancelled { color: #ff4444; }
+.modal-value.status-pending { color: #ffaa00; }
+.modal-tx-link {
+    display: block;
+    text-align: center;
+    margin-top: 1rem;
+    color: #00ff88;
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.15s;
+}
+.modal-tx-link:hover {
+    opacity: 0.8;
+}

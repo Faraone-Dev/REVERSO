@@ -133,6 +133,25 @@ const VAULT_ABI = [
 // Production mode - set to false for real transactions
 const DEMO_MODE = false;
 
+// ==========================================
+// Live ETH Price (CoinGecko)
+// ==========================================
+let cachedEthPrice = 2500; // fallback
+async function fetchEthPrice() {
+    try {
+        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+        const data = await res.json();
+        if (data?.ethereum?.usd) {
+            cachedEthPrice = data.ethereum.usd;
+        }
+    } catch {
+        // keep cached/fallback price
+    }
+}
+// Fetch on load, then every 60s
+fetchEthPrice();
+setInterval(fetchEthPrice, 60_000);
+
 // App State
 let appState = {
     connected: false,
@@ -244,8 +263,8 @@ function updateFees() {
     const amountInput = document.getElementById('sendAmount');
     const amount = parseFloat(amountInput?.value) || 0;
     
-    // Determine fee tier based on USD value (simplified - assume 1 ETH = $2500)
-    const ethPrice = 2500;
+    // Determine fee tier based on USD value (live price from CoinGecko)
+    const ethPrice = cachedEthPrice;
     const usdValue = amount * ethPrice;
     
     let feePercent;
@@ -685,25 +704,77 @@ window.viewTransfer = function(transferId) {
     const expiryDate = transfer.expiresAt ? new Date(transfer.expiresAt).toLocaleString() : 'N/A';
     const createdDate = transfer.createdAt ? new Date(transfer.createdAt).toLocaleString() : 'N/A';
     
-    const details = `
-Transfer Details
-================
-ID: ${transfer.id}
-Amount: ${transfer.amount} ${transfer.token}
-Status: ${transfer.status}
-
-From: ${transfer.sender || 'You'}
-To: ${transfer.recipient}
-
-Created: ${createdDate}
-Unlocks: ${unlockDate}
-Expires: ${expiryDate}
-
-${transfer.txHash ? 'TX: ' + transfer.txHash : ''}
-    `.trim();
-    
-    alert(details);
+    // Show transfer details in a modal
+    showTransferModal(transfer, createdDate, unlockDate, expiryDate);
 };
+
+// ==========================================
+// Transfer Details Modal
+// ==========================================
+function showTransferModal(transfer, createdDate, unlockDate, expiryDate) {
+    // Remove existing modal if any
+    document.getElementById('transferModal')?.remove();
+
+    const explorerUrl = transfer.txHash ? getExplorerUrl(appState.chainId, transfer.txHash) : '';
+    const statusClass = transfer.status === 'completed' ? 'status-completed' : transfer.status === 'cancelled' ? 'status-cancelled' : 'status-pending';
+
+    const modal = document.createElement('div');
+    modal.id = 'transferModal';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close modal">&times;</button>
+            <h3 class="modal-title">Transfer Details</h3>
+            <div class="modal-body">
+                <div class="modal-row">
+                    <span class="modal-label">ID</span>
+                    <span class="modal-value">${transfer.id}</span>
+                </div>
+                <div class="modal-row">
+                    <span class="modal-label">Amount</span>
+                    <span class="modal-value">${transfer.amount} ${transfer.token}</span>
+                </div>
+                <div class="modal-row">
+                    <span class="modal-label">Status</span>
+                    <span class="modal-value ${statusClass}">${transfer.status}</span>
+                </div>
+                <div class="modal-row">
+                    <span class="modal-label">From</span>
+                    <span class="modal-value mono">${transfer.sender || 'You'}</span>
+                </div>
+                <div class="modal-row">
+                    <span class="modal-label">To</span>
+                    <span class="modal-value mono">${transfer.recipient}</span>
+                </div>
+                <div class="modal-row">
+                    <span class="modal-label">Created</span>
+                    <span class="modal-value">${createdDate}</span>
+                </div>
+                <div class="modal-row">
+                    <span class="modal-label">Unlocks</span>
+                    <span class="modal-value">${unlockDate}</span>
+                </div>
+                <div class="modal-row">
+                    <span class="modal-label">Expires</span>
+                    <span class="modal-value">${expiryDate}</span>
+                </div>
+                ${explorerUrl ? `<a href="${explorerUrl}" target="_blank" rel="noopener noreferrer" class="modal-tx-link">View on Explorer &rarr;</a>` : ''}
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    // Trigger animation
+    requestAnimationFrame(() => modal.classList.add('active'));
+
+    // Close handlers
+    const close = () => { modal.classList.remove('active'); setTimeout(() => modal.remove(), 200); };
+    modal.querySelector('.modal-close').addEventListener('click', close);
+    modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+    document.addEventListener('keydown', function handler(e) {
+        if (e.key === 'Escape') { close(); document.removeEventListener('keydown', handler); }
+    });
+}
 
 function formatDelay(seconds) {
     if (seconds < 3600) return `${Math.round(seconds / 60)} minutes`;

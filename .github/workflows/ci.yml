@@ -1,0 +1,63 @@
+# ═══════════════════════════════════════════
+#  REVERSO Protocol — CI Pipeline
+# ═══════════════════════════════════════════
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  # ── Compile Solidity & run Hardhat tests ──
+  contracts:
+    name: Contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+      - run: npx hardhat compile
+      - run: npx hardhat test
+
+  # ── Build the website ──
+  website:
+    name: Website
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+
+      - run: npm ci
+        working-directory: website
+      - run: npm run build
+        working-directory: website
+
+  # ── Type-check the API ──
+  api:
+    name: API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+
+      - run: npm ci
+        working-directory: api
+      - run: npx tsc --noEmit
+        working-directory: api

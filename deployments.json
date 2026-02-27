@@ -49,6 +49,8 @@
     "chain": "optimism",
     "chainId": "10",
     "vault": "0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322",
+    "guardian": "0x7C962938cce85737eB25147667279117f40dE23a",
+    "monitor": "0x1610DA56f09555a388AB8a095F180A2069FDA4F1",
     "deployer": "0x211a8C2d4f5924d4378162b48bC759a3E3e57dD8",
     "timestamp": "2026-02-24T22:20:43.584Z",
     "txHash": "0x761f4d783131eca2a8fcd1d88ca04c84a01fffbcfbd575161223887e68988501"
@@ -57,6 +59,8 @@
     "chain": "avalanche",
     "chainId": "43114",
     "vault": "0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322",
+    "guardian": "0x7C962938cce85737eB25147667279117f40dE23a",
+    "monitor": "0x1610DA56f09555a388AB8a095F180A2069FDA4F1",
     "deployer": "0x211a8C2d4f5924d4378162b48bC759a3E3e57dD8",
     "timestamp": "2026-02-24T22:21:07.676Z",
     "txHash": "0x3d2be22668beb753c9fa9304a9357e5ae7ef45546cb4c37a93b9b674fca6c18e"

@@ -482,4 +482,114 @@ describe("ReversoMonitor", function () {
             expect(monitoring).to.be.true;
         });
     });
+
+    describe("Perform Upkeep", function () {
+        it("Should reset alert level via performUpkeep", async function () {
+            const { monitor, owner, user1 } = await loadFixture(deployMonitorFixture);
+
+            // Trigger a HIGH alert
+            await monitor.connect(owner).recordTransaction(user1.address, ethers.parseEther("55"));
+            expect((await monitor.getStatus()).alertLevel).to.be.gte(3); // HIGH=3
+
+            // Perform upkeep resets alert
+            await monitor.connect(owner).performUpkeep("0x");
+            expect((await monitor.getStatus()).alertLevel).to.equal(0); // NONE=0
+        });
+
+        it("Should allow authorized keeper to performUpkeep", async function () {
+            const { monitor, owner, keeper, user1 } = await loadFixture(deployMonitorFixture);
+            await monitor.connect(owner).setAuthorizedKeeper(keeper.address, true);
+
+            await monitor.connect(owner).recordTransaction(user1.address, ethers.parseEther("55"));
+            await monitor.connect(keeper).performUpkeep("0x");
+            expect((await monitor.getStatus()).alertLevel).to.equal(0);
+        });
+    });
+
+    describe("Reset Alert Level", function () {
+        it("Should allow owner to reset alert level", async function () {
+            const { monitor, owner, user1 } = await loadFixture(deployMonitorFixture);
+            await monitor.connect(owner).recordTransaction(user1.address, ethers.parseEther("55"));
+
+            await monitor.connect(owner).resetAlertLevel();
+            expect((await monitor.getStatus()).alertLevel).to.equal(0);
+        });
+
+        it("Should revert if non-owner tries to reset", async function () {
+            const { monitor, user1 } = await loadFixture(deployMonitorFixture);
+            await expect(monitor.connect(user1).resetAlertLevel()).to.be.revertedWithCustomError(monitor, "NotAuthorized");
+        });
+    });
+
+    describe("Suspicious Threshold", function () {
+        it("Should update suspicious threshold", async function () {
+            const { monitor, owner } = await loadFixture(deployMonitorFixture);
+
+            await expect(monitor.connect(owner).setSuspiciousThreshold(ethers.parseEther("100")))
+                .to.emit(monitor, "ThresholdUpdated");
+            expect(await monitor.suspiciousAmountThreshold()).to.equal(ethers.parseEther("100"));
+        });
+
+        it("Should not trigger alert below new threshold", async function () {
+            const { monitor, owner, user1 } = await loadFixture(deployMonitorFixture);
+            await monitor.connect(owner).setSuspiciousThreshold(ethers.parseEther("100"));
+
+            // 55 ETH was HIGH before, now should be NONE
+            await monitor.connect(owner).recordTransaction(user1.address, ethers.parseEther("55"));
+            expect((await monitor.getStatus()).alertLevel).to.equal(0);
+        });
+    });
+
+    describe("Ownership Transfer", function () {
+        it("Should transfer ownership", async function () {
+            const { monitor, owner, user1 } = await loadFixture(deployMonitorFixture);
+            await monitor.connect(owner).transferOwnership(user1.address);
+            expect(await monitor.owner()).to.equal(user1.address);
+        });
+
+        it("Should revert transfer to zero address", async function () {
+            const { monitor, owner } = await loadFixture(deployMonitorFixture);
+            await expect(monitor.connect(owner).transferOwnership(ethers.ZeroAddress))
+                .to.be.revertedWithCustomError(monitor, "InvalidAddress");
+        });
+
+        it("Should revert if non-owner transfers", async function () {
+            const { monitor, user1, user2 } = await loadFixture(deployMonitorFixture);
+            await expect(monitor.connect(user1).transferOwnership(user2.address))
+                .to.be.revertedWithCustomError(monitor, "NotAuthorized");
+        });
+    });
+
+    describe("Access Control", function () {
+        it("Should revert recordTransaction from unauthorized caller", async function () {
+            const { monitor, user1, user2 } = await loadFixture(deployMonitorFixture);
+            await expect(monitor.connect(user1).recordTransaction(user2.address, ethers.parseEther("1")))
+                .to.be.revertedWithCustomError(monitor, "NotAuthorized");
+        });
+
+        it("Should revert performUpkeep from unauthorized caller", async function () {
+            const { monitor, user1 } = await loadFixture(deployMonitorFixture);
+            await expect(monitor.connect(user1).performUpkeep("0x"))
+                .to.be.revertedWithCustomError(monitor, "NotAuthorized");
+        });
+
+        it("Should revert setMaxVolumePerHour from non-owner", async function () {
+            const { monitor, user1 } = await loadFixture(deployMonitorFixture);
+            await expect(monitor.connect(user1).setMaxVolumePerHour(ethers.parseEther("500")))
+                .to.be.revertedWithCustomError(monitor, "NotAuthorized");
+        });
+
+        it("Should revert addToWatchlist from non-owner", async function () {
+            const { monitor, user1, user2 } = await loadFixture(deployMonitorFixture);
+            await expect(monitor.connect(user1).addToWatchlist(user2.address, "test"))
+                .to.be.revertedWithCustomError(monitor, "NotAuthorized");
+        });
+
+        it("Should revoke keeper authorization", async function () {
+            const { monitor, owner, keeper } = await loadFixture(deployMonitorFixture);
+            await monitor.connect(owner).setAuthorizedKeeper(keeper.address, true);
+            await monitor.connect(owner).setAuthorizedKeeper(keeper.address, false);
+            expect(await monitor.authorizedKeepers(keeper.address)).to.be.false;
+        });
+    });
 });
