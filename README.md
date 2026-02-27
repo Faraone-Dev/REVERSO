@@ -15,7 +15,7 @@
 
 *"Never lose crypto to mistakes again."*
 
-### 🌐 [Live Demo](https://reverso-protocol.netlify.app/) • 📄 [Documentation](#-quick-start) • 🔌 [API](#-enterprise-api) • 🛡️ [Security](#-security-architecture)
+### 🌐 [Live Demo](https://reverso.one/) • 📄 [Documentation](#-quick-start) • 🔌 [API](#-enterprise-api) • 🛡️ [Security](#-security-architecture)
 
 </div>
 
@@ -30,7 +30,7 @@
 | 👁️ **ReversoMonitor** | ✅ **Deployed on Ethereum** | [Verified on Etherscan](https://etherscan.io/address/0x152935935E86ab06ce75b6871c500f6Eb57f5332#code) — Anomaly detection + auto-pause |
 | 🧪 **Test Suite** | ✅ 95 tests passing | Unit tests + integration tests + security tests |
 | 🔌 **Enterprise API** | ✅ Hardened | HMAC auth, rate limiting, fraud prevention |
-| 🌐 **Website** | ✅ [Live](https://reverso-protocol.netlify.app/) | Interactive demo with wallet connection |
+| 🌐 **Website** | ✅ [Live](https://reverso.one/) | Interactive demo with wallet connection |
 | ⛓️ **Multi-chain** | ✅ **7 Chains Live** | Ethereum, BSC, Base, Arbitrum, Polygon, Optimism, Avalanche |
 
 > **All 3 contracts deployed and wired on 7 chains: Ethereum, BSC, Base, Arbitrum, Polygon, Optimism, Avalanche.**
@@ -1003,7 +1003,7 @@ MIT License - see [LICENSE](LICENSE)
 
 | Resource | Link |
 |----------|------|
-| 🌐 **Live Demo** | [reverso-protocol.netlify.app](https://reverso-protocol.netlify.app/) |
+| 🌐 **Live Demo** | [reverso.one](https://reverso.one/) |
 | 📦 **Repository** | [github.com/conditional-team/REVERSO](https://github.com/conditional-team/REVERSO) |
 | 📄 **Documentation** | [This README](#-quick-start) |
 | 🔌 **API Docs** | [Enterprise API Section](#-enterprise-api) |

@@ -39,7 +39,7 @@
     "type": "git",
     "url": "https://github.com/conditional-team/REVERSO.git"
   },
-  "homepage": "https://reverso-protocol.netlify.app",
+  "homepage": "https://reverso.one",
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
     "@nomicfoundation/hardhat-ethers": "^3.0.0",
