@@ -141,8 +141,8 @@ Example: 10 ETH with insurance
 | Base | ✅ **Deployed** | 8453 |
 | Arbitrum | ✅ **Deployed** | 42161 |
 | Polygon | ✅ **Deployed** | 137 |
-| Optimism | 🔧 Configured | 10 |
-| Avalanche | 🔜 Planned | 43114 |
+| Optimism | ✅ **Deployed** | 10 |
+| Avalanche | ✅ **Deployed** | 43114 |
 | zkSync Era | 🔜 Planned | 324 |
 | Linea | 🔜 Planned | 59144 |
 | Scroll | 🔜 Planned | 534352 |

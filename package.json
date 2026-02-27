@@ -37,9 +37,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/reverso-protocol/reverso.git"
+    "url": "https://github.com/conditional-team/REVERSO.git"
   },
-  "homepage": "https://reverso.finance",
+  "homepage": "https://reverso-protocol.netlify.app",
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
     "@nomicfoundation/hardhat-ethers": "^3.0.0",

@@ -1,8 +1,54 @@
 [
   {
+    "chain": "ethereum",
+    "chainId": "1",
+    "vault": "0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085",
+    "guardian": "0x7F1CB513B7A582A11f3057F104D561E9A9126A7d",
+    "monitor": "0x152935935E86ab06ce75b6871c500f6Eb57f5332",
+    "deployer": "0x211a8C2d4f5924d4378162b48bC759a3E3e57dD8",
+    "timestamp": "2026-02-24T00:00:00.000Z",
+    "verified": true
+  },
+  {
+    "chain": "bsc",
+    "chainId": "56",
+    "vault": "0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322",
+    "guardian": "0x7C962938cce85737eB25147667279117f40dE23a",
+    "monitor": "0x1610DA56f09555a388AB8a095F180A2069FDA4F1",
+    "deployer": "0x211a8C2d4f5924d4378162b48bC759a3E3e57dD8",
+    "timestamp": "2026-02-24T00:00:00.000Z"
+  },
+  {
+    "chain": "base",
+    "chainId": "8453",
+    "vault": "0x1610DA56f09555a388AB8a095F180A2069FDA4F1",
+    "guardian": "0x038516Fd2EbF5AC7c6E4A85858CDaF908F4650C9",
+    "monitor": "0xA8854b60A3c150BA0b4FB7418eD7b15d577a129b",
+    "deployer": "0x211a8C2d4f5924d4378162b48bC759a3E3e57dD8",
+    "timestamp": "2026-02-24T00:00:00.000Z"
+  },
+  {
+    "chain": "arbitrum",
+    "chainId": "42161",
+    "vault": "0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322",
+    "guardian": "0x7C962938cce85737eB25147667279117f40dE23a",
+    "monitor": "0x1610DA56f09555a388AB8a095F180A2069FDA4F1",
+    "deployer": "0x211a8C2d4f5924d4378162b48bC759a3E3e57dD8",
+    "timestamp": "2026-02-24T00:00:00.000Z"
+  },
+  {
+    "chain": "polygon",
+    "chainId": "137",
+    "vault": "0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322",
+    "guardian": "0x7C962938cce85737eB25147667279117f40dE23a",
+    "monitor": "0x1610DA56f09555a388AB8a095F180A2069FDA4F1",
+    "deployer": "0x211a8C2d4f5924d4378162b48bC759a3E3e57dD8",
+    "timestamp": "2026-02-24T00:00:00.000Z"
+  },
+  {
     "chain": "optimism",
     "chainId": "10",
-    "address": "0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322",
+    "vault": "0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322",
     "deployer": "0x211a8C2d4f5924d4378162b48bC759a3E3e57dD8",
     "timestamp": "2026-02-24T22:20:43.584Z",
     "txHash": "0x761f4d783131eca2a8fcd1d88ca04c84a01fffbcfbd575161223887e68988501"
@@ -10,7 +56,7 @@
   {
     "chain": "avalanche",
     "chainId": "43114",
-    "address": "0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322",
+    "vault": "0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322",
     "deployer": "0x211a8C2d4f5924d4378162b48bC759a3E3e57dD8",
     "timestamp": "2026-02-24T22:21:07.676Z",
     "txHash": "0x3d2be22668beb753c9fa9304a9357e5ae7ef45546cb4c37a93b9b674fca6c18e"

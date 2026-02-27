@@ -44,6 +44,7 @@ export interface TransferRequest {
 
 export interface TransferResponse {
   id: string;
+  onChainTransferId?: number;
   chainId: number;
   txHash?: string;
   status: 'pending' | 'submitted' | 'locked' | 'claimed' | 'cancelled' | 'refunded';

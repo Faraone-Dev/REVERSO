@@ -16,7 +16,7 @@
     "defaultRpc": "https://ethereum-rpc.publicnode.com",
     "explorer": "https://etherscan.io",
     "contractEnv": "ETHEREUM_VAULT",
-    "contract": "0x0000000000000000000000000000000000000000"
+    "contract": "0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085"
   },
   {
     "name": "Arbitrum",
@@ -25,7 +25,7 @@
     "defaultRpc": "https://arb1.arbitrum.io/rpc",
     "explorer": "https://arbiscan.io",
     "contractEnv": "ARBITRUM_VAULT",
-    "contract": "0x0000000000000000000000000000000000000000"
+    "contract": "0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322"
   },
   {
     "name": "Base",
@@ -34,7 +34,7 @@
     "defaultRpc": "https://mainnet.base.org",
     "explorer": "https://basescan.org",
     "contractEnv": "BASE_VAULT",
-    "contract": "0x0000000000000000000000000000000000000000"
+    "contract": "0x1610DA56f09555a388AB8a095F180A2069FDA4F1"
   },
   {
     "name": "Optimism",
@@ -43,16 +43,16 @@
     "defaultRpc": "https://mainnet.optimism.io",
     "explorer": "https://optimistic.etherscan.io",
     "contractEnv": "OPTIMISM_VAULT",
-    "contract": "0x0000000000000000000000000000000000000000"
+    "contract": "0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322"
   },
   {
     "name": "Polygon",
     "chainId": 137,
     "rpcEnv": "POLYGON_RPC",
-    "defaultRpc": "https://polygon-rpc.com",
+    "defaultRpc": "https://polygon-bor-rpc.publicnode.com",
     "explorer": "https://polygonscan.com",
     "contractEnv": "POLYGON_VAULT",
-    "contract": "0x0000000000000000000000000000000000000000"
+    "contract": "0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322"
   },
   {
     "name": "BSC",
@@ -61,7 +61,7 @@
     "defaultRpc": "https://bsc-dataseed.binance.org",
     "explorer": "https://bscscan.com",
     "contractEnv": "BSC_VAULT",
-    "contract": "0x0000000000000000000000000000000000000000"
+    "contract": "0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322"
   },
   {
     "name": "Avalanche",
@@ -70,6 +70,6 @@
     "defaultRpc": "https://api.avax.network/ext/bc/C/rpc",
     "explorer": "https://snowtrace.io",
     "contractEnv": "AVALANCHE_VAULT",
-    "contract": "0x0000000000000000000000000000000000000000"
+    "contract": "0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322"
   }
 ]

@@ -10,20 +10,24 @@ import { ethers } from 'ethers';
 // ==========================================
 const REVERSO_CONFIG = {
     contracts: {
-        1: '0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085', // Ethereum Mainnet
+        1: '0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085',       // Ethereum Mainnet
         11155111: '0x3D1f9d1cEaf350885A91f7Fb05c99a78Bc544ED8', // Sepolia Testnet
-        42161: '0x...', // Arbitrum (TBD)
-        8453: '0x...', // Base (TBD)
-        137: '0x...', // Polygon (TBD)
-        10: '0x...', // Optimism (TBD)
+        42161: '0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322',    // Arbitrum
+        8453: '0x1610DA56f09555a388AB8a095F180A2069FDA4F1',      // Base
+        137: '0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322',      // Polygon
+        10: '0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322',       // Optimism
+        56: '0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322',       // BSC
+        43114: '0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322',    // Avalanche
     },
     rpcUrls: {
         1: 'https://eth.llamarpc.com',
         11155111: 'https://ethereum-sepolia-rpc.publicnode.com',
         42161: 'https://arb1.arbitrum.io/rpc',
         8453: 'https://mainnet.base.org',
-        137: 'https://polygon-rpc.com',
+        137: 'https://polygon-bor-rpc.publicnode.com',
         10: 'https://mainnet.optimism.io',
+        56: 'https://bsc-dataseed.binance.org',
+        43114: 'https://api.avax.network/ext/bc/C/rpc',
     },
     chainNames: {
         1: 'Ethereum',
@@ -32,6 +36,8 @@ const REVERSO_CONFIG = {
         8453: 'Base',
         137: 'Polygon',
         10: 'Optimism',
+        56: 'BSC',
+        43114: 'Avalanche',
     }
 };
 
@@ -343,12 +349,14 @@ async function executeReversoTransaction(amount, recipient, recovery1, recovery2
         showNotification('Please confirm the transaction in your wallet...', 'info');
         
         // Call sendETH on the contract
+        const memo = document.getElementById('transferMemo')?.value || '';
         const tx = await appState.contract.sendETH(
             recipient,
             delay,
             expiryPeriod,
             recovery1,
             recovery2,
+            memo,
             { value: totalWithFee }
         );
         

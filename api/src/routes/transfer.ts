@@ -248,8 +248,8 @@ transferRouter.post('/:id/cancel', asyncHandler(async (req: AuthenticatedRequest
   const CHAINS = loadChains();
   const chain = CHAINS[transfer.chainId];
   const iface = new ethers.Interface(REVERSO_ABI);
-  // NOTE: map internal transfer id -> on-chain transferId in production
-  const data = iface.encodeFunctionData('cancel', [0]);
+  const onChainId = transfer.onChainTransferId ?? 0;
+  const data = iface.encodeFunctionData('cancel', [onChainId]);
 
   res.json({
     success: true,
