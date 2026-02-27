@@ -11,6 +11,7 @@ on:
 
 env:
   NODE_VERSION: "20"
+  NPM_CONFIG_LEGACY_PEER_DEPS: "true"
 
 jobs:
   # ── Compile Solidity & run Hardhat tests ──
