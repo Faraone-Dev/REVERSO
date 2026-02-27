@@ -897,6 +897,87 @@ a.trust-badge:hover {
 }
 
 /* === Section Styles === */
+
+/* ── Glass Card DNA (transfer-card effects, lighter) ── */
+.problem-card,
+.layer,
+.step,
+.tier,
+.api-plan,
+.app-card,
+.insurance-addon,
+.transfers-panel {
+    /* Top edge highlight */
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Shimmer sweep on hover */
+.problem-card::after,
+.step::after,
+.tier::after,
+.api-plan::after,
+.app-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.05), transparent);
+    transition: none;
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+.problem-card:hover::after,
+.step:hover::after,
+.tier:hover::after,
+.api-plan:hover::after,
+.app-card:hover::after {
+    animation: shimmerOnce 0.8s ease forwards;
+}
+
+@keyframes shimmerOnce {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Glow box-shadow on hover (like transfer-card) */
+.problem-card:hover,
+.layer:hover,
+.step:hover,
+.tier:hover,
+.api-plan:hover {
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 8px 40px rgba(0, 0, 0, 0.4),
+        0 0 50px rgba(0, 255, 136, 0.06);
+}
+
+/* Subtle green top-line glow on hover */
+.step::before,
+.tier::before,
+.api-plan::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.4), transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.step:hover::before,
+.tier:hover::before,
+.api-plan:hover::before {
+    opacity: 1;
+}
+
 section {
     padding: 100px 0;
 }
@@ -945,9 +1026,10 @@ section {
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 60%;
+    width: 80%;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.45), transparent);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
 }
 
 /* === Problem Section === */
@@ -990,7 +1072,10 @@ section {
 .problem-card:hover {
     transform: translateY(-10px);
     border-color: rgba(255, 75, 75, 0.25);
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(255, 75, 75, 0.06);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 25px 60px rgba(0, 0, 0, 0.4),
+        0 0 50px rgba(255, 75, 75, 0.08);
 }
 
 .problem-card:hover::before {
@@ -1081,7 +1166,6 @@ section {
 .layer:hover {
     transform: translateX(10px);
     border-color: rgba(0, 255, 136, 0.2);
-    box-shadow: 0 0 30px rgba(0, 255, 136, 0.08);
     background: rgba(18, 18, 26, 0.95);
 }
 
@@ -1143,12 +1227,12 @@ section {
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     position: relative;
+    overflow: hidden;
 }
 
 .step:hover {
     transform: translateY(-12px);
     border-color: rgba(0, 255, 136, 0.2);
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 255, 136, 0.06);
 }
 
 .step-number {
@@ -1269,11 +1353,11 @@ section {
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
+    overflow: hidden;
 }
 
 .tier:hover {
     transform: translateY(-8px);
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
 }
 
 .tier.featured {
@@ -2044,10 +2128,14 @@ section {
 }
 
 .app-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    background: rgba(18, 18, 26, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: var(--border-radius-lg);
     padding: 24px;
+    position: relative;
+    overflow: hidden;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
 }
 
 .app-row {
@@ -2364,10 +2452,12 @@ section {
 
 /* Transfers Panel */
 .transfers-panel {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    background: rgba(18, 18, 26, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: var(--border-radius-lg);
     padding: 24px;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
 }
 
 .transfers-panel h3 {
@@ -2753,11 +2843,11 @@ section {
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
+    overflow: hidden;
 }
 
 .api-plan:hover {
     transform: translateY(-8px);
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
 }
 
 .api-plan.featured {
