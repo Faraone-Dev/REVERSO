@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { createApiKey } from '../middleware/apiKey';
 import { asyncHandler, BadRequest } from '../middleware/errorHandler';
 import { ApiPlan, PLAN_CONFIG } from '../types';
@@ -25,6 +26,79 @@ interface User {
 }
 
 const users: Map<string, User> = new Map();
+
+// Rate limit for quick-key generation (per IP, 3 per hour)
+const quickKeyRateLimit: Map<string, { ts: number; count: number }> = new Map();
+
+/**
+ * POST /api/v1/auth/quick-key
+ * Generate an API key instantly with just email + company (no password needed).
+ * Used by the website form. Returns Starter plan key.
+ */
+authRouter.post('/quick-key', asyncHandler(async (req: any, res: Response) => {
+  const { email, company } = req.body;
+
+  if (!email || typeof email !== 'string' || !email.includes('@')) {
+    throw BadRequest('A valid email is required');
+  }
+
+  // Rate limit: max 3 quick-key generations per IP per hour
+  const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+  const now = Date.now();
+  const window = quickKeyRateLimit.get(ip);
+  if (window && (now - window.ts) < 3600_000) {
+    if (window.count >= 3) {
+      return res.status(429).json({
+        error: 'Too many key requests. Try again in 1 hour.',
+        code: 'RATE_LIMITED'
+      });
+    }
+    window.count++;
+  } else {
+    quickKeyRateLimit.set(ip, { ts: now, count: 1 });
+  }
+
+  // Check if email already registered — return error
+  for (const user of users.values()) {
+    if (user.email === email.toLowerCase().trim()) {
+      throw BadRequest('Email already registered. Use /auth/login to get a new key.');
+    }
+  }
+
+  const userId = uuidv4();
+  const autoPassword = crypto.randomBytes(24).toString('hex');
+  const hashedPassword = await bcrypt.hash(autoPassword, 10);
+  const plan: ApiPlan = 'starter';
+
+  const user: User = {
+    id: userId,
+    email: email.toLowerCase().trim(),
+    hashedPassword,
+    company: company || undefined,
+    plan,
+    apiKeys: [],
+    createdAt: new Date()
+  };
+
+  // Create API key
+  const apiKey = await createApiKey(userId, plan);
+  user.apiKeys.push(apiKey.id);
+  users.set(userId, user);
+
+  // Generate JWT so they can manage their key later
+  const token = jwt.sign({ userId, email: user.email, plan }, JWT_SECRET!, { expiresIn: '30d' });
+
+  res.status(201).json({
+    success: true,
+    apiKey: apiKey.key,
+    signingSecret: apiKey.signingSecret,
+    plan,
+    txLimit: PLAN_CONFIG[plan].txLimit,
+    expiresAt: apiKey.expiresAt,
+    token,
+    message: 'Save your API key and signing secret — they are shown only once!'
+  });
+}));
 
 /**
  * POST /api/v1/auth/register

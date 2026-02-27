@@ -190,6 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initAppSection();
     initApiTabs();
     initCopyButtons();
+    initApiKeyForm();
 });
 
 // ==========================================
@@ -856,6 +857,57 @@ function initCopyButtons() {
                 showNotification('Copy failed', 'error');
             });
         });
+    });
+}
+
+// ==========================================
+// API Key Generator
+// ==========================================
+const API_BASE = 'https://reverso-tu3o.onrender.com';
+
+function initApiKeyForm() {
+    const form = document.getElementById('apiKeyForm');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('apiKeyEmail')?.value?.trim();
+        const company = document.getElementById('apiKeyCompany')?.value?.trim();
+        const btn = document.getElementById('apiKeyBtn');
+        const resultDiv = document.getElementById('apiKeyResult');
+
+        if (!email) return;
+
+        // Disable button + show loading
+        btn.disabled = true;
+        btn.textContent = 'Generating...';
+
+        try {
+            const res = await fetch(`${API_BASE}/api/v1/auth/quick-key`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, company })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || 'Failed to generate key');
+            }
+
+            // Show the key
+            document.getElementById('apiKeyValue').textContent = data.apiKey;
+            document.getElementById('signingSecretValue').textContent = data.signingSecret;
+            resultDiv.classList.remove('hidden');
+            form.style.display = 'none';
+
+            showNotification('API Key generated! Save it now.', 'success');
+        } catch (err) {
+            showNotification(err.message || 'Error generating key', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Generate API Key';
+        }
     });
 }
 

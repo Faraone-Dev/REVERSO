@@ -802,21 +802,30 @@ console.<span class="code-function">log</span>(transfer.canCancel);     <span cl
                 <a href="https://github.com/conditional-team/REVERSO#-enterprise-api" class="btn btn-primary btn-large" target="_blank" rel="noopener noreferrer">
                     📖 Read Full Documentation
                 </a>
-                <a href="https://github.com/conditional-team/REVERSO/tree/main/api" class="btn btn-ghost btn-large" target="_blank" rel="noopener noreferrer">
-                    🔑 Get API Key / Self-host
-                </a>
             </div>
 
-            <!-- Lead Capture -->
-            <div class="api-lead">
-                <h3>Request API Access</h3>
-                <p>Tell us your use case. Sandbox keys subito; production keys post-audit.</p>
-                <form class="lead-form" action="https://formspree.io/f/mvgpyday" method="POST">
-                    <input type="email" name="email" placeholder="Work email" required>
-                    <input type="text" name="company" placeholder="Company / Project" required>
-                    <textarea name="usecase" rows="3" placeholder="Use case (exchange, wallet, payments, etc.)" required></textarea>
-                    <button type="submit" class="btn btn-primary">Request Access</button>
+            <!-- Instant API Key Generator -->
+            <div class="api-lead" id="getApiKey">
+                <h3>🔑 Get Your API Key — Instantly</h3>
+                <p>Enter your email and get a Starter key now. No sign-up, no waiting.</p>
+                <form class="lead-form" id="apiKeyForm">
+                    <input type="email" id="apiKeyEmail" placeholder="your@email.com" required>
+                    <input type="text" id="apiKeyCompany" placeholder="Company / Project (optional)">
+                    <button type="submit" class="btn btn-primary" id="apiKeyBtn">Generate API Key</button>
                 </form>
+                <div class="api-key-result hidden" id="apiKeyResult">
+                    <div class="key-row">
+                        <span class="key-label">API Key</span>
+                        <code class="key-value" id="apiKeyValue"></code>
+                        <button class="btn btn-ghost copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('apiKeyValue').textContent);this.textContent='Copied!'">Copy</button>
+                    </div>
+                    <div class="key-row">
+                        <span class="key-label">Signing Secret</span>
+                        <code class="key-value" id="signingSecretValue"></code>
+                        <button class="btn btn-ghost copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('signingSecretValue').textContent);this.textContent='Copied!'">Copy</button>
+                    </div>
+                    <p class="key-warning">⚠️ Save these now — they are shown only once!</p>
+                </div>
             </div>
         </div>
     </section>
