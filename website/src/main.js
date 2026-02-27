@@ -879,9 +879,14 @@ function initApiKeyForm() {
 
         if (!email) return;
 
-        // Disable button + show loading
+        // Disable button + show loading with spinner
         btn.disabled = true;
-        btn.textContent = 'Generating...';
+        btn.innerHTML = '<span class="spinner"></span> Generating...';
+
+        // After 3s show "waking up server" hint (Render cold start)
+        const slowTimer = setTimeout(() => {
+            btn.innerHTML = '<span class="spinner"></span> Waking up server...';
+        }, 3000);
 
         try {
             const res = await fetch(`${API_BASE}/api/v1/auth/quick-key`, {
@@ -890,6 +895,7 @@ function initApiKeyForm() {
                 body: JSON.stringify({ email, company })
             });
 
+            clearTimeout(slowTimer);
             const data = await res.json();
 
             if (!res.ok) {
@@ -904,6 +910,7 @@ function initApiKeyForm() {
 
             showNotification('API Key generated! Save it now.', 'success');
         } catch (err) {
+            clearTimeout(slowTimer);
             showNotification(err.message || 'Error generating key', 'error');
             btn.disabled = false;
             btn.textContent = 'Generate API Key';

@@ -67,7 +67,7 @@ authRouter.post('/quick-key', asyncHandler(async (req: any, res: Response) => {
 
   const userId = uuidv4();
   const autoPassword = crypto.randomBytes(24).toString('hex');
-  const hashedPassword = await bcrypt.hash(autoPassword, 10);
+  const hashedPassword = await bcrypt.hash(autoPassword, 4); // Low rounds: auto-generated pwd, user never sees it
   const plan: ApiPlan = 'starter';
 
   const user: User = {
