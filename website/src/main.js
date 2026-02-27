@@ -3,6 +3,8 @@
  * Handles wallet connection, animations, and interactivity
  */
 
+import { ethers } from 'ethers';
+
 // ==========================================
 // Contract Addresses & Config
 // ==========================================
@@ -194,8 +196,8 @@ function initAppSection() {
     const recoveryInputs = document.getElementById('recoveryInputs');
     if (toggleRecovery && recoveryInputs) {
         toggleRecovery.addEventListener('click', () => {
-            const isVisible = recoveryInputs.style.display !== 'none';
-            recoveryInputs.style.display = isVisible ? 'none' : 'flex';
+            const isVisible = !recoveryInputs.classList.contains('hidden');
+            recoveryInputs.classList.toggle('hidden', isVisible);
             toggleRecovery.textContent = isVisible ? '+ Add' : '- Hide';
         });
     }
@@ -207,7 +209,7 @@ function initAppSection() {
         insuranceCheckbox.addEventListener('change', () => {
             appState.withInsurance = insuranceCheckbox.checked;
             if (insuranceFeeRow) {
-                insuranceFeeRow.style.display = insuranceCheckbox.checked ? 'flex' : 'none';
+                insuranceFeeRow.classList.toggle('hidden', !insuranceCheckbox.checked);
             }
             updateFees();
         });

@@ -3,6 +3,15 @@
    Crypto Pro Dark Theme
    ========================================== */
 
+/* === Utility Classes === */
+.hidden {
+    display: none;
+}
+
+.hero-contract-link {
+    color: #00ff88;
+}
+
 /* === CSS Variables === */
 :root {
     /* Colors */
@@ -213,6 +222,7 @@ h3 { font-size: clamp(1.25rem, 2vw, 1.5rem); }
     right: 0;
     height: var(--nav-height);
     background: rgba(10, 10, 15, 0.8);
+    -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border-color);
     z-index: 1000;
@@ -245,6 +255,7 @@ h3 { font-size: clamp(1.25rem, 2vw, 1.5rem); }
 .logo-text {
     background: var(--gradient-primary);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -485,6 +496,7 @@ h3 { font-size: clamp(1.25rem, 2vw, 1.5rem); }
     font-weight: 700;
     background: var(--gradient-primary);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -743,6 +755,7 @@ section {
     font-weight: 700;
     background: var(--gradient-primary);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 20px;
 }
@@ -901,6 +914,7 @@ section {
     font-weight: 700;
     background: var(--gradient-primary);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
