@@ -16,6 +16,7 @@
     <meta property="og:image" content="https://reverso.one/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="REVERSO Protocol - Reversible Blockchain Transactions">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
@@ -71,25 +72,92 @@
     }
     </script>
     
+    <!-- FAQ Structured Data (Rich Snippets) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is REVERSO Protocol?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "REVERSO is the first reversible transaction protocol on blockchain. It lets you cancel crypto transfers before they're final, protecting you from mistakes, scams, and wrong addresses."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do reversible transactions work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You send crypto with a chosen lock period (1 hour to 30 days). During this window, you can cancel the transfer and get a full refund. After the lock expires, the recipient can claim the funds."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which blockchains does REVERSO support?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "REVERSO is live on 7 EVM chains: Ethereum, BNB Chain (BSC), Base, Arbitrum, Polygon, Optimism, and Avalanche."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How much does REVERSO cost?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Fees are progressive: 0.3% for transfers under $1,000, 0.5% for $1K-$100K, and 0.7% for over $100K. Optional insurance is +0.2% for full scam protection."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is REVERSO open source?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. All smart contracts, deploy scripts, ABI, API, and documentation are open source on GitHub under the conditional-team/REVERSO repository."
+          }
+        }
+      ]
+    }
+    </script>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Preload critical CSS -->
+    <link rel="preload" href="/src/styles/main.css" as="style">
     
     <!-- Styles -->
     <link rel="stylesheet" href="/src/styles/main.css">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/og-image.png">
 </head>
 <body>
+    <!-- Noscript fallback for crawlers / no-JS users -->
+    <noscript>
+        <div style="padding:40px;text-align:center;background:#0a0a0f;color:#fff;font-family:sans-serif">
+            <h1>REVERSO Protocol — Reversible Blockchain Transactions</h1>
+            <p>The first protocol that lets you cancel crypto transfers before they're final. Never lose funds to mistakes, scams, or wrong addresses again.</p>
+            <p>Live on 7 chains: Ethereum, BSC, Base, Arbitrum, Polygon, Optimism, Avalanche.</p>
+            <p>Progressive fees from 0.3%. Enterprise API available. Open source on <a href="https://github.com/conditional-team/REVERSO">GitHub</a>.</p>
+        </div>
+    </noscript>
+
     <!-- Animated Background -->
-    <div class="bg-grid"></div>
-    <div class="bg-glow"></div>
-    <div class="aurora-orb aurora-orb-1"></div>
-    <div class="aurora-orb aurora-orb-2"></div>
-    <div class="aurora-orb aurora-orb-3"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+    <div class="bg-glow" aria-hidden="true"></div>
+    <div class="aurora-orb aurora-orb-1" aria-hidden="true"></div>
+    <div class="aurora-orb aurora-orb-2" aria-hidden="true"></div>
+    <div class="aurora-orb aurora-orb-3" aria-hidden="true"></div>
     
+    <!-- Skip to content (accessibility) -->
+    <a href="#app" class="sr-only" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">Skip to main content</a>
+
     <!-- Navigation -->
     <nav class="nav">
         <div class="nav-container">
@@ -122,6 +190,7 @@
         </div>
     </nav>
     
+    <main>
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
@@ -969,6 +1038,8 @@ console.<span class="code-function">log</span>(transfer.canCancel);     <span cl
         </div>
     </section>
     
+    </main>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
@@ -1016,9 +1087,9 @@ console.<span class="code-function">log</span>(transfer.canCancel);     <span cl
                     </div>
                     <div class="footer-column">
                         <h4>Legal</h4>
-                        <a href="#" onclick="REVERSO.showNotification('Terms of Service coming soon','info');return false;">Terms of Service</a>
-                        <a href="#" onclick="REVERSO.showNotification('Privacy Policy coming soon','info');return false;">Privacy Policy</a>
-                        <a href="#" onclick="REVERSO.showNotification('Cookie Policy coming soon','info');return false;">Cookie Policy</a>
+                        <a href="/terms" onclick="event.preventDefault();REVERSO.showNotification('Terms of Service coming soon','info')">Terms of Service</a>
+                        <a href="/privacy" onclick="event.preventDefault();REVERSO.showNotification('Privacy Policy coming soon','info')">Privacy Policy</a>
+                        <a href="/cookies" onclick="event.preventDefault();REVERSO.showNotification('Cookie Policy coming soon','info')">Cookie Policy</a>
                     </div>
                 </div>
             </div>
