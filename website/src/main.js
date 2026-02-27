@@ -962,6 +962,19 @@ function initMobileNav() {
             document.body.style.overflow = '';
         }
     });
+
+    // Close mobile menu on resize to desktop
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            toggle.classList.remove('active');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            if (mobileMenu) {
+                mobileMenu.style.transform = 'translateY(-100%)';
+                mobileMenu.style.opacity = '0';
+            }
+            document.body.style.overflow = '';
+        }
+    });
 }
 
 // ==========================================
