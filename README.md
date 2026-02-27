@@ -8,8 +8,9 @@
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![Verified](https://img.shields.io/badge/Etherscan-Verified-blue?style=for-the-badge)
 ![Tests](https://img.shields.io/badge/Tests-109%20passing-brightgreen?style=for-the-badge)
+![Fuzz](https://img.shields.io/badge/Fuzz-13%2C000%2B%20runs-orange?style=for-the-badge)
 ![Security](https://img.shields.io/badge/Security-3%20Contract%20Stack-red?style=for-the-badge)
-![API](https://img.shields.io/badge/Enterprise%20API-Ready-blue?style=for-the-badge)
+![API](https://img.shields.io/badge/Enterprise%20API-Live-blue?style=for-the-badge)
 
 **The First Reversible Transaction Protocol on Blockchain**
 
@@ -30,8 +31,9 @@
 | 👁️ **ReversoMonitor** | ✅ **Deployed on Ethereum** | [Verified on Etherscan](https://etherscan.io/address/0x152935935E86ab06ce75b6871c500f6Eb57f5332#code) — Anomaly detection + auto-pause |
 | 🧪 **Test Suite** | ✅ 109 tests passing | Unit tests + integration tests + security tests + gas benchmarks |
 | 🔌 **Enterprise API** | ✅ [Live](https://reverso-tu3o.onrender.com) | HMAC auth, rate limiting, fraud prevention |
-| 🌐 **Website** | ✅ [Live](https://reverso.one/) | Interactive demo with wallet connection |
+| 🌐 **Website** | ✅ [Live — reverso.one](https://reverso.one/) | Interactive demo with wallet connection |
 | ⛓️ **Multi-chain** | ✅ **7 Chains Live** | Ethereum, BSC, Base, Arbitrum, Polygon, Optimism, Avalanche |
+| 🔀 **Fuzz Testing** | ✅ 13,000+ runs | 13 property tests × 1,000 random inputs (Foundry) |
 
 > **All 3 contracts deployed and wired on 7 chains: Ethereum, BSC, Base, Arbitrum, Polygon, Optimism, Avalanche.**
 
@@ -804,21 +806,23 @@ Layer 5: RESCUE
 
 ### Audit Status
 
-🔒 **Security First Approach**
+🔒 **Security First Approach — Mainnet Live**
 
 - Smart contract follows OpenZeppelin best practices
 - ReentrancyGuard, Pausable, SafeERC20 implemented
-- Professional security audit planned before mainnet launch
-- Bug bounty program will launch alongside mainnet
+- Bug bounty program active (up to $50K)
 
 **Current Status:**
 - ✅ Ethereum Mainnet deployed (all 3 contracts verified on Etherscan)
-- ✅ 7 chains live (BSC, Base, Arbitrum, Polygon, Optimism, Avalanche)
-- ✅ Internal review + testnet completed (Sepolia)
-- ✅ 109 Hardhat tests passing (unit + integration + security + gas benchmarks)
-- ✅ Foundry fuzz testing (13,000+ runs)
-- ✅ Slither static analysis
-- 🔜 Professional audit planned Q3 2026 (OpenZeppelin / Trail of Bits)
+- ✅ **7 chains live** — Ethereum, BSC, Base, Arbitrum, Polygon, Optimism, Avalanche
+- ✅ Testnet validation completed (Sepolia — 7/7 live tests passed)
+- ✅ **109 Hardhat tests** passing (unit + integration + security + gas benchmarks)
+- ✅ **13,000+ Foundry fuzz runs** (13 property-based tests × 1,000 random inputs each)
+- ✅ Slither static analysis (143 items reviewed, 0 true-positive criticals)
+- ✅ Gas benchmarks — all operations within L2-friendly limits
+- ✅ Website live at [reverso.one](https://reverso.one)
+- ✅ Enterprise API live at [reverso-tu3o.onrender.com](https://reverso-tu3o.onrender.com)
+- 🔜 External audit planned Q3 2026 (OpenZeppelin / Trail of Bits)
 
 ### Bug Bounty
 
@@ -1012,7 +1016,8 @@ MIT License - see [LICENSE](LICENSE)
 
 | Resource | Link |
 |----------|------|
-| 🌐 **Live Demo** | [reverso.one](https://reverso.one/) |
+| 🌐 **Website** | [reverso.one](https://reverso.one/) |
+| 🔌 **API (Live)** | [reverso-tu3o.onrender.com](https://reverso-tu3o.onrender.com) |
 | 📦 **Repository** | [github.com/conditional-team/REVERSO](https://github.com/conditional-team/REVERSO) |
 | 📄 **Documentation** | [This README](#-quick-start) |
 | 🔌 **API Docs** | [Enterprise API Section](#-enterprise-api) |
