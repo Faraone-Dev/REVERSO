@@ -160,8 +160,8 @@ Example: 10 ETH with insurance
 
 ```bash
 # Clone the repository
-git clone https://github.com/reverso-protocol/reverso.git
-cd reverso
+git clone https://github.com/conditional-team/REVERSO.git
+cd REVERSO
 
 # Install dependencies
 npm install
@@ -542,7 +542,7 @@ REVERSO offers a powerful REST API for businesses, exchanges, and dApps.
 ### Base URL
 
 ```
-Production: https://api.reverso.finance/api/v1  (coming soon)
+Production: https://api.reverso.one/api/v1  (coming soon)
 Development: http://localhost:3000/api/v1
 ```
 
@@ -550,7 +550,7 @@ Development: http://localhost:3000/api/v1
 
 ```bash
 curl -H "Authorization: Bearer rsk_business_xxx..." \
-  https://api.reverso.finance/api/v1/transfers
+  https://api.reverso.one/api/v1/transfers
 ```
 
 ### Quick Example
@@ -954,8 +954,8 @@ REVERSO is designed to integrate with the broader DeFi ecosystem:
 
 ```bash
 # Clone repo
-git clone https://github.com/reverso-protocol/reverso.git
-cd reverso
+git clone https://github.com/conditional-team/REVERSO.git
+cd REVERSO
 
 # Install dependencies
 npm install

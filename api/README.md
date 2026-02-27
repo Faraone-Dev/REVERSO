@@ -30,7 +30,7 @@ All API requests require a Bearer token:
 
 ```bash
 curl -H "Authorization: Bearer rsk_business_xxx..." \
-  https://api.reverso.finance/api/v1/transfers
+  https://api.reverso.one/api/v1/transfers
 ```
 
 ## API Reference
@@ -245,6 +245,6 @@ Coming soon:
 
 ## Support
 
-- **Starter**: support@reverso.finance (48h response)
-- **Business**: priority@reverso.finance (4h response)
-- **Enterprise**: enterprise@reverso.finance (1h response, 24/7)
+- **Starter**: support@reverso.one (48h response)
+- **Business**: priority@reverso.one (4h response)
+- **Enterprise**: enterprise@reverso.one (1h response, 24/7)

@@ -50,7 +50,7 @@ app.get('/', (req, res) => {
   res.json({
     name: 'REVERSO Enterprise API',
     version: '1.0.0',
-    documentation: 'https://docs.reverso.finance/api',
+    documentation: 'https://reverso.one/api',
     endpoints: {
       auth: '/api/v1/auth',
       transfers: '/api/v1/transfers',
@@ -89,7 +89,7 @@ app.listen(PORT, () => {
 ║   🔄 REVERSO Enterprise API v1.0.0                        ║
 ║                                                           ║
 ║   Server running on port ${PORT}                            ║
-║   Documentation: https://docs.reverso.finance/api         ║
+║   Documentation: https://reverso.one/api              ║
 ║                                                           ║
 ║   Plans:                                                  ║
 ║   • Starter:    $99/mo  - 100 tx/month                   ║

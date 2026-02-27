@@ -75,7 +75,7 @@ export async function apiKeyMiddleware(
           plan: foundKey.plan,
           limit: planConfig.txLimit,
           used: foundKey.txUsed,
-          upgrade: 'Contact sales@reverso.finance to upgrade'
+          upgrade: 'Contact sales@reverso.one to upgrade'
         }
       });
     }

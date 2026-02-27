@@ -229,7 +229,7 @@ POST /api/v1/transfers
 
 ```bash
 # Example authenticated request
-curl -X POST https://api.reverso.finance/api/v1/transfers \
+curl -X POST https://api.reverso.one/api/v1/transfers \
   -H "Authorization: Bearer rsk_business_abc123" \
   -H "x-reverso-timestamp: 1703678400000" \
   -H "x-reverso-nonce: 550e8400-e29b-41d4-a716-446655440000" \
