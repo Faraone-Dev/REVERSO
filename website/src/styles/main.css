@@ -1992,7 +1992,7 @@ section {
 /* === APP Section === */
 .app-section {
     background: var(--bg-surface);
-    padding: 100px 0;
+    padding: 60px 0;
 }
 
 .app-container {
@@ -2006,17 +2006,18 @@ section {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-lg);
-    padding: 32px;
+    padding: 24px;
 }
 
 .app-row {
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .app-row label {
     display: block;
     font-weight: 600;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
     color: var(--text-primary);
 }
 
@@ -2030,20 +2031,21 @@ section {
 .network-btn {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
+    gap: 6px;
+    padding: 8px 12px;
     background: var(--bg-surface);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     color: var(--text-secondary);
     font-weight: 500;
+    font-size: 0.85rem;
     cursor: pointer;
     transition: all var(--transition-fast);
 }
 
 .network-btn img {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
 }
 
@@ -2074,11 +2076,11 @@ section {
 
 .amount-input-wrapper input {
     flex: 1;
-    padding: 16px;
+    padding: 12px 16px;
     background: transparent;
     border: none;
     color: var(--text-primary);
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-family: 'Space Grotesk', sans-serif;
     font-weight: 600;
     outline: none;
@@ -2094,7 +2096,7 @@ section {
 }
 
 .token-btn {
-    padding: 16px 12px;
+    padding: 12px 10px;
     background: transparent;
     border: none;
     color: var(--text-secondary);
@@ -2123,7 +2125,7 @@ section {
 /* Address Input */
 .address-input {
     width: 100%;
-    padding: 16px;
+    padding: 12px 16px;
     background: var(--bg-surface);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
@@ -2150,7 +2152,7 @@ section {
 }
 
 .delay-btn {
-    padding: 12px 20px;
+    padding: 8px 16px;
     background: var(--bg-surface);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
@@ -2218,7 +2220,7 @@ section {
 
 /* Insurance Toggle */
 .insurance-toggle {
-    padding: 16px;
+    padding: 12px;
     background: rgba(0, 255, 136, 0.05);
     border: 1px solid rgba(0, 255, 136, 0.1);
     border-radius: var(--border-radius);
@@ -2273,27 +2275,27 @@ section {
 
 /* Fee Summary */
 .fee-summary {
-    padding: 20px;
+    padding: 14px 16px;
     background: var(--bg-surface);
     border-radius: var(--border-radius);
-    margin-bottom: 20px;
+    margin-bottom: 14px;
 }
 
 .fee-row {
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
+    padding: 5px 0;
     color: var(--text-secondary);
-    font-size: 0.95rem;
+    font-size: 0.88rem;
 }
 
 .fee-row.total {
     border-top: 1px solid var(--border-color);
-    margin-top: 8px;
-    padding-top: 16px;
+    margin-top: 6px;
+    padding-top: 10px;
     font-weight: 700;
     color: var(--text-primary);
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 .fee-row.total span:last-child {
@@ -2303,8 +2305,8 @@ section {
 /* Send Button */
 .btn-send {
     width: 100%;
-    padding: 18px;
-    font-size: 1.1rem;
+    padding: 14px;
+    font-size: 1rem;
 }
 
 .btn-send:disabled {
@@ -2314,9 +2316,9 @@ section {
 
 .app-note {
     text-align: center;
-    margin-top: 16px;
+    margin-top: 10px;
     color: var(--text-muted);
-    font-size: 0.9rem;
+    font-size: 0.82rem;
 }
 
 /* Transfers Panel */
