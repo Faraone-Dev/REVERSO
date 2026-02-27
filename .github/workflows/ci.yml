@@ -25,7 +25,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
       - run: npx hardhat compile
       - run: npx hardhat test
 
@@ -41,7 +41,7 @@ jobs:
           cache: npm
           cache-dependency-path: website/package-lock.json
 
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
         working-directory: website
       - run: npm run build
         working-directory: website
@@ -58,7 +58,7 @@ jobs:
           cache: npm
           cache-dependency-path: api/package-lock.json
 
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
         working-directory: api
       - run: npx tsc --noEmit
         working-directory: api
