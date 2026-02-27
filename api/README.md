@@ -30,7 +30,7 @@ All API requests require a Bearer token:
 
 ```bash
 curl -H "Authorization: Bearer rsk_business_xxx..." \
-  https://api.reverso.one/api/v1/transfers
+  https://reverso-tu3o.onrender.com/api/v1/transfers
 ```
 
 ## API Reference

@@ -30,7 +30,7 @@ export class ReversoClient {
   constructor(opts: ReversoClientOptions) {
     this.apiKey = opts.apiKey;
     this.secret = opts.signingSecret;
-    this.baseUrl = opts.baseUrl || 'https://api.reverso.one/api/v1';
+    this.baseUrl = opts.baseUrl || 'https://reverso-tu3o.onrender.com/api/v1';
     this.fetcher = opts.fetcher || fetch;
   }
 

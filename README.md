@@ -542,7 +542,7 @@ REVERSO offers a powerful REST API for businesses, exchanges, and dApps.
 ### Base URL
 
 ```
-Production: https://api.reverso.one/api/v1  (coming soon)
+Production: https://reverso-tu3o.onrender.com/api/v1
 Development: http://localhost:3000/api/v1
 ```
 
@@ -550,7 +550,7 @@ Development: http://localhost:3000/api/v1
 
 ```bash
 curl -H "Authorization: Bearer rsk_business_xxx..." \
-  https://api.reverso.one/api/v1/transfers
+  https://reverso-tu3o.onrender.com/api/v1/transfers
 ```
 
 ### Quick Example
