@@ -149,8 +149,17 @@ async function fetchEthPrice() {
     }
 }
 // Fetch on load, then every 60s
-fetchEthPrice();
-setInterval(fetchEthPrice, 60_000);
+fetchEthPrice().then(() => updateHeroCardPrice());
+setInterval(() => { fetchEthPrice().then(() => updateHeroCardPrice()); }, 60_000);
+
+// Update hero card USD value with live price
+function updateHeroCardPrice() {
+    const usdEl = document.querySelector('.hero-visual .amount-usd');
+    if (usdEl) {
+        const usdValue = (10 * cachedEthPrice).toLocaleString('en-US', { maximumFractionDigits: 0 });
+        usdEl.textContent = `≈ $${usdValue}`;
+    }
+}
 
 // App State
 let appState = {
@@ -854,6 +863,24 @@ function initCopyButtons() {
 // Scroll Animations
 // ==========================================
 function initScrollAnimations() {
+    // Reveal entire sections on scroll
+    const revealSections = document.querySelectorAll('.reveal');
+    
+    const sectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                sectionObserver.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.08,
+        rootMargin: '0px 0px -60px 0px'
+    });
+    
+    revealSections.forEach(el => sectionObserver.observe(el));
+
+    // Legacy: animate individual elements that aren't inside .reveal
     const animatedElements = document.querySelectorAll(
         '.problem-card, .layer, .step, .tier, .api-plan, .section-header'
     );
@@ -872,7 +899,6 @@ function initScrollAnimations() {
     
     animatedElements.forEach((el) => {
         el.classList.add('scroll-animate');
-        // Remove stagger to make text appear immediately
         el.style.transitionDelay = '0s';
         observer.observe(el);
     });

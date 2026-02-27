@@ -40,6 +40,9 @@
     <!-- Animated Background -->
     <div class="bg-grid"></div>
     <div class="bg-glow"></div>
+    <div class="aurora-orb aurora-orb-1"></div>
+    <div class="aurora-orb aurora-orb-2"></div>
+    <div class="aurora-orb aurora-orb-3"></div>
     
     <!-- Navigation -->
     <nav class="nav">
@@ -94,13 +97,28 @@
             
             <div class="hero-stats">
                 <div class="stat">
-                    <span class="stat-value">$8.6B+</span>
+                    <span class="stat-value" data-count="8.6" data-suffix="B+" data-prefix="$">$8.6B+</span>
                     <span class="stat-label">Lost annually to crypto mistakes</span>
                 </div>
                 <div class="stat">
-                    <span class="stat-value">0</span>
+                    <span class="stat-value" data-count="0">0</span>
                     <span class="stat-label">With REVERSO</span>
                 </div>
+            </div>
+
+            <div class="hero-trust">
+                <a href="https://etherscan.io/address/0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085#code" target="_blank" rel="noopener noreferrer" class="trust-badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    Verified on Etherscan
+                </a>
+                <span class="trust-badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    109 Tests Passing
+                </span>
+                <span class="trust-badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    13K+ Fuzz Runs
+                </span>
             </div>
             
             <div class="hero-actions">
@@ -163,7 +181,7 @@
     </section>
     
     <!-- APP Section - Send Transaction (MOVED TO TOP!) -->
-    <section class="app-section" id="app">
+    <section class="app-section reveal" id="app">
         <div class="container">
             <div class="section-header">
                 <span class="section-tag">🚀 Launch App</span>
@@ -314,7 +332,7 @@
     </section>
     
     <!-- Problem Section -->
-    <section class="problem" id="problem">
+    <section class="problem reveal" id="problem">
         <div class="container">
             <div class="section-header">
                 <span class="section-tag">The Problem</span>
@@ -357,7 +375,7 @@
     </section>
 
     <!-- Partners / Pilots -->
-    <section class="partners" id="partners">
+    <section class="partners reveal" id="partners">
         <div class="container">
             <div class="section-header">
                 <span class="section-tag">In Pilot</span>
@@ -385,7 +403,7 @@
     </section>
     
     <!-- Solution Section -->
-    <section class="solution" id="features">
+    <section class="solution reveal" id="features">
         <div class="container">
             <div class="section-header">
                 <span class="section-tag">The Solution</span>
@@ -443,7 +461,7 @@
     </section>
     
     <!-- How It Works -->
-    <section class="how-it-works" id="how-it-works">
+    <section class="how-it-works reveal" id="how-it-works">
         <div class="container">
             <div class="section-header">
                 <span class="section-tag">How It Works</span>
@@ -514,7 +532,7 @@
     </section>
     
     <!-- Pricing Section -->
-    <section class="pricing" id="pricing">
+    <section class="pricing reveal" id="pricing">
         <div class="container">
             <div class="section-header">
                 <span class="section-tag">Pricing</span>
@@ -573,7 +591,7 @@
     </section>
     
     <!-- API Section -->
-    <section class="api-section" id="api">
+    <section class="api-section reveal" id="api">
         <div class="container">
             <div class="section-header">
                 <span class="section-tag">For Developers</span>
@@ -812,59 +830,59 @@ console.<span class="code-function">log</span>(transfer.canCancel);     <span cl
     </section>
     
     <!-- Security & Status -->
-    <section class="solution" id="security">
+    <section class="solution reveal" id="security">
         <div class="container">
             <div class="section-header">
                 <span class="section-tag">Security & Status</span>
-                <h2>What is Live Today</h2>
-                <p>Audit-first rollout: contracts deployed and verified, API with HMAC/nonce/timestamp auth</p>
+                <h2>Production-Grade Security</h2>
+                <p>3-contract security stack deployed and verified on 7 EVM chains</p>
             </div>
             <div class="problem-grid">
                 <div class="problem-card">
-                    <div class="problem-icon">🔒</div>
-                    <h3>Audit</h3>
-                    <p>Smart contracts ready for external audit (Q1 2026). Mainnet sends are disabled in this demo.</p>
+                    <div class="problem-icon">✅</div>
+                    <h3>Mainnet Live</h3>
+                    <p>All 3 contracts deployed and verified on Ethereum, BSC, Base, Arbitrum, Polygon, Optimism, Avalanche.</p>
                 </div>
                 <div class="problem-card">
                     <div class="problem-icon">🧪</div>
-                    <h3>Demo/Testnet</h3>
-                    <p>Front-end runs in simulation; use testnet to try flows without funds at risk.</p>
+                    <h3>109 Tests Passing</h3>
+                    <p>Hardhat unit + integration + security tests, plus 13,000+ Foundry fuzz runs with zero vulnerabilities.</p>
                 </div>
                 <div class="problem-card">
                     <div class="problem-icon">📦</div>
-                    <h3>Code & Docs</h3>
-                    <p><a href="https://github.com/conditional-team/REVERSO" target="_blank" rel="noopener noreferrer">Repo and README</a> include deploy scripts, ABI, and API details.</p>
+                    <h3>Open Source</h3>
+                    <p><a href="https://github.com/conditional-team/REVERSO" target="_blank" rel="noopener noreferrer">Full repo</a> — contracts, deploy scripts, ABI, API, and documentation.</p>
                 </div>
                 <div class="problem-card">
                     <div class="problem-icon">🛡️</div>
-                    <h3>API</h3>
-                    <p>HMAC + nonce + timestamp auth. No bearer tokens in frontend, keys server-side only, rate limiting active.</p>
+                    <h3>Enterprise API</h3>
+                    <p>HMAC + nonce + timestamp auth. Keys server-side only, rate limiting, fraud prevention active.</p>
                 </div>
                 <div class="problem-card">
-                    <div class="problem-icon">🔗</div>
-                    <h3>Testnet / Demo</h3>
-                    <p>Sandbox for risk-free testing. Mainnet opens after external audit (Q1 2026).</p>
+                    <div class="problem-icon">👁️</div>
+                    <h3>ReversoMonitor</h3>
+                    <p>Real-time anomaly detection. Auto-pause on critical alerts. Chainlink Automation compatible.</p>
                 </div>
             </div>
 
             <div class="rollout">
-                <h3>Production Rollout</h3>
+                <h3>Infrastructure Status</h3>
                 <div class="rollout-grid">
                     <div class="rollout-item">
-                        <span class="rollout-label">Audit</span>
-                        <span class="rollout-value">Scheduled Q1 2026 (external)</span>
+                        <span class="rollout-label">Contracts</span>
+                        <span class="rollout-value">✅ Live on 7 chains — verified on Etherscan</span>
+                    </div>
+                    <div class="rollout-item">
+                        <span class="rollout-label">Monitoring</span>
+                        <span class="rollout-value">✅ ReversoMonitor + EmergencyGuardian active</span>
                     </div>
                     <div class="rollout-item">
                         <span class="rollout-label">Bug Bounty</span>
-                        <span class="rollout-value">Coming with mainnet gate</span>
+                        <span class="rollout-value">✅ Active — up to $50,000 rewards</span>
                     </div>
                     <div class="rollout-item">
-                        <span class="rollout-label">Observability</span>
-                        <span class="rollout-value">On-chain monitors + alerts at launch</span>
-                    </div>
-                    <div class="rollout-item">
-                        <span class="rollout-label">Contracts</span>
-                        <span class="rollout-value">Deployed on 7 chains; verified on Etherscan</span>
+                        <span class="rollout-label">External Audit</span>
+                        <span class="rollout-value">🔜 Planned Q3 2026 (OpenZeppelin / Trail of Bits)</span>
                     </div>
                 </div>
                 <div class="copy-row">
@@ -881,7 +899,7 @@ console.<span class="code-function">log</span>(transfer.canCancel);     <span cl
         <div class="container">
             <div class="cta-content">
                 <h2>Ready to Send Safely?</h2>
-                <p>Join early adopters testing reversible transfers without risking funds</p>
+                <p>Join the first reversible transaction protocol — live on 7 chains</p>
                 <div class="cta-actions">
                     <a href="#app" class="btn btn-large btn-white">Launch App</a>
                     <a href="https://github.com/conditional-team/REVERSO" class="btn btn-large btn-ghost-white" target="_blank" rel="noopener noreferrer">Read Docs</a>

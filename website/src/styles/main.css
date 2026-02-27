@@ -154,6 +154,122 @@ body {
     to { transform: rotate(360deg); }
 }
 
+/* === Aurora Orbs === */
+.aurora-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.4;
+    z-index: -1;
+    pointer-events: none;
+    will-change: transform;
+}
+
+.aurora-orb-1 {
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(0, 255, 136, 0.15) 0%, transparent 70%);
+    top: -10%;
+    right: -5%;
+    animation: auroraFloat1 20s ease-in-out infinite;
+}
+
+.aurora-orb-2 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.12) 0%, transparent 70%);
+    bottom: 20%;
+    left: -10%;
+    animation: auroraFloat2 25s ease-in-out infinite;
+}
+
+.aurora-orb-3 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.1) 0%, transparent 70%);
+    top: 40%;
+    right: 20%;
+    animation: auroraFloat3 18s ease-in-out infinite;
+}
+
+@keyframes auroraFloat1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(-40px, 30px) scale(1.1); }
+    66% { transform: translate(20px, -20px) scale(0.95); }
+}
+
+@keyframes auroraFloat2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -40px) scale(1.05); }
+    66% { transform: translate(-20px, 20px) scale(1.1); }
+}
+
+@keyframes auroraFloat3 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-30px, -30px) scale(1.15); }
+}
+
+/* === Scroll Reveal Animation === */
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Staggered children */
+.reveal.visible .problem-card,
+.reveal.visible .layer,
+.reveal.visible .step,
+.reveal.visible .tier,
+.reveal.visible .api-plan,
+.reveal.visible .api-feature,
+.reveal.visible .partner-card {
+    opacity: 0;
+    animation: revealChild 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.reveal.visible .problem-card:nth-child(1),
+.reveal.visible .layer:nth-child(1),
+.reveal.visible .step:nth-child(1),
+.reveal.visible .tier:nth-child(1),
+.reveal.visible .api-plan:nth-child(1),
+.reveal.visible .api-feature:nth-child(1),
+.reveal.visible .partner-card:nth-child(1) { animation-delay: 0.1s; }
+
+.reveal.visible .problem-card:nth-child(2),
+.reveal.visible .layer:nth-child(2),
+.reveal.visible .step:nth-child(2),
+.reveal.visible .tier:nth-child(2),
+.reveal.visible .api-plan:nth-child(2),
+.reveal.visible .api-feature:nth-child(2),
+.reveal.visible .partner-card:nth-child(2) { animation-delay: 0.2s; }
+
+.reveal.visible .problem-card:nth-child(3),
+.reveal.visible .layer:nth-child(3),
+.reveal.visible .step:nth-child(3),
+.reveal.visible .tier:nth-child(3),
+.reveal.visible .api-plan:nth-child(3),
+.reveal.visible .api-feature:nth-child(3),
+.reveal.visible .partner-card:nth-child(3) { animation-delay: 0.3s; }
+
+.reveal.visible .problem-card:nth-child(4),
+.reveal.visible .layer:nth-child(4),
+.reveal.visible .api-feature:nth-child(4) { animation-delay: 0.4s; }
+
+.reveal.visible .problem-card:nth-child(5),
+.reveal.visible .layer:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes revealChild {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 /* === Container === */
 .container {
     max-width: var(--container-max);
@@ -507,6 +623,44 @@ h3 { font-size: clamp(1.25rem, 2vw, 1.5rem); }
     max-width: 380px;
     box-shadow: var(--shadow-card), var(--shadow-glow);
     animation: float 6s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Shimmer effect on card */
+.transfer-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.04), transparent);
+    animation: shimmer 4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* Glow border ring */
+.transfer-card::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: var(--border-radius-lg);
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.3), transparent 40%, transparent 60%, rgba(0, 212, 255, 0.2));
+    z-index: -1;
+    animation: glowRotate 8s linear infinite;
+    opacity: 0.5;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
+}
+
+@keyframes glowRotate {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
 }
 
 @keyframes float {
@@ -644,6 +798,26 @@ section {
     font-size: 1.1rem;
 }
 
+/* === Section Divider Gradients === */
+.problem,
+.how-it-works,
+.api-section {
+    position: relative;
+}
+
+.problem::before,
+.how-it-works::before,
+.api-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.3), transparent);
+}
+
 /* === Problem Section === */
 .problem {
     background: var(--bg-surface);
@@ -663,12 +837,15 @@ section {
     padding: 28px;
     text-align: center;
     transition: all var(--transition-normal);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    background: rgba(18, 18, 26, 0.8);
 }
 
 .problem-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-8px);
     border-color: rgba(255, 75, 75, 0.3);
-    box-shadow: 0 10px 40px rgba(255, 75, 75, 0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px rgba(255, 75, 75, 0.08);
 }
 
 .problem-icon {
@@ -730,7 +907,9 @@ section {
     align-items: center;
     gap: 24px;
     padding: 24px;
-    background: var(--bg-card);
+    background: rgba(18, 18, 26, 0.8);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-lg);
     transition: all var(--transition-normal);
@@ -739,7 +918,8 @@ section {
 .layer:hover {
     transform: translateX(10px);
     border-color: var(--primary);
-    box-shadow: var(--shadow-glow);
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.12), var(--shadow-glow);
+    background: rgba(18, 18, 26, 0.95);
 }
 
 .layer-number {
