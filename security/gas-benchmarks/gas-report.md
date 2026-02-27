@@ -1,19 +1,19 @@
 # ⛽ Gas Benchmarks - REVERSO Protocol
 
-Generated: 2026-01-22T11:34:26.122Z
+Generated: 2026-02-27T16:36:35.736Z
 
 ## Summary
 
 | Function | Gas Used | Cost @30 gwei | Cost @10 gwei (L2) |
 |----------|----------|---------------|---------------------|
-| sendToken (ERC20) | 388.441 | $29.13 | $9.71 |
+| sendToken (ERC20) | 390.391 | $29.28 | $9.76 |
 | sendETH (full) | 386.302 | $28.97 | $9.66 |
 | sendETHPremium | 360.790 | $27.06 | $9.02 |
 | sendETHSimple | 316.117 | $23.71 | $7.90 |
 | batchRefundExpired (5) | 249.453 | $18.71 | $6.24 |
 | claim | 195.103 | $14.63 | $4.88 |
 | refundExpired | 94.597 | $7.09 | $2.36 |
-| freezeTransfer | 72.775 | $5.46 | $1.82 |
+| freezeTransfer | 75.133 | $5.63 | $1.88 |
 | cancel | 68.938 | $5.17 | $1.72 |
 | setGuardian | 47.673 | $3.58 | $1.19 |
 | getTransfer (view) | 47.625 | $3.57 | $1.19 |

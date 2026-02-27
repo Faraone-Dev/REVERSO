@@ -7,7 +7,7 @@
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.20-363636?style=for-the-badge&logo=solidity)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![Verified](https://img.shields.io/badge/Etherscan-Verified-blue?style=for-the-badge)
-![Tests](https://img.shields.io/badge/Tests-95%20passing-brightgreen?style=for-the-badge)
+![Tests](https://img.shields.io/badge/Tests-109%20passing-brightgreen?style=for-the-badge)
 ![Security](https://img.shields.io/badge/Security-3%20Contract%20Stack-red?style=for-the-badge)
 ![API](https://img.shields.io/badge/Enterprise%20API-Ready-blue?style=for-the-badge)
 
@@ -28,8 +28,8 @@
 | 🔐 **ReversoVault** | ✅ **Deployed on Ethereum** | [Verified on Etherscan](https://etherscan.io/address/0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085#code) — 1,194 lines, 5-layer protection |
 | 🛡️ **EmergencyGuardian** | ✅ **Deployed on Ethereum** | [Verified on Etherscan](https://etherscan.io/address/0x7F1CB513B7A582A11f3057F104D561E9A9126A7d#code) — Multi-sig + 24h timelock |
 | 👁️ **ReversoMonitor** | ✅ **Deployed on Ethereum** | [Verified on Etherscan](https://etherscan.io/address/0x152935935E86ab06ce75b6871c500f6Eb57f5332#code) — Anomaly detection + auto-pause |
-| 🧪 **Test Suite** | ✅ 95 tests passing | Unit tests + integration tests + security tests |
-| 🔌 **Enterprise API** | ✅ Hardened | HMAC auth, rate limiting, fraud prevention |
+| 🧪 **Test Suite** | ✅ 109 tests passing | Unit tests + integration tests + security tests + gas benchmarks |
+| 🔌 **Enterprise API** | ✅ [Live](https://reverso-tu3o.onrender.com) | HMAC auth, rate limiting, fraud prevention |
 | 🌐 **Website** | ✅ [Live](https://reverso.one/) | Interactive demo with wallet connection |
 | ⛓️ **Multi-chain** | ✅ **7 Chains Live** | Ethereum, BSC, Base, Arbitrum, Polygon, Optimism, Avalanche |
 
@@ -240,12 +240,16 @@ npx hardhat run scripts/deploy-multichain.ts
 | Contract | Address |
 |----------|---------|
 | 🔐 **ReversoVault** | `0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322` |
+| 🛡️ **EmergencyGuardian** | `0x7C962938cce85737eB25147667279117f40dE23a` |
+| 👁️ **ReversoMonitor** | `0x1610DA56f09555a388AB8a095F180A2069FDA4F1` |
 
 ### Avalanche (C-Chain)
 
 | Contract | Address |
 |----------|---------|
 | 🔐 **ReversoVault** | `0x6Ec438bEfE7f956d115c4Aa2B9eB80996df4d322` |
+| 🛡️ **EmergencyGuardian** | `0x7C962938cce85737eB25147667279117f40dE23a` |
+| 👁️ **ReversoMonitor** | `0x1610DA56f09555a388AB8a095F180A2069FDA4F1` |
 
 ### 🔗 Contract Wiring (On-Chain)
 
@@ -809,8 +813,12 @@ Layer 5: RESCUE
 
 **Current Status:**
 - ✅ Ethereum Mainnet deployed (all 3 contracts verified on Etherscan)
+- ✅ 7 chains live (BSC, Base, Arbitrum, Polygon, Optimism, Avalanche)
 - ✅ Internal review + testnet completed (Sepolia)
-- 🔜 Professional audit planned (OpenZeppelin / Trail of Bits)
+- ✅ 109 Hardhat tests passing (unit + integration + security + gas benchmarks)
+- ✅ Foundry fuzz testing (13,000+ runs)
+- ✅ Slither static analysis
+- 🔜 Professional audit planned Q3 2026 (OpenZeppelin / Trail of Bits)
 
 ### Bug Bounty
 
@@ -850,8 +858,9 @@ REVERSO/
 │   └── interfaces/
 │       └── IReversoVault.sol        # Contract interface
 ├── 📁 test/                         # Test suites
-│   ├── ReversoVault.test.ts         # Vault tests (32 tests)
-│   └── SecurityContracts.test.ts    # Guardian + Monitor tests (34 tests)
+│   ├── ReversoVault.test.ts         # Vault tests
+│   ├── SecurityContracts.test.ts    # Guardian + Monitor tests
+│   └── GasBenchmarks.test.ts       # Gas benchmarks
 ├── 📁 api/                          # Enterprise REST API
 │   ├── src/
 │   │   ├── index.ts                 # Express server
@@ -1020,8 +1029,8 @@ REVERSO/
 │   ├── EmergencyGuardian   # Multi-sig + timelock + emergency pause
 │   ├── ReversoMonitor      # Anomaly detection + auto-pause
 │   └── interfaces/         # Contract interfaces
-├── 📁 test/                # Hardhat test suite (80 unit tests)
-├── 📁 security/            # Security suite (13,000+ fuzz tests + Slither)
+├── 📁 test/                # Hardhat test suite (109 tests)
+├── 📁 security/            # Security suite (Foundry fuzz 13,000+ runs + Slither)
 ├── 📁 api/                 # Enterprise REST API
 │   ├── src/routes/         # Transfer, auth, webhooks, admin
 │   ├── src/middleware/     # HMAC, rate limiting, API keys
@@ -1070,7 +1079,7 @@ npx hardhat run scripts/deploy.ts --network ethereum
 
 **[ReversoVault](https://etherscan.io/address/0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085#code)** · **[EmergencyGuardian](https://etherscan.io/address/0x7F1CB513B7A582A11f3057F104D561E9A9126A7d#code)** · **[ReversoMonitor](https://etherscan.io/address/0x152935935E86ab06ce75b6871c500f6Eb57f5332#code)**
 
-95 tests passing · 3-contract security stack · Enterprise REST API
+109 tests passing · 3-contract security stack · Enterprise REST API
 
 ---
 
