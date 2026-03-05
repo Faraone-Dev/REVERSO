@@ -445,7 +445,22 @@ h3 { font-size: clamp(1.25rem, 2vw, 1.5rem); }
 }
 
 .logo-icon {
-    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(0, 229, 155, 0.1);
+    border: 1px solid rgba(0, 229, 155, 0.2);
+    transition: all 0.3s ease;
+}
+
+.nav-logo:hover .logo-icon,
+.footer-logo:hover .logo-icon {
+    background: rgba(0, 229, 155, 0.18);
+    border-color: rgba(0, 229, 155, 0.35);
+    box-shadow: 0 0 16px rgba(0, 229, 155, 0.15);
 }
 
 .logo-text {
