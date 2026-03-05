@@ -6,6 +6,14 @@
 import { ethers } from 'ethers';
 
 // ==========================================
+// Security: HTML sanitizer for user data
+// ==========================================
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+}
+// ==========================================
 // Contract Addresses & Config
 // ==========================================
 const REVERSO_CONFIG = {
@@ -191,6 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initApiTabs();
     initCopyButtons();
     initApiKeyForm();
+    handleDeepLinks();
 });
 
 // ==========================================
@@ -570,6 +579,7 @@ function renderTransfersList() {
             }
         }
         actionButtons += `<button class="btn btn-details" onclick="viewTransfer('${t.id}')">Details</button>`;
+        actionButtons += `<button class="btn btn-details" onclick="shareTransfer('${t.id}')" title="Share link">↗ Share</button>`;
         
         return `
             <div class="transfer-item ${statusClass}" data-id="${t.id}">
@@ -1067,6 +1077,192 @@ function initMobileNav() {
 // ==========================================
 // Wallet Connection (with ethers.js)
 // ==========================================
+// ==========================================
+// Wallet Connection (with wallet selector modal)
+// ==========================================
+const WALLET_OPTIONS = [
+    {
+        id: 'injected',
+        name: 'MetaMask',
+        icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSIjRjY4NTFCIiBkPSJNMjEuNSAyTDE0IDcuNWwxLjQtMy40eiIvPjxwYXRoIGZpbGw9IiNFNDc2MUIiIGQ9Ik0yLjUgMkwxMCA3LjZsLTEuNC0zLjV6Ii8+PHBhdGggZmlsbD0iI0Y2ODUxQiIgZD0iTTE4LjcgMTYuNUwxNiAyMC42bDUuNi0xLjUuOC01LjZ6TTEuNiAxMy41bC44IDUuNiA1LjYgMS41LTIuNy00LjF6Ii8+PHBhdGggZmlsbD0iI0U0NzYxQiIgZD0iTTguMyAxMC43TDYuNSAxMy4ybDUuNS4yLS4yLTUuNXpNMTUuNyAxMC43bC0xLjYtMi44LS4xIDUuNSA1LjUtLjJ6Ii8+PHBhdGggZmlsbD0iI0Y2ODUxQiIgZD0iTTggMjAuNmwyLjgtMS40LTIuNC0xLjl6TTE0LjIgMTkuMmwyLjggMS40LS40LTMuM3oiLz48cGF0aCBmaWxsPSIjRDc1OTFCIiBkPSJNMTcgMjAuNmwtMi44LTEuNC4yIDIuM0wxNyAyMHpNOCAyMC42bDIuNi0xLjcuMiAyLjNMOCAyMHoiLz48cGF0aCBmaWxsPSIjMjMzNDQ3IiBkPSJNMTAuOCAxNS40TDguMyAxNC44bDEuOC0uOHpNMTMuMiAxNS40bC43LTEuNC0xLjguOHoiLz48cGF0aCBmaWxsPSIjQ0Q2MTE2IiBkPSJNOCAyMC42bC40LTMuMy0yLjcuMXpNMTUuNiAxNy4zbC40IDMuMyAyLjMtMy4yeiIvPjxwYXRoIGZpbGw9IiNFNDc2MUIiIGQ9Ik0xOS41IDEzLjJsLTUuNS4yLjUgMi44IDEuOC0uOHpNOC4zIDE0LjhsMS44LjguNS0yLjgtNS41LS4yeiIvPjxwYXRoIGZpbGw9IiNGNjg1MUIiIGQ9Ik01IDEzLjJsMy4zIDMuMy0uMS0xLjd6TTE5IDEzLjJsLTMuMiAxLjYtLjEgMS43eiIvPjwvc3ZnPg==',
+        description: 'Popular browser extension',
+        check: () => typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask,
+        deepLink: 'https://metamask.app.link/dapp/reverso.one'
+    },
+    {
+        id: 'coinbase',
+        name: 'Coinbase Wallet',
+        icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMiIgZmlsbD0iIzAwNTJGRiIvPjxyZWN0IHg9IjcuNSIgeT0iNy41IiB3aWR0aD0iOSIgaGVpZ2h0PSI5IiByeD0iMiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==',
+        description: 'By Coinbase',
+        check: () => typeof window.ethereum !== 'undefined' && window.ethereum.isCoinbaseWallet,
+        deepLink: 'https://go.cb-w.com/dapp?cb_url=https://reverso.one'
+    },
+    {
+        id: 'trust',
+        name: 'Trust Wallet',
+        icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSIjMzM3NUJCIiBkPSJNMTIgMkM2LjQ4IDIgMiA2LjQ4IDIgMTJzNC40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnptMCAxNS41Yy0uNDEgMC0uNzUtLjM0LS43NS0uNzVWMTBjMC0uNDEuMzQtLjc1Ljc1LS43NXMuNzUuMzQuNzUuNzV2Ni43NWMwIC40MS0uMzQuNzUtLjc1Ljc1em0wLTEwYy0uNTUgMC0xLS40NS0xLTFzLjQ1LTEgMS0xIDEgLjQ1IDEgMS0uNDUgMS0xIDF6Ii8+PC9zdmc+',
+        description: 'Trust Wallet App',
+        check: () => typeof window.ethereum !== 'undefined' && window.ethereum.isTrust,
+        deepLink: 'https://link.trustwallet.com/open_url?coin_id=60&url=https://reverso.one'
+    },
+    {
+        id: 'walletconnect',
+        name: 'WalletConnect',
+        icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMiIgZmlsbD0iIzM0OTZGRiIvPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Ik03LjUgOS41YzIuNS0yLjUgNi41LTIuNSA5IDBsLjMuM2MuMS4xLjEuNCAwIC41bC0xIDFjLS4xLjEtLjIuMS0uMyAwbC0uNC0uNGMtMS43LTEuNy00LjUtMS43LTYuMyAwbC0uNC40Yy0uMS4xLS4yLjEtLjMgMGwtMS0xYy0uMS0uMS0uMS0uNCAwLS41bC4zLS4zek0xOSAxMi4zbC45LjljLjEuMS4xLjQgMCAuNWwtNCA0Yy0uMS4xLS40LjEtLjUgMGwtMi44LTIuOGMwLS4xLS4xLS4xLS4xIDBsLTIuOCAyLjhjLS4xLjEtLjQuMS0uNSAwbC00LTRjLS4xLS4xLS4xLS40IDAtLjVsLjktLjljLjEtLjEuNC0uMS41IDBsMi44IDIuOGMwIC4xLjEuMS4xIDBsMi44LTIuOGMuMS0uMS40LS4xLjUgMGwyLjggMi44YzAgLjEuMS4xLjEgMGwyLjgtMi44Yy4xLS4xLjQtLjEuNSAweiIvPjwvc3ZnPg==',
+        description: 'Scan QR code',
+        check: () => false,
+        deepLink: null,
+        projectId: 'c8799977f3dd9cab3501e10f5e23bd46'
+    }
+];
+
+function isMobile() {
+    return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+}
+
+function showWalletModal() {
+    document.getElementById('walletModal')?.remove();
+
+    const hasAnyWallet = typeof window.ethereum !== 'undefined';
+    const mobile = isMobile();
+
+    const modal = document.createElement('div');
+    modal.id = 'walletModal';
+    modal.className = 'modal-overlay';
+
+    const walletItems = WALLET_OPTIONS.map(w => {
+        const available = w.check();
+        const showDeepLink = mobile && w.deepLink && !available;
+
+        return `
+            <button class="wallet-option ${available ? 'available' : ''}" 
+                    data-wallet="${w.id}" 
+                    ${showDeepLink ? `data-deeplink="${w.deepLink}"` : ''}>
+                <img src="${w.icon}" alt="${w.name}" width="40" height="40">
+                <div class="wallet-option-info">
+                    <span class="wallet-option-name">${w.name}</span>
+                    <span class="wallet-option-desc">${available ? 'Detected' : (showDeepLink ? 'Open App' : w.description)}</span>
+                </div>
+                <span class="wallet-option-arrow">${available ? '●' : '→'}</span>
+            </button>
+        `;
+    }).join('');
+
+    modal.innerHTML = `
+        <div class="modal-content wallet-modal-content">
+            <button class="modal-close" aria-label="Close">&times;</button>
+            <h3 class="modal-title" style="color: #fff; font-size: 1.2rem; font-weight: 700; margin-bottom: 6px;">Connect Wallet</h3>
+            <p style="color: rgba(160,160,176,0.8); font-size: 0.82rem; margin-bottom: 1.25rem;">
+                Choose your preferred wallet to connect to REVERSO Protocol.
+            </p>
+            <div class="wallet-options">
+                ${walletItems}
+            </div>
+            ${!hasAnyWallet && !mobile ? `
+                <p style="color: var(--text-muted); font-size: 0.8rem; text-align: center; margin-top: 1rem;">
+                    No wallet detected. <a href="https://metamask.io/download/" target="_blank" rel="noopener noreferrer" style="color: var(--primary);">Install MetaMask</a>
+                </p>
+            ` : ''}
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    requestAnimationFrame(() => modal.classList.add('active'));
+
+    // Close handlers
+    const close = () => { modal.classList.remove('active'); setTimeout(() => modal.remove(), 200); };
+    modal.querySelector('.modal-close').addEventListener('click', close);
+    modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+    document.addEventListener('keydown', function handler(e) {
+        if (e.key === 'Escape') { close(); document.removeEventListener('keydown', handler); }
+    });
+
+    // Wallet selection handlers
+    modal.querySelectorAll('.wallet-option').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const walletId = btn.dataset.wallet;
+            const deeplink = btn.dataset.deeplink;
+
+            // Deep link → open wallet app
+            if (deeplink) {
+                window.location.href = deeplink;
+                close();
+                return;
+            }
+
+            // WalletConnect
+            if (walletId === 'walletconnect') {
+                try {
+                    btn.querySelector('.wallet-option-desc').textContent = 'Initializing...';
+                    const { EthereumProvider } = await import('https://esm.sh/@walletconnect/ethereum-provider@2.17.0');
+                    // Close our modal before WC shows its QR
+                    close();
+                    const wcProvider = await EthereumProvider.init({
+                        projectId: 'c8799977f3dd9cab3501e10f5e23bd46',
+                        chains: [1],
+                        optionalChains: [42161, 8453, 137, 10, 56, 43114],
+                        showQrModal: true,
+                        metadata: {
+                            name: 'REVERSO Protocol',
+                            description: 'Reversible Transaction Protocol',
+                            url: 'https://reverso.one',
+                            icons: ['https://reverso.one/og-image.png']
+                        }
+                    });
+                    await wcProvider.connect();
+                    // Use WC provider with ethers
+                    appState.provider = new ethers.BrowserProvider(wcProvider);
+                    appState.signer = await appState.provider.getSigner();
+                    appState.address = await appState.signer.getAddress();
+                    const network = await appState.provider.getNetwork();
+                    appState.chainId = Number(network.chainId);
+                    const contractAddress = REVERSO_CONFIG.contracts[appState.chainId];
+                    if (contractAddress) {
+                        appState.contract = new ethers.Contract(contractAddress, VAULT_ABI, appState.signer);
+                    }
+                    const connectBtn = document.getElementById('connectWallet');
+                    updateWalletButton(connectBtn, appState.address);
+                    showNotification('Connected via WalletConnect!', 'success');
+                } catch (e) {
+                    console.error('WalletConnect error:', e);
+                    if (e?.message?.includes('rejected') || e?.message?.includes('declined')) {
+                        showNotification('Connection declined', 'error');
+                    } else {
+                        showNotification('WalletConnect failed. Try another wallet.', 'error');
+                    }
+                    btn.querySelector('.wallet-option-desc').textContent = 'Scan QR code';
+                }
+                return;
+            }
+
+            // Injected wallet
+            if (typeof window.ethereum === 'undefined') {
+                showNotification('No wallet detected. Please install a Web3 wallet.', 'error');
+                return;
+            }
+
+            try {
+                btn.querySelector('.wallet-option-desc').textContent = 'Connecting...';
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                if (accounts.length > 0) {
+                    await setupProvider();
+                    const connectBtn = document.getElementById('connectWallet');
+                    updateWalletButton(connectBtn, accounts[0]);
+                    showNotification(`Connected to ${WALLET_OPTIONS.find(w => w.id === walletId)?.name || 'wallet'}!`, 'success');
+                    close();
+                }
+            } catch (error) {
+                if (error.code === 4001) {
+                    showNotification('Connection rejected', 'error');
+                } else {
+                    showNotification('Failed to connect', 'error');
+                }
+                btn.querySelector('.wallet-option-desc').textContent = 'Try again';
+            }
+        });
+    });
+}
+
 async function initWalletConnect() {
     const connectBtn = document.getElementById('connectWallet');
     if (!connectBtn) return;
@@ -1089,40 +1285,21 @@ async function initWalletConnect() {
     connectBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         
-        if (typeof window.ethereum === 'undefined') {
-            showNotification('Please install MetaMask or another Web3 wallet', 'error');
-            window.open('https://metamask.io/download/', '_blank');
+        // If already connected, disconnect
+        if (appState.connected) {
+            appState.connected = false;
+            appState.address = null;
+            appState.provider = null;
+            appState.signer = null;
+            appState.contract = null;
+            connectBtn.innerHTML = `<span class="wallet-dot"></span> Connect Wallet`;
+            connectBtn.classList.remove('connected');
+            showNotification('Wallet disconnected', 'info');
             return;
         }
-        
-        try {
-            connectBtn.innerHTML = `
-                <span class="loading-spinner"></span>
-                Connecting...
-            `;
-            
-            const accounts = await window.ethereum.request({ 
-                method: 'eth_requestAccounts' 
-            });
-            
-            if (accounts.length > 0) {
-                await setupProvider();
-                updateWalletButton(connectBtn, accounts[0]);
-                showNotification('Wallet connected successfully!', 'success');
-            }
-        } catch (error) {
-            console.error('Connection error:', error);
-            connectBtn.innerHTML = `
-                <span class="wallet-dot"></span>
-                Connect Wallet
-            `;
-            
-            if (error.code === 4001) {
-                showNotification('Connection rejected', 'error');
-            } else {
-                showNotification('Failed to connect wallet', 'error');
-            }
-        }
+
+        // Show wallet selector modal
+        showWalletModal();
     });
     
     // Listen for account changes
@@ -1240,7 +1417,7 @@ function showNotification(message, type = 'info') {
     notification.className = `notification notification-${type}`;
     notification.innerHTML = `
         <span class="notification-icon">${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}</span>
-        <span class="notification-message">${message}</span>
+        <span class="notification-message">${escapeHtml(message)}</span>
     `;
     
     notification.style.cssText = `
@@ -1483,4 +1660,125 @@ document.querySelectorAll('.layer').forEach(layer => {
 window.REVERSO = {
     showNotification,
     connectWallet: () => document.getElementById('connectWallet')?.click()
+};
+
+// ==========================================
+// Deep Link Router
+// ==========================================
+function handleDeepLinks() {
+    const params = new URLSearchParams(window.location.search);
+    const action = params.get('action');
+    const transferId = params.get('id') || params.get('transfer');
+    const chainId = params.get('chain');
+    const to = params.get('to');
+    const amount = params.get('amount');
+
+    // No deep link params → nothing to do
+    if (!action && !transferId) return;
+
+    // Scroll to app section
+    setTimeout(() => {
+        document.getElementById('app')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 500);
+
+    // Handle action=send → pre-fill the form
+    if (action === 'send') {
+        if (to && /^0x[a-fA-F0-9]{40}$/.test(to)) {
+            const recipientInput = document.getElementById('recipientAddress');
+            if (recipientInput) recipientInput.value = to;
+        }
+        if (amount && !isNaN(parseFloat(amount))) {
+            const amountInput = document.getElementById('sendAmount');
+            if (amountInput) {
+                amountInput.value = amount;
+                amountInput.dispatchEvent(new Event('input'));
+            }
+        }
+        if (chainId) {
+            const chainBtn = document.querySelector(`.network-btn[data-chain="${chainId}"]`);
+            if (chainBtn) chainBtn.click();
+        }
+        showNotification('Transfer pre-filled from link. Connect wallet to send.', 'info');
+        return;
+    }
+
+    // Handle action=cancel or action=claim → need wallet + contract
+    if ((action === 'cancel' || action === 'claim') && transferId) {
+        if (chainId) {
+            const chainBtn = document.querySelector(`.network-btn[data-chain="${chainId}"]`);
+            if (chainBtn) chainBtn.click();
+        }
+
+        const waitForWallet = () => {
+            if (!appState.connected) {
+                showNotification(`Connect wallet to ${action} transfer #${transferId}`, 'info');
+                return;
+            }
+            if (action === 'cancel') {
+                window.handleCancel(transferId);
+            } else {
+                window.handleClaim(transferId);
+            }
+        };
+        // Give wallet time to auto-connect
+        setTimeout(waitForWallet, 2000);
+        return;
+    }
+
+    // Handle ?transfer=ID → view transfer (shared link from sender)
+    if (transferId) {
+        if (chainId) {
+            const chainBtn = document.querySelector(`.network-btn[data-chain="${chainId}"]`);
+            if (chainBtn) chainBtn.click();
+        }
+
+        const waitAndView = async () => {
+            if (!appState.connected) {
+                showNotification(`Connect wallet to view transfer #${transferId}`, 'info');
+                return;
+            }
+            if (appState.contract) {
+                try {
+                    const transfer = await appState.contract.getTransfer(transferId);
+                    const createdDate = new Date(Number(transfer.createdAt) * 1000).toLocaleString();
+                    const unlockDate = new Date(Number(transfer.unlockAt) * 1000).toLocaleString();
+                    const expiryDate = new Date(Number(transfer.expiresAt) * 1000).toLocaleString();
+                    showTransferModal({
+                        id: transferId,
+                        amount: ethers.formatEther(transfer.amount),
+                        token: transfer.token === ethers.ZeroAddress ? 'ETH' : 'TOKEN',
+                        sender: transfer.sender,
+                        recipient: transfer.recipient,
+                        status: ['Pending', 'Completed', 'Cancelled', 'Refunded', 'Frozen'][transfer.status],
+                    }, createdDate, unlockDate, expiryDate);
+                } catch (e) {
+                    showNotification(`Transfer #${transferId} not found on this chain`, 'error');
+                }
+            }
+        };
+        setTimeout(waitAndView, 2500);
+        return;
+    }
+}
+
+// ==========================================
+// Share Transfer Link
+// ==========================================
+window.shareTransfer = function(transferId) {
+    const chainId = appState.chainId;
+    const url = `${window.location.origin}${window.location.pathname}?transfer=${transferId}&chain=${chainId}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'REVERSO Transfer',
+            text: `View reversible transfer #${transferId} on REVERSO Protocol`,
+            url: url
+        }).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(url).then(() => {
+            showNotification('Share link copied to clipboard!', 'success');
+        }).catch(() => {
+            showNotification('Failed to copy link', 'error');
+        });
+    }
 };

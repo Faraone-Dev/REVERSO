@@ -123,6 +123,11 @@
     }
     </script>
 
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://esm.sh 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data: blob:; connect-src 'self' https://*.alchemy.com https://*.publicnode.com https://*.base.org https://*.optimism.io https://*.binance.org https://api.avax.network https://reverso-tu3o.onrender.com https://api.coingecko.com wss://*.walletconnect.com wss://*.walletconnect.org https://*.walletconnect.com https://*.walletconnect.org; frame-src https://*.walletconnect.com https://*.walletconnect.org; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -953,7 +958,7 @@ console.<span class="code-function">log</span>(transfer.canCancel);     <span cl
                 <h2>Production-Grade Security</h2>
                 <p>3-contract security stack deployed and verified on 7 EVM chains</p>
             </div>
-            <div class="problem-grid">
+            <div class="security-grid">
                 <div class="problem-card">
                     <div class="problem-icon">✅</div>
                     <h3>Mainnet Live</h3>

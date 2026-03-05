@@ -140,7 +140,7 @@ export async function createApiKey(
   allowedOrigins: string[] = []
 ): Promise<ApiKey> {
   const rawKey = `rsk_${plan}_${uuidv4().replace(/-/g, '')}`;
-  const hashedKey = await bcrypt.hash(rawKey, 6); // Reduced rounds for faster key generation
+  const hashedKey = await bcrypt.hash(rawKey, 10);
   const signingSecret = `sig_${uuidv4().replace(/-/g, '')}`;
   
   const apiKey: ApiKey = {

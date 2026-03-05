@@ -14,15 +14,20 @@ export function errorHandler(
   console.error('API Error:', err);
 
   const statusCode = err.statusCode || 500;
-  const message = err.message || 'Internal server error';
+  const message = statusCode === 500 ? 'Internal server error' : (err.message || 'Internal server error');
   const code = err.code || 'INTERNAL_ERROR';
 
-  res.status(statusCode).json({
+  const response: Record<string, unknown> = {
     error: message,
     code,
-    timestamp: new Date().toISOString(),
-    path: req.path
-  });
+    timestamp: new Date().toISOString()
+  };
+
+  if (process.env.NODE_ENV !== 'production') {
+    response.path = req.path;
+  }
+
+  res.status(statusCode).json(response);
 }
 
 export function asyncHandler(fn: Function) {

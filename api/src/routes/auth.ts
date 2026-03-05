@@ -38,7 +38,8 @@ const quickKeyRateLimit: Map<string, { ts: number; count: number }> = new Map();
 authRouter.post('/quick-key', asyncHandler(async (req: any, res: Response) => {
   const { email, company } = req.body;
 
-  if (!email || typeof email !== 'string' || !email.includes('@')) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || typeof email !== 'string' || !emailRegex.test(email)) {
     throw BadRequest('A valid email is required');
   }
 
