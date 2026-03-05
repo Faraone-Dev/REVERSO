@@ -19,7 +19,7 @@ REVERSO is the first **non-custodial reversible transaction protocol** for EVM c
 | **Problem Size** | $3.8B+ lost annually |
 | **Solution** | Time-locked reversible transfers |
 | **Product Status** | MVP complete, 66/66 tests passing |
-| **Chains Supported** | 5 live (ETH, Arbitrum, Base, Optimism, Polygon) |
+| **Chains Supported** | 7 live (ETH, BSC, Base, Arbitrum, Polygon, Optimism, Avalanche) |
 | **Revenue Model** | 0.3-0.7% fees + 0.2% insurance + API subscriptions |
 | **Ask** | $50,000 |
 | **Use** | Security audit + enterprise partnerships + go-to-market |
@@ -77,7 +77,7 @@ REVERSO introduces a **non-custodial safety layer** between sender and recipient
 **Key Differentiators:**
 - **Non-custodial**: Funds stay in smart contract, not our wallets
 - **Configurable lock**: 1 hour to 30 days
-- **Multi-chain**: Same UX across 5+ EVM chains
+- **Multi-chain**: Same UX across 7 EVM chains
 - **Insurance option**: +0.2% for full scam protection
 - **Enterprise API**: HMAC-secured, rate-limited, webhook-enabled
 
@@ -366,7 +366,7 @@ We're applying for the **Optimism Foundation Audit Grant** - a program that subs
 - ✅ Smart contract development (1,119 lines)
 - ✅ Full test suite (32 tests, 100% passing)
 - ✅ Enterprise API with security hardening
-- ✅ Multi-chain configuration (5 chains)
+- ✅ Multi-chain configuration (7 chains)
 - ✅ Website and demo UI
 - ✅ Documentation and investor materials
 

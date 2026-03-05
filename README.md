@@ -780,6 +780,26 @@ monitor.recordTransaction(sender, amount);
 - ✅ OpenZeppelin battle-tested contracts
 - ✅ Anomaly detection with auto-pause
 
+### Web & API Security
+
+| Protection | Layer | Description |
+|-----------|-------|-------------|
+| **Content Security Policy** | Website | Strict CSP blocking unauthorized scripts, iframes, and connections |
+| **X-Content-Type-Options** | Website | Prevents MIME-type sniffing attacks |
+| **Referrer Policy** | Website | Controls information leakage to external sites |
+| **Frame-ancestors: none** | Website | Anti-clickjacking — prevents iframe embedding |
+| **Upgrade-insecure-requests** | Website | Forces HTTPS on all resources |
+| **XSS Sanitizer** | Website | `escapeHtml()` on all user-interpolated data |
+| **CORS Lockdown** | API | Restricted to `reverso.one` only (no wildcard) |
+| **Helmet.js** | API | HSTS (1 year + preload), CSP, referrer policy |
+| **HMAC-SHA256** | API | Request signature verification with timestamp + nonce |
+| **Replay Protection** | API | Nonce-based deduplication prevents replay attacks |
+| **Rate Limiting** | API | Global: 1000 req/15min — Per-key: 300 req/min |
+| **Bcrypt (10 rounds)** | API | Industry-standard hashing for API key credentials |
+| **JWT Auth** | API | 30-day token expiry with strong secret |
+| **Error Masking** | API | 500 errors masked in production, no path leakage |
+| **Input Validation** | API | Email regex, address regex, amount checks |
+
 ### 5-Layer User Protection System
 
 ```
