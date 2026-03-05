@@ -22,7 +22,9 @@ export default defineConfig({
         cssMinify: true,
         rollupOptions: {
             input: {
-                main: './index.html'
+                main: './index.html',
+                terms: './terms.html',
+                privacy: './privacy.html'
             },
             output: {
                 manualChunks: {
