@@ -2097,8 +2097,8 @@ section {
     /* Hero mobile improvements */
     .hero {
         min-height: auto;
-        padding: calc(var(--nav-height) + 24px) 16px 40px;
-        gap: 32px;
+        padding: calc(var(--nav-height) + 16px) 16px 20px;
+        gap: 24px;
     }
 
     .hero-badge {
@@ -2135,11 +2135,11 @@ section {
 
     /* Sections spacing */
     section {
-        padding: 60px 0;
+        padding: 36px 0;
     }
 
     .section-header {
-        margin-bottom: 36px;
+        margin-bottom: 24px;
     }
 
     .container {
@@ -2319,7 +2319,7 @@ section {
 
     /* Sections */
     section {
-        padding: 48px 0;
+        padding: 28px 0;
     }
 
     .container {
@@ -2327,7 +2327,7 @@ section {
     }
 
     .section-header {
-        margin-bottom: 28px;
+        margin-bottom: 20px;
     }
 
     .section-tag {
@@ -2374,7 +2374,7 @@ section {
 
     /* CTA */
     .cta {
-        padding: 40px 0;
+        padding: 24px 0;
     }
 
     .cta-stat-value {
