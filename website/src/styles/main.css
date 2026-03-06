@@ -3607,9 +3607,36 @@ section {
     opacity: 0.8;
 }
 
-/* WalletConnect QR modal — force above everything */
+/* WalletConnect QR modal — force above everything & fix mobile clipping */
 w3m-modal, .wcm-overlay, [class*="walletconnect"], #walletconnect-wrapper {
     z-index: 99999 !important;
+    position: fixed !important;
+}
+
+w3m-modal {
+    --w3m-z-index: 99999 !important;
+}
+
+/* Mobile: prevent QR from being cut off */
+@media (max-width: 768px) {
+    w3m-modal, .wcm-overlay, [class*="walletconnect"], #walletconnect-wrapper {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 100dvh !important;
+        overflow-y: auto !important;
+    }
+
+    /* Scale down QR container to fit mobile viewport */
+    w3m-modal::part(card),
+    wcm-modal .wcm-card,
+    [class*="walletconnect-modal__base"] {
+        max-height: 90dvh !important;
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+        margin: auto !important;
+    }
 }
 
 /* ==========================================
