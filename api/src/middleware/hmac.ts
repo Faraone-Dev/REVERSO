@@ -7,8 +7,11 @@ const nonceStore: Map<string, Set<string>> = new Map();
 const MAX_DRIFT_MS = 60 * 1000; // 60 seconds - tight window for security
 
 function safeJsonStringify(body: any): string {
+  if (body === undefined || body === null) return '';
   try {
-    return typeof body === 'string' ? body : JSON.stringify(body || {});
+    if (typeof body === 'string') return body;
+    const s = JSON.stringify(body);
+    return s === '{}' ? '' : s;
   } catch {
     return '';
   }
