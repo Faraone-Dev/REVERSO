@@ -1,6 +1,6 @@
 # ⛽ Gas Benchmarks - REVERSO Protocol
 
-Generated: 2026-02-27T16:36:35.736Z
+Generated: 2026-03-07T14:45:44.725Z
 
 ## Summary
 
