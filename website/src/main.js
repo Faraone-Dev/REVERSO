@@ -1659,18 +1659,25 @@ function initTransferCardAnimation() {
 // Nav Scroll Effect
 // ==========================================
 let lastScroll = 0;
+let scrollTicking = false;
 window.addEventListener('scroll', () => {
-    const nav = document.querySelector('.nav');
-    const currentScroll = window.pageYOffset;
-    
-    if (currentScroll > 100) {
-        nav.style.background = 'rgba(10, 10, 15, 0.95)';
-    } else {
-        nav.style.background = 'rgba(10, 10, 15, 0.8)';
+    if (!scrollTicking) {
+        requestAnimationFrame(() => {
+            const nav = document.querySelector('.nav');
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                nav.style.background = 'rgba(10, 10, 15, 0.95)';
+            } else {
+                nav.style.background = 'rgba(10, 10, 15, 0.8)';
+            }
+            
+            lastScroll = currentScroll;
+            scrollTicking = false;
+        });
+        scrollTicking = true;
     }
-    
-    lastScroll = currentScroll;
-});
+}, { passive: true });
 
 // ==========================================
 // Layer Hover Effects

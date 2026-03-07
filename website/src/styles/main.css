@@ -177,13 +177,14 @@ body::after {
 .aurora-orb {
     position: absolute;
     border-radius: 50%;
-    filter: blur(100px);
-    opacity: 0.6;
+    filter: blur(60px);
+    opacity: 0.5;
     z-index: -1;
     pointer-events: none;
     will-change: transform;
-    contain: layout style;
+    contain: layout style paint;
     backface-visibility: hidden;
+    transform: translateZ(0);
 }
 
 .aurora-orb-1 {
