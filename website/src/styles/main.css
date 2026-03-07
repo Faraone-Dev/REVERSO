@@ -1402,6 +1402,7 @@ section {
 .tier {
     position: relative;
     padding: 36px;
+    padding-top: 48px;
     background: rgba(18, 18, 26, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: var(--border-radius-lg);
@@ -1409,6 +1410,7 @@ section {
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
+    overflow: visible;
 }
 
 .tier:hover {
@@ -1422,9 +1424,9 @@ section {
 
 .tier-badge {
     position: absolute;
-    top: -1px;
+    top: -12px;
     left: 50%;
-    transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%);
     padding: 6px 16px;
     background: var(--gradient-primary);
     border-radius: 50px;
