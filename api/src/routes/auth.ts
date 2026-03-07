@@ -96,7 +96,7 @@ authRouter.post('/quick-key', asyncHandler(async (req: any, res: Response) => {
   if (resend) {
     const txLimit = PLAN_CONFIG[plan].txLimit;
     resend.emails.send({
-      from: 'REVERSO <onboarding@resend.dev>',
+      from: 'REVERSO <noreply@reverso.one>',
       to: user.email,
       subject: 'Welcome to REVERSO — Your API Access is Active',
       html: `
