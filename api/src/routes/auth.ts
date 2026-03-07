@@ -51,7 +51,7 @@ authRouter.post('/quick-key', asyncHandler(async (req: any, res: Response) => {
   const now = Date.now();
   const window = quickKeyRateLimit.get(ip);
   if (window && (now - window.ts) < 3600_000) {
-    if (window.count >= 3) {
+      if (window.count >= 10) {
       return res.status(429).json({
         error: 'Too many key requests. Try again in 1 hour.',
         code: 'RATE_LIMITED'
