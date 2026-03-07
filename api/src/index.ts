@@ -10,6 +10,7 @@ import { transferRouter } from './routes/transfer';
 import { webhookRouter } from './routes/webhook';
 import { adminRouter } from './routes/admin';
 import { usecaseRouter } from './routes/usecases';
+import { billingRouter } from './routes/billing';
 import { apiKeyMiddleware } from './middleware/apiKey';
 import { hmacMiddleware } from './middleware/hmac';
 import { errorHandler } from './middleware/errorHandler';
@@ -42,6 +43,12 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'x-reverso-signature', 'x-reverso-timestamp', 'x-reverso-nonce']
 }));
 app.use(morgan('combined'));
+// Raw body for Stripe webhook signature verification
+app.use('/api/v1/billing/webhook', express.raw({ type: 'application/json', limit: '1mb' }), (req: any, _res, next) => {
+  req.rawBody = req.body;
+  req.body = JSON.parse(req.body.toString());
+  next();
+});
 app.use(express.json({ limit: '10mb' }));
 
 // Global rate limit
@@ -83,6 +90,7 @@ app.get('/', (req, res) => {
 
 // Public routes
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/billing', billingRouter);
 
 // Protected routes (require API key + HMAC)
 app.use('/api/v1/transfers', apiKeyMiddleware, hmacMiddleware, transferRouter);

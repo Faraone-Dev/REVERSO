@@ -875,6 +875,43 @@ function initCopyButtons() {
 // ==========================================
 const API_BASE = 'https://reverso-tu3o.onrender.com';
 
+// Stripe Checkout
+window.startCheckout = async function(plan) {
+    try {
+        const btn = document.querySelector(`[data-plan="${plan}"]`);
+        if (btn) {
+            btn.textContent = 'Redirecting...';
+            btn.style.pointerEvents = 'none';
+        }
+
+        const res = await fetch(`${API_BASE}/api/v1/billing/checkout`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ plan })
+        });
+
+        const data = await res.json();
+
+        if (data.url) {
+            window.location.href = data.url;
+        } else {
+            alert('Error creating checkout session. Please try again.');
+            if (btn) {
+                btn.textContent = 'Get Started';
+                btn.style.pointerEvents = 'auto';
+            }
+        }
+    } catch (err) {
+        console.error('Checkout error:', err);
+        alert('Error connecting to payment server. Please try again.');
+        const btn = document.querySelector(`[data-plan="${plan}"]`);
+        if (btn) {
+            btn.textContent = 'Get Started';
+            btn.style.pointerEvents = 'auto';
+        }
+    }
+};
+
 function initApiKeyForm() {
     const form = document.getElementById('apiKeyForm');
     if (!form) return;
