@@ -4,7 +4,7 @@
 
 **REVERSIBLE TRANSACTIONS INFRASTRUCTURE FOR WEB3**
 
-*Built in 2 weeks. Production-ready. Seeking strategic investment.*
+*Production-ready. Seeking strategic investment.*
 
 </div>
 
@@ -393,7 +393,6 @@ We're applying for the **Optimism Foundation Audit Grant** - a program that subs
 
 **Why solo is an advantage:**
 - Zero coordination overhead
-- Built entire MVP in 2 weeks
 - Fast iteration, no committee decisions
 - Capital goes to product, not salaries
 
@@ -450,7 +449,7 @@ We're applying for the **Optimism Foundation Audit Grant** - a program that subs
 
 <div align="center">
 
-*"I built this in 2 weeks because I believe crypto needs to be safer for everyone. I'm looking for an investor who shares that vision and wants to build something that matters."*
+*"I believe crypto needs to be safer for everyone. I'm looking for an investor who shares that vision and wants to build something that matters."*
 
 **REVERSO Protocol - Because everyone deserves a second chance.**
 
