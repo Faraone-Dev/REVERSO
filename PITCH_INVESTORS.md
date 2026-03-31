@@ -440,7 +440,7 @@ We're applying for the **Optimism Foundation Audit Grant** - a program that subs
 
 | Channel | Link |
 |---------|------|
-| **GitHub** | github.com/conditional-team/conditionalx/tree/main/REVERSO |
+| **GitHub** | github.com/Faraone-Dev/REVERSO |
 | **Demo** | Available on request |
 | **Email** | [Your email here] |
 | **Telegram** | [Your Telegram here] |

@@ -162,7 +162,7 @@ Example: 10 ETH with insurance
 
 ```bash
 # Clone the repository
-git clone https://github.com/conditional-team/REVERSO.git
+git clone https://github.com/Faraone-Dev/REVERSO.git
 cd REVERSO
 
 # Install dependencies
@@ -987,7 +987,7 @@ REVERSO is designed to integrate with the broader DeFi ecosystem:
 
 ```bash
 # Clone repo
-git clone https://github.com/conditional-team/REVERSO.git
+git clone https://github.com/Faraone-Dev/REVERSO.git
 cd REVERSO
 
 # Install dependencies
@@ -1038,7 +1038,7 @@ MIT License - see [LICENSE](LICENSE)
 |----------|------|
 | 🌐 **Website** | [reverso.one](https://reverso.one/) |
 | 🔌 **API (Live)** | [reverso-tu3o.onrender.com](https://reverso-tu3o.onrender.com) |
-| 📦 **Repository** | [github.com/conditional-team/REVERSO](https://github.com/conditional-team/REVERSO) |
+| 📦 **Repository** | [github.com/Faraone-Dev/REVERSO](https://github.com/Faraone-Dev/REVERSO) |
 | 📄 **Documentation** | [This README](#-quick-start) |
 | 🔌 **API Docs** | [Enterprise API Section](#-enterprise-api) |
 | 💼 **Investor Pitch** | [PITCH_INVESTORS.md](PITCH_INVESTORS.md) |
