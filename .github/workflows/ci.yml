@@ -65,3 +65,5 @@ jobs:
         working-directory: api
       - run: npx tsc --noEmit
         working-directory: api
+      - run: npm test -- --passWithNoTests
+        working-directory: api

@@ -841,4 +841,302 @@ describe("ReversoVault", function () {
         .withArgs(1, sender.address, refundAmount, "Test manual refund");
     });
   });
+
+  // ═══════════════════════════════════════════════════════════════
+  //                 WITHDRAW EXCESS INSURANCE
+  // ═══════════════════════════════════════════════════════════════
+
+  describe("Withdraw Excess Insurance", function () {
+    it("Should withdraw excess insurance to treasury", async function () {
+      // Create several premium transfers to build up insurance pool
+      for (let i = 0; i < 5; i++) {
+        await reversoVault.connect(sender).sendETHPremium(
+          recipient.address,
+          ONE_HOUR,
+          ONE_DAY * 7,
+          sender.address,
+          sender.address,
+          "Build pool",
+          { value: TEN_ETH }
+        );
+      }
+
+      const poolBefore = await reversoVault.getInsurancePoolBalance();
+      expect(poolBefore).to.be.greaterThan(0);
+
+      // TVL is non-zero, so 20% reserve required
+      // If pool > 20% of TVL, excess can be withdrawn
+      const tvl = await reversoVault.totalValueLocked(ethers.ZeroAddress);
+      const requiredReserve = (tvl * 20n) / 100n;
+
+      if (poolBefore > requiredReserve) {
+        const treasuryBefore = await ethers.provider.getBalance(treasury.address);
+        await reversoVault.connect(owner).withdrawExcessInsurance();
+        const treasuryAfter = await ethers.provider.getBalance(treasury.address);
+        const poolAfter = await reversoVault.getInsurancePoolBalance();
+
+        expect(poolAfter).to.equal(requiredReserve);
+        expect(treasuryAfter).to.be.greaterThan(treasuryBefore);
+      }
+    });
+
+    it("Should reject if pool is at minimum reserve", async function () {
+      // No premium transfers → pool is 0 → cannot withdraw
+      await expect(
+        reversoVault.connect(owner).withdrawExcessInsurance()
+      ).to.be.reverted;
+    });
+
+    it("Should reject from non-owner", async function () {
+      await expect(
+        reversoVault.connect(sender).withdrawExcessInsurance()
+      ).to.be.revertedWithCustomError(reversoVault, "OwnableUnauthorizedAccount");
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  //                      FEE TIER BOUNDARIES
+  // ═══════════════════════════════════════════════════════════════
+
+  describe("Fee Tier Boundaries", function () {
+    it("Should apply retail fee (0.3%) for small amounts", async function () {
+      const smallAmount = ethers.parseEther("0.1"); // < 0.4 ETH = retail
+      const expectedFeeBps = 30n;
+      const expectedFee = (smallAmount * expectedFeeBps) / 10000n;
+
+      const treasuryBefore = await ethers.provider.getBalance(treasury.address);
+      await reversoVault.connect(sender).sendETHSimple(
+        recipient.address, "Retail test", { value: smallAmount }
+      );
+      const treasuryAfter = await ethers.provider.getBalance(treasury.address);
+
+      expect(treasuryAfter - treasuryBefore).to.equal(expectedFee);
+    });
+
+    it("Should apply standard fee (0.5%) for medium amounts", async function () {
+      const mediumAmount = ethers.parseEther("1"); // 0.4-40 ETH = standard
+      const expectedFeeBps = 50n;
+      const expectedFee = (mediumAmount * expectedFeeBps) / 10000n;
+
+      const treasuryBefore = await ethers.provider.getBalance(treasury.address);
+      await reversoVault.connect(sender).sendETHSimple(
+        recipient.address, "Standard test", { value: mediumAmount }
+      );
+      const treasuryAfter = await ethers.provider.getBalance(treasury.address);
+
+      expect(treasuryAfter - treasuryBefore).to.equal(expectedFee);
+    });
+
+    it("Should apply whale fee (0.7%) for large amounts", async function () {
+      const whaleAmount = ethers.parseEther("50"); // > 40 ETH = whale
+      const expectedFeeBps = 70n;
+      const expectedFee = (whaleAmount * expectedFeeBps) / 10000n;
+
+      const treasuryBefore = await ethers.provider.getBalance(treasury.address);
+      await reversoVault.connect(sender).sendETHSimple(
+        recipient.address, "Whale test", { value: whaleAmount }
+      );
+      const treasuryAfter = await ethers.provider.getBalance(treasury.address);
+
+      expect(treasuryAfter - treasuryBefore).to.equal(expectedFee);
+    });
+
+    it("Should use correct tier at exact boundary (0.4 ETH)", async function () {
+      const boundary = ethers.parseEther("0.4"); // exactly TIER_RETAIL_MAX
+      expect(await reversoVault.calculateFeeBps(boundary)).to.equal(30); // retail
+    });
+
+    it("Should use correct tier just above boundary (0.4+ ETH)", async function () {
+      const aboveBoundary = ethers.parseEther("0.4") + 1n;
+      expect(await reversoVault.calculateFeeBps(aboveBoundary)).to.equal(50); // standard
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  //                   ERC20 TOKEN LIFECYCLE
+  // ═══════════════════════════════════════════════════════════════
+
+  describe("Token Lifecycle (Cancel, Claim, Refund, Freeze)", function () {
+    let token: TestToken;
+    const TOKEN_AMT = ethers.parseEther("100");
+
+    beforeEach(async function () {
+      const TokenFactory = await ethers.getContractFactory("TestToken");
+      token = await TokenFactory.connect(sender).deploy("Mock", "MOCK", ethers.parseEther("10000")) as unknown as TestToken;
+      await token.waitForDeployment();
+      await token.connect(sender).approve(await reversoVault.getAddress(), ethers.MaxUint256);
+    });
+
+    it("Should cancel ERC20 transfer and return tokens", async function () {
+      await reversoVault.connect(sender).sendToken(
+        await token.getAddress(), recipient.address, TOKEN_AMT,
+        ONE_DAY, ONE_DAY * 7, sender.address, sender.address, "Token cancel"
+      );
+
+      const balBefore = await token.balanceOf(sender.address);
+      await reversoVault.connect(sender).cancel(1);
+      const balAfter = await token.balanceOf(sender.address);
+
+      const transfer = await reversoVault.getTransfer(1);
+      expect(transfer.status).to.equal(2); // Cancelled
+      expect(balAfter).to.be.greaterThan(balBefore);
+    });
+
+    it("Should claim ERC20 transfer after unlock", async function () {
+      await reversoVault.connect(sender).sendToken(
+        await token.getAddress(), recipient.address, TOKEN_AMT,
+        ONE_HOUR, ONE_DAY * 7, sender.address, sender.address, "Token claim"
+      );
+
+      await time.increase(ONE_HOUR + 1);
+
+      const balBefore = await token.balanceOf(recipient.address);
+      await reversoVault.connect(recipient).claim(1);
+      const balAfter = await token.balanceOf(recipient.address);
+
+      const transfer = await reversoVault.getTransfer(1);
+      expect(transfer.status).to.equal(1); // Claimed
+      expect(balAfter).to.be.greaterThan(balBefore);
+    });
+
+    it("Should refund expired ERC20 transfer", async function () {
+      await reversoVault.connect(sender).sendToken(
+        await token.getAddress(), recipient.address, TOKEN_AMT,
+        ONE_HOUR, ONE_DAY * 7, sender.address, sender.address, "Token refund"
+      );
+
+      await time.increase(ONE_HOUR + ONE_DAY * 7 + 1);
+
+      const balBefore = await token.balanceOf(sender.address);
+      await reversoVault.connect(owner).refundExpired(1);
+      const balAfter = await token.balanceOf(sender.address);
+
+      const transfer = await reversoVault.getTransfer(1);
+      expect(transfer.status).to.equal(3); // Refunded
+      expect(balAfter).to.be.greaterThan(balBefore);
+    });
+
+    it("Should freeze ERC20 transfer by guardian", async function () {
+      await reversoVault.connect(sender).sendToken(
+        await token.getAddress(), recipient.address, TOKEN_AMT,
+        ONE_DAY, ONE_DAY * 7, sender.address, sender.address, "Token freeze"
+      );
+
+      await reversoVault.connect(owner).setGuardian(owner.address, true);
+
+      const balBefore = await token.balanceOf(sender.address);
+      await reversoVault.connect(owner).freezeTransfer(1, "Suspicious token tx");
+      const balAfter = await token.balanceOf(sender.address);
+
+      const transfer = await reversoVault.getTransfer(1);
+      expect(transfer.status).to.equal(2); // Cancelled (frozen)
+      expect(balAfter).to.be.greaterThan(balBefore);
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  //                   INSURANCE EDGE CASES
+  // ═══════════════════════════════════════════════════════════════
+
+  describe("Insurance Edge Cases", function () {
+    it("Should reject insurance claim on non-insured transfer", async function () {
+      // Regular (non-premium) transfer
+      await reversoVault.connect(sender).sendETH(
+        recipient.address, ONE_HOUR, ONE_DAY * 7,
+        sender.address, sender.address, "No insurance",
+        { value: ONE_ETH }
+      );
+      await time.increase(ONE_HOUR + 1);
+      await reversoVault.connect(recipient).claim(1);
+
+      await expect(
+        reversoVault.connect(owner).payInsuranceClaim(1, sender.address, ethers.parseEther("0.01"), "Not insured")
+      ).to.be.reverted;
+    });
+
+    it("Should reject insurance claim exceeding pool balance", async function () {
+      await reversoVault.connect(sender).sendETHPremium(
+        recipient.address, ONE_HOUR, ONE_DAY * 7,
+        sender.address, sender.address, "Small premium",
+        { value: ONE_ETH }
+      );
+      await time.increase(ONE_HOUR + 1);
+      await reversoVault.connect(recipient).claim(1);
+
+      const pool = await reversoVault.getInsurancePoolBalance();
+
+      await expect(
+        reversoVault.connect(owner).payInsuranceClaim(1, sender.address, pool + 1n, "Too much")
+      ).to.be.reverted;
+    });
+
+    it("Should reject insurance claim to zero address", async function () {
+      await reversoVault.connect(sender).sendETHPremium(
+        recipient.address, ONE_HOUR, ONE_DAY * 7,
+        sender.address, sender.address, "Claim to zero",
+        { value: ONE_ETH }
+      );
+      await time.increase(ONE_HOUR + 1);
+      await reversoVault.connect(recipient).claim(1);
+
+      await expect(
+        reversoVault.connect(owner).payInsuranceClaim(1, ethers.ZeroAddress, ethers.parseEther("0.001"), "Bad addr")
+      ).to.be.reverted;
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  //                  CIRCUIT BREAKER & RATE LIMIT
+  // ═══════════════════════════════════════════════════════════════
+
+  describe("Circuit Breaker and Admin Config", function () {
+    it("Should update circuit breaker limits", async function () {
+      await reversoVault.connect(owner).setCircuitBreakerLimits(200, ethers.parseEther("500"));
+      expect(await reversoVault.maxWithdrawalsPerHour()).to.equal(200);
+      expect(await reversoVault.maxValuePerHour()).to.equal(ethers.parseEther("500"));
+    });
+
+    it("Should reject circuit breaker update from non-owner", async function () {
+      await expect(
+        reversoVault.connect(sender).setCircuitBreakerLimits(200, ethers.parseEther("500"))
+      ).to.be.revertedWithCustomError(reversoVault, "OwnableUnauthorizedAccount");
+    });
+
+    it("Should update alert threshold", async function () {
+      await reversoVault.connect(owner).setAlertThreshold(5000); // 50%
+      expect(await reversoVault.alertThresholdBps()).to.equal(5000);
+    });
+
+    it("Should reject alert threshold > 100%", async function () {
+      await expect(
+        reversoVault.connect(owner).setAlertThreshold(10001)
+      ).to.be.reverted;
+    });
+
+    it("Should reject alert threshold update from non-owner", async function () {
+      await expect(
+        reversoVault.connect(sender).setAlertThreshold(5000)
+      ).to.be.revertedWithCustomError(reversoVault, "OwnableUnauthorizedAccount");
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  //                  GUARDIAN ACCESS CONTROL
+  // ═══════════════════════════════════════════════════════════════
+
+  describe("Guardian Access Control", function () {
+    it("Should reject setGuardian from non-owner", async function () {
+      await expect(
+        reversoVault.connect(sender).setGuardian(sender.address, true)
+      ).to.be.revertedWithCustomError(reversoVault, "OwnableUnauthorizedAccount");
+    });
+
+    it("Should correctly report guardian status", async function () {
+      await reversoVault.connect(owner).setGuardian(sender.address, true);
+      expect(await reversoVault.isGuardian(sender.address)).to.equal(true);
+
+      await reversoVault.connect(owner).setGuardian(sender.address, false);
+      expect(await reversoVault.isGuardian(sender.address)).to.equal(false);
+    });
+  });
 });

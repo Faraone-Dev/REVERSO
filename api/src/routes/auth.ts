@@ -303,3 +303,143 @@ authRouter.post('/api-key', asyncHandler(async (req: any, res: Response) => {
     throw BadRequest('Invalid or expired token');
   }
 }));
+
+// ═══════════════════════════════════════════════════════════════
+//                   EMAIL VERIFICATION
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * POST /api/v1/auth/verify-email/send
+ * Send (or re-send) a verification email. Requires JWT.
+ */
+authRouter.post('/verify-email/send', asyncHandler(async (req: any, res: Response) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) throw BadRequest('JWT required');
+
+  const decoded = jwt.verify(authHeader.substring(7), JWT_SECRET!) as any;
+  const user = DB.findUserById.get(decoded.userId) as any;
+  if (!user) throw BadRequest('User not found');
+
+  if (user.email_verified) {
+    return res.json({ success: true, message: 'Email already verified' });
+  }
+
+  const token = crypto.randomBytes(32).toString('hex');
+  DB.insertEmailVerification.run({ userId: user.id, token });
+
+  // Send verification email
+  if (resend) {
+    const verifyUrl = `${process.env.APP_URL || 'https://reverso.one'}/verify?token=${token}`;
+    resend.emails.send({
+      from: 'REVERSO <noreply@reverso.one>',
+      to: user.email,
+      subject: 'Verify your email — REVERSO',
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 500px; margin: 0 auto; padding: 40px 20px;">
+          <h2>Verify your email</h2>
+          <p>Click the button below to verify your REVERSO account:</p>
+          <a href="${verifyUrl}" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">Verify Email</a>
+          <p style="color: #6b7280; font-size: 13px; margin-top: 24px;">This link expires in 24 hours. If you didn't create this account, ignore this email.</p>
+        </div>
+      `
+    }).catch(err => console.error('Verification email failed:', err));
+  }
+
+  res.json({ success: true, message: 'Verification email sent' });
+}));
+
+/**
+ * GET /api/v1/auth/verify-email?token=...
+ * Verify email with token
+ */
+authRouter.get('/verify-email', asyncHandler(async (req: any, res: Response) => {
+  const { token } = req.query;
+  if (!token || typeof token !== 'string') throw BadRequest('Token required');
+
+  const row = DB.findEmailVerification.get(token) as any;
+  if (!row) throw BadRequest('Invalid or expired verification token');
+
+  // Check 24h expiry
+  const created = new Date(row.created_at).getTime();
+  if (Date.now() - created > 24 * 60 * 60 * 1000) {
+    DB.deleteEmailVerification.run(row.user_id);
+    throw BadRequest('Verification token expired. Request a new one.');
+  }
+
+  DB.updateUserEmailVerified.run(row.user_id);
+  DB.deleteEmailVerification.run(row.user_id);
+
+  res.json({ success: true, message: 'Email verified successfully' });
+}));
+
+// ═══════════════════════════════════════════════════════════════
+//                    PASSWORD RESET
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * POST /api/v1/auth/forgot-password
+ * Request password reset email
+ */
+authRouter.post('/forgot-password', asyncHandler(async (req: any, res: Response) => {
+  const { email } = req.body;
+  if (!email) throw BadRequest('Email is required');
+
+  // Always return success to prevent email enumeration
+  const user = DB.findUserByEmail.get(email.toLowerCase().trim()) as any;
+
+  if (user) {
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
+
+    DB.insertPasswordReset.run({
+      id: uuidv4(),
+      userId: user.id,
+      tokenHash,
+      expiresAt
+    });
+
+    if (resend) {
+      const resetUrl = `${process.env.APP_URL || 'https://reverso.one'}/reset-password?token=${resetToken}`;
+      resend.emails.send({
+        from: 'REVERSO <noreply@reverso.one>',
+        to: user.email,
+        subject: 'Reset your password — REVERSO',
+        html: `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 500px; margin: 0 auto; padding: 40px 20px;">
+            <h2>Password Reset</h2>
+            <p>Click below to reset your REVERSO password:</p>
+            <a href="${resetUrl}" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">Reset Password</a>
+            <p style="color: #6b7280; font-size: 13px; margin-top: 24px;">This link expires in 1 hour. If you didn't request this, ignore this email.</p>
+          </div>
+        `
+      }).catch(err => console.error('Reset email failed:', err));
+    }
+  }
+
+  // Same response regardless of whether email exists (anti-enumeration)
+  res.json({ success: true, message: 'If that email is registered, a reset link has been sent.' });
+}));
+
+/**
+ * POST /api/v1/auth/reset-password
+ * Set new password using reset token
+ */
+authRouter.post('/reset-password', asyncHandler(async (req: any, res: Response) => {
+  const { token, newPassword } = req.body;
+  if (!token || !newPassword) throw BadRequest('Token and new password are required');
+  if (newPassword.length < 8) throw BadRequest('Password must be at least 8 characters');
+
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+  const resetRow = DB.findPasswordResetByTokenHash.get(tokenHash) as any;
+
+  if (!resetRow) {
+    throw BadRequest('Invalid or expired reset token');
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  DB.updateUserPassword.run(hashedPassword, resetRow.user_id);
+  DB.markPasswordResetUsed.run(resetRow.id);
+
+  res.json({ success: true, message: 'Password updated successfully. You can now log in.' });
+}));

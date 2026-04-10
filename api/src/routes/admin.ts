@@ -1,8 +1,10 @@
 import { Router, Response } from 'express';
 import { AuthenticatedRequest, hasFeature } from '../middleware/apiKey';
-import { asyncHandler, Forbidden } from '../middleware/errorHandler';
+import { asyncHandler, BadRequest, Forbidden } from '../middleware/errorHandler';
 import { PLAN_CONFIG } from '../types';
 import { loadChains } from '../config/chains';
+import * as DB from '../db';
+import { addToDenylist, removeFromDenylist, listDenylist } from '../utils/fraud';
 
 export const adminRouter = Router();
 
@@ -56,24 +58,34 @@ adminRouter.get('/stats', asyncHandler(async (req: AuthenticatedRequest, res: Re
     throw Forbidden('Statistics require Enterprise plan');
   }
 
-  // Minimal real-time-ish stats placeholder (would come from DB/metrics)
+  // Real stats from SQLite
   const CHAINS = loadChains();
+
+  const total = (DB.countTransfers.get() as any)?.total || 0;
+  const claimed = (DB.countTransfersByStatus.get('claimed') as any)?.total || 0;
+  const cancelled = (DB.countTransfersByStatus.get('cancelled') as any)?.total || 0;
+  const refunded = (DB.countTransfersByStatus.get('refunded') as any)?.total || 0;
+  const pending = (DB.countTransfersByStatus.get('pending') as any)?.total || 0;
+
+  // Per-chain breakdown
+  const byChain: Record<string, number> = {};
+  for (const chain of Object.values(CHAINS) as any[]) {
+    const count = (DB.countTransfersByChain.get(chain.chainId) as any)?.total || 0;
+    byChain[chain.name] = count;
+  }
+
+  // Insurance stats
+  const insuredRows = DB.db.prepare(`SELECT COUNT(*) as cnt, COALESCE(SUM(CAST(insurance_premium AS REAL)),0) as premiums FROM transfers WHERE insurance_active = 1`).get() as any;
+
   res.json({
     stats: {
-      totalTransfers: apiKey.txUsed,
-      successRate: 'n/a (mock)',
-      avgLockTime: 'n/a (mock)',
-      byStatus: {
-        claimed: 0,
-        cancelled: 0,
-        refunded: 0,
-        pending: 0
-      },
-      byChain: Object.fromEntries(Object.values(CHAINS).map((c) => [c.name, 0])),
+      totalTransfers: total,
+      successRate: total > 0 ? `${((claimed / total) * 100).toFixed(1)}%` : 'n/a',
+      byStatus: { claimed, cancelled, refunded, pending },
+      byChain,
       insurance: {
-        premiumsCollected: 'n/a',
-        claimsPaid: 'n/a',
-        activePolicies: 0
+        premiumsCollected: insuredRows?.premiums || 0,
+        activePolicies: insuredRows?.cnt || 0
       }
     },
     period: {
@@ -235,4 +247,54 @@ adminRouter.get('/export', asyncHandler(async (req: AuthenticatedRequest, res: R
       expiresIn: '1 hour'
     }
   });
+}));
+
+// ═══════════════════════════════════════════════════════════════
+//                    DENYLIST MANAGEMENT
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * GET /api/v1/admin/denylist
+ * List blocked addresses (Enterprise only)
+ */
+adminRouter.get('/denylist', asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const apiKey = req.apiKey!;
+  if (apiKey.plan !== 'enterprise') {
+    throw Forbidden('Denylist management requires Enterprise plan');
+  }
+  res.json({ addresses: listDenylist() });
+}));
+
+/**
+ * POST /api/v1/admin/denylist
+ * Add address to denylist (Enterprise only)
+ */
+adminRouter.post('/denylist', asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const apiKey = req.apiKey!;
+  if (apiKey.plan !== 'enterprise') {
+    throw Forbidden('Denylist management requires Enterprise plan');
+  }
+  const { address } = req.body;
+  if (!address || !/^0x[a-fA-F0-9]{40}$/.test(address)) {
+    throw BadRequest('Valid Ethereum address required');
+  }
+  addToDenylist(address);
+  res.status(201).json({ success: true, message: `${address} added to denylist` });
+}));
+
+/**
+ * DELETE /api/v1/admin/denylist/:address
+ * Remove address from denylist (Enterprise only)
+ */
+adminRouter.delete('/denylist/:address', asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const apiKey = req.apiKey!;
+  if (apiKey.plan !== 'enterprise') {
+    throw Forbidden('Denylist management requires Enterprise plan');
+  }
+  const { address } = req.params;
+  if (!address || !/^0x[a-fA-F0-9]{40}$/i.test(address)) {
+    throw BadRequest('Valid Ethereum address required');
+  }
+  removeFromDenylist(address);
+  res.json({ success: true, message: `${address} removed from denylist` });
 }));

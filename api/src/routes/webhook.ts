@@ -261,6 +261,61 @@ function generateSignature(payload: any, secret: string): string {
   return `t=${timestamp},v1=${signature}`;
 }
 
+// Retry config
+const MAX_RETRIES = 3;
+const RETRY_BASE_MS = 1000; // 1s, 2s, 4s exponential backoff
+
+async function deliverWithRetry(
+  url: string,
+  event: WebhookEvent,
+  secret: string,
+  retries = MAX_RETRIES
+): Promise<{ ok: boolean; status?: number; error?: string }> {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10_000); // 10s timeout
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Reverso-Signature': generateSignature(event, secret),
+          'X-Reverso-Event': event.type,
+          'X-Reverso-Delivery': event.id,
+          'X-Reverso-Attempt': String(attempt + 1)
+        },
+        body: JSON.stringify(event),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+
+      if (response.ok) {
+        return { ok: true, status: response.status };
+      }
+
+      // Don't retry 4xx (client errors are permanent)
+      if (response.status >= 400 && response.status < 500) {
+        return { ok: false, status: response.status };
+      }
+
+      // 5xx — retry if we have attempts left
+      if (attempt < retries) {
+        await new Promise(r => setTimeout(r, RETRY_BASE_MS * Math.pow(2, attempt)));
+      } else {
+        return { ok: false, status: response.status };
+      }
+    } catch (error: any) {
+      if (attempt < retries) {
+        await new Promise(r => setTimeout(r, RETRY_BASE_MS * Math.pow(2, attempt)));
+      } else {
+        return { ok: false, error: error.message };
+      }
+    }
+  }
+  return { ok: false, error: 'Max retries exceeded' };
+}
+
 // Export for use in transfer events
 export async function triggerWebhook(apiKeyId: string, event: WebhookEvent): Promise<void> {
   const allWebhooks = DB.listActiveWebhooksByApiKeyAndEvent.all(apiKeyId) as any[];
@@ -270,37 +325,18 @@ export async function triggerWebhook(apiKeyId: string, event: WebhookEvent): Pro
   });
 
   for (const webhook of matching) {
-    try {
-      const response = await fetch(webhook.url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Reverso-Signature': generateSignature(event, webhook.secret),
-          'X-Reverso-Event': event.type
-        },
-        body: JSON.stringify(event)
-      });
+    const result = await deliverWithRetry(webhook.url, event, webhook.secret);
 
-      if (response.ok) {
-        DB.updateWebhook.run({
-          id: webhook.id,
-          url: webhook.url,
-          events: webhook.events,
-          isActive: webhook.is_active,
-          lastTriggered: new Date().toISOString(),
-          failCount: 0
-        });
-      } else {
-        DB.updateWebhook.run({
-          id: webhook.id,
-          url: webhook.url,
-          events: webhook.events,
-          isActive: (webhook.fail_count + 1) >= 10 ? 0 : webhook.is_active,
-          lastTriggered: webhook.last_triggered,
-          failCount: webhook.fail_count + 1
-        });
-      }
-    } catch (error) {
+    if (result.ok) {
+      DB.updateWebhook.run({
+        id: webhook.id,
+        url: webhook.url,
+        events: webhook.events,
+        isActive: webhook.is_active,
+        lastTriggered: new Date().toISOString(),
+        failCount: 0
+      });
+    } else {
       const newFailCount = webhook.fail_count + 1;
       DB.updateWebhook.run({
         id: webhook.id,
@@ -310,7 +346,7 @@ export async function triggerWebhook(apiKeyId: string, event: WebhookEvent): Pro
         lastTriggered: webhook.last_triggered,
         failCount: newFailCount
       });
-      console.error(`Webhook delivery failed for ${webhook.id}:`, error);
+      console.error(`Webhook delivery failed for ${webhook.id}: ${result.error || `HTTP ${result.status}`}`);
     }
   }
 

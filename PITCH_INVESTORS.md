@@ -18,7 +18,7 @@ REVERSO is the first **non-custodial reversible transaction protocol** for EVM c
 |--------|-------|
 | **Problem Size** | $3.8B+ lost annually |
 | **Solution** | Time-locked reversible transfers |
-| **Product Status** | MVP complete, 66/66 tests passing |
+| **Product Status** | MVP complete, 163 tests passing (131 Hardhat + 32 API) |
 | **Chains Supported** | 7 live (ETH, BSC, Base, Arbitrum, Polygon, Optimism, Avalanche) |
 | **Revenue Model** | 0.3-0.7% fees + 0.2% insurance + API subscriptions |
 | **Ask** | $50,000 |
@@ -245,8 +245,8 @@ curl -X POST https://reverso-tu3o.onrender.com/api/v1/transfers \
 | Component | Status | Details |
 |-----------|--------|---------|
 | **Smart Contract** | ✅ Production-ready | ~1,800 lines (3 contracts), OpenZeppelin security |
-| **Test Suite** | ✅ 66/66 passing | Full coverage: send, cancel, claim, insurance, rescue |
-| **API Backend** | ✅ Hardened | HMAC auth, rate limiting, fraud checks |
+| **Test Suite** | ✅ 163 total | 131 Hardhat (contracts) + 32 Jest (API: HMAC, validation, denylist, plans) |
+| **API Backend** | ✅ Hardened | HMAC auth, email verification, password reset, fraud denylist, webhook retry |
 | **Website/Demo** | ✅ Complete | 960+ lines, responsive, demo mode |
 | **Multi-chain** | ✅ Configured | ETH, Arbitrum, Base, Optimism, Polygon |
 | **Documentation** | ✅ Comprehensive | README, API docs, this pitch |
@@ -353,7 +353,7 @@ We're applying for the **Optimism Foundation Audit Grant** - a program that subs
 | **ReversoMonitor.sol** | ~380 | Anomaly detection thresholds, circuit breaker triggers |
 
 **Pre-Audit Security:**
-- ✅ 66/66 tests passing
+- ✅ 163 tests passing (131 Hardhat + 32 API)
 - ✅ OpenZeppelin patterns (ReentrancyGuard, Pausable, SafeERC20, Ownable)
 - ✅ 48h timelock on admin changes
 - ✅ Circuit breaker for suspicious activity
@@ -364,8 +364,9 @@ We're applying for the **Optimism Foundation Audit Grant** - a program that subs
 
 ### Completed (Dec 2024)
 - ✅ Smart contract development (1,119 lines)
-- ✅ Full test suite (32 tests, 100% passing)
-- ✅ Enterprise API with security hardening
+- ✅ Full test suite (163 tests, 100% passing)
+- ✅ Enterprise API with email verification, password reset, fraud denylist
+- ✅ CI/CD pipeline (GitHub Actions)
 - ✅ Multi-chain configuration (7 chains)
 - ✅ Website and demo UI
 - ✅ Documentation and investor materials

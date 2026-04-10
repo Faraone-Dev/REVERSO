@@ -7,7 +7,7 @@
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.20-363636?style=for-the-badge&logo=solidity)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![Verified](https://img.shields.io/badge/Etherscan-Verified-blue?style=for-the-badge)
-![Tests](https://img.shields.io/badge/Tests-109%20passing-brightgreen?style=for-the-badge)
+![Tests](https://img.shields.io/badge/Tests-163%20passing-brightgreen?style=for-the-badge)
 ![Fuzz](https://img.shields.io/badge/Fuzz-13%2C000%2B%20runs-orange?style=for-the-badge)
 ![Security](https://img.shields.io/badge/Security-3%20Contract%20Stack-red?style=for-the-badge)
 
@@ -28,8 +28,8 @@
 | 🔐 **ReversoVault** | ✅ **Deployed on Ethereum** | [Verified on Etherscan](https://etherscan.io/address/0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085#code) — 1,194 lines, 5-layer protection |
 | 🛡️ **EmergencyGuardian** | ✅ **Deployed on Ethereum** | [Verified on Etherscan](https://etherscan.io/address/0x7F1CB513B7A582A11f3057F104D561E9A9126A7d#code) — Multi-sig + 24h timelock |
 | 👁️ **ReversoMonitor** | ✅ **Deployed on Ethereum** | [Verified on Etherscan](https://etherscan.io/address/0x152935935E86ab06ce75b6871c500f6Eb57f5332#code) — Anomaly detection + auto-pause |
-| 🧪 **Test Suite** | ✅ 109 tests passing | Unit tests + integration tests + security tests + gas benchmarks |
-| 🔌 **Enterprise API** | ✅ [Live](https://reverso-tu3o.onrender.com) | HMAC auth, rate limiting, fraud prevention |
+| 🧪 **Test Suite** | ✅ 163 tests passing | 131 Hardhat (contracts) + 32 Jest (API) — HMAC, validation, denylist, plans |
+| 🔌 **Enterprise API** | ✅ [Live](https://reverso-tu3o.onrender.com) | HMAC auth, email verification, password reset, fraud denylist, webhooks with retry |
 | 🌐 **Website** | ✅ [Live — reverso.one](https://reverso.one/) | Interactive demo with wallet connection |
 | ⛓️ **Multi-chain** | ✅ **7 Chains Live** | Ethereum, BSC, Base, Arbitrum, Polygon, Optimism, Avalanche |
 | 🔀 **Fuzz Testing** | ✅ 13,000+ runs | 13 property tests × 1,000 random inputs (Foundry) |
@@ -107,6 +107,9 @@ Even if scammer claims your funds:
 ├── You contact us with proof
 ├── We verify the scam
 └── You get refunded from Insurance Pool 💰
+
+Fully tested: payInsuranceClaim(), withdrawExcessInsurance(),
+    reject on non-insured transfer, reject on empty pool.
 
 Example: 10 ETH with insurance
 ├── Base fee: 0.05 ETH (0.5%)
@@ -371,12 +374,11 @@ ReversoMonitor.guardian  → EmergencyGuardian  ✅
 
 | Test | Function | Description | Status |
 |------|----------|-------------|--------|
-| 8 | `refundExpired()` | Auto-refund after expiry | ⏳ Requires 7+ days |
-| 9 | `recoverToBackup()` | Recovery address claim | ⏳ Requires expiry |
-| 10 | `freezeTransfer()` | Guardian blocks suspicious transfer | ⏳ Requires Guardian setup |
-| 11 | `rescueAbandoned()` | Rescue funds after 90+ days | ❌ Not feasible on testnet |
+| 8 | `refundExpired()` | Auto-refund after expiry | ✅ Verified in Hardhat (ETH + ERC20) |
+| 9 | `freezeTransfer()` | Guardian blocks suspicious transfer | ✅ Verified in Hardhat (ETH + ERC20) |
+| 10 | `rescueAbandoned()` | Rescue funds after 90+ days | ✅ Verified in Hardhat (TVL consistent) |
 
-**Note:** Tests 8-11 are verified in local Hardhat tests (see section below). On testnet they require real wait times.
+**Note:** Tests 8-10 are fully verified in local Hardhat tests (131 passing) including ERC20 lifecycle. On testnet they require real wait times.
 
 ### 🔑 Test Wallets
 
@@ -453,9 +455,20 @@ TEST 7: RESCUE (TVL)
 |----------|--------|-------------|
 | `sendETH()` | ✅ Passed | Create reversible transfer with delay |
 | `sendETHSimple()` | ✅ Passed | Quick transfer with 24h default |
-| `cancel()` | ✅ Passed | Cancel and receive full refund |
-| `claim()` | ✅ Passed | Recipient claims after delay |
-| `calculateFee()` | ✅ Passed | Progressive fee calculation |
+| `sendETHPremium()` | ✅ Passed | Transfer with insurance (+0.2%) |
+| `sendToken()` | ✅ Passed | ERC20 transfer with fee-on-transfer support |
+| `cancel()` | ✅ Passed | Cancel and receive full refund (ETH + ERC20) |
+| `claim()` | ✅ Passed | Recipient claims after delay (ETH + ERC20) |
+| `refundExpired()` | ✅ Passed | Auto-refund after expiry (ETH + ERC20) |
+| `batchRefundExpired()` | ✅ Passed | Batch refund with DoS protection |
+| `freezeTransfer()` | ✅ Passed | Guardian freeze + refund (ETH + ERC20) |
+| `manualRefund()` | ✅ Passed | Owner manual refund for edge cases |
+| `rescueAbandoned()` | ✅ Passed | TVL-consistent late recovery |
+| `payInsuranceClaim()` | ✅ Passed | Insurance payout from pool |
+| `withdrawExcessInsurance()` | ✅ Passed | Excess pool withdrawal to treasury |
+| `calculateFee()` | ✅ Passed | Progressive fee tiers (retail/standard/whale) |
+| `setCircuitBreakerLimits()` | ✅ Passed | Circuit breaker configuration |
+| `setAlertThreshold()` | ✅ Passed | Alert threshold with bounds check |
 | Fee Collection | ✅ Passed | Treasury receives fees automatically |
 
 ---
@@ -576,18 +589,33 @@ const { transaction } = await transfer.json();
 |--------|----------|-------------|
 | `POST` | `/auth/register` | Create account & get API key |
 | `POST` | `/auth/login` | Login existing user |
+| `POST` | `/auth/quick-key` | Instant API key (email only) |
 | `GET` | `/auth/plans` | List subscription plans |
+| `POST` | `/auth/verify-email/send` | Send verification email (JWT) |
+| `GET` | `/auth/verify-email?token=` | Verify email address |
+| `POST` | `/auth/forgot-password` | Request password reset |
+| `POST` | `/auth/reset-password` | Set new password with token |
 | `POST` | `/transfers` | Create reversible transfer |
 | `GET` | `/transfers/:id` | Get transfer status |
 | `GET` | `/transfers` | List all transfers |
 | `POST` | `/transfers/:id/cancel` | Generate cancel transaction |
 | `POST` | `/transfers/:id/confirm` | Confirm after blockchain tx |
+| `POST` | `/usecases/checkout` | E-commerce checkout flow (Enterprise) |
+| `POST` | `/usecases/payroll` | Batch payroll (Enterprise) |
+| `POST` | `/usecases/escrow` | Escrow transfer (Enterprise) |
 | `GET` | `/webhooks` | List webhooks (Business+) |
 | `POST` | `/webhooks` | Create webhook (Business+) |
+| `PATCH` | `/webhooks/:id` | Update webhook (Business+) |
+| `DELETE` | `/webhooks/:id` | Delete webhook (Business+) |
+| `POST` | `/webhooks/:id/test` | Send test event (Business+) |
 | `GET` | `/admin/usage` | View API usage (Business+) |
-| `GET` | `/admin/stats` | Analytics (Enterprise) |
+| `GET` | `/admin/stats` | Real-time analytics from SQLite (Enterprise) |
+| `GET` | `/admin/denylist` | List blocked addresses (Enterprise) |
+| `POST` | `/admin/denylist` | Block address (Enterprise) |
+| `DELETE` | `/admin/denylist/:addr` | Unblock address (Enterprise) |
 | `PUT` | `/admin/branding` | White-label config (Enterprise) |
 | `GET` | `/admin/sla` | SLA status (Enterprise) |
+| `GET` | `/admin/export` | Export transfer data (Business+) |
 
 ### Webhooks
 
@@ -800,7 +828,7 @@ Layer 5: RESCUE
 - ✅ Ethereum Mainnet deployed (all 3 contracts verified on Etherscan)
 - ✅ **7 chains live** — Ethereum, BSC, Base, Arbitrum, Polygon, Optimism, Avalanche
 - ✅ Testnet validation completed (Sepolia — 7/7 live tests passed)
-- ✅ **109 Hardhat tests** passing (unit + integration + security + gas benchmarks)
+- ✅ **163 tests** passing (131 Hardhat + 32 API Jest — HMAC, validation, denylist, plans)
 - ✅ **13,000+ Foundry fuzz runs** (13 property-based tests × 1,000 random inputs each)
 - ✅ Slither static analysis (143 items reviewed, 0 true-positive criticals)
 - ✅ Gas benchmarks — all operations within L2-friendly limits
@@ -828,26 +856,36 @@ REVERSO/
 │   ├── ReversoMonitor.sol           # Anomaly detection (320 lines)
 │   └── interfaces/
 │       └── IReversoVault.sol        # Contract interface
-├── 📁 test/                         # Test suites
-│   ├── ReversoVault.test.ts         # Vault tests
-│   ├── SecurityContracts.test.ts    # Guardian + Monitor tests
-│   └── GasBenchmarks.test.ts       # Gas benchmarks
+├── 📁 test/                         # Test suites (131 Hardhat tests)
+│   ├── ReversoVault.test.ts         # Vault tests (68 tests)
+│   ├── SecurityContracts.test.ts    # Guardian + Monitor tests (48 tests)
+│   └── GasBenchmarks.test.ts       # Gas benchmarks (15 tests)
 ├── 📁 api/                          # Enterprise REST API
 │   ├── src/
 │   │   ├── index.ts                 # Express server
-│   │   ├── routes/                  # Transfer, auth, webhooks, admin
-│   │   └── middleware/              # HMAC, rate limiting, API keys
-│   ├── sdk/                         # JavaScript/TypeScript SDK
+│   │   ├── routes/                  # Transfer, auth, webhooks, admin, usecases, billing
+│   │   ├── middleware/              # HMAC, rate limiting, API keys
+│   │   └── utils/                   # Fraud denylist (file + env + runtime)
+│   ├── test/                        # API tests (32 Jest tests)
+│   ├── sdk/                         # TypeScript SDK with HMAC signing
 │   └── config/                      # Multi-chain configuration
 ├── 📁 website/                      # Production website (Vite)
 │   ├── src/
 │   │   ├── main.js                  # App logic
 │   │   └── styles/                  # CSS
 │   └── index.html                   # Entry point
+├── 📁 keeper/                       # Keeper bot (WebSocket + Monitor)
+│   └── src/index.ts                 # Event listener, reconnection, stats
 ├── 📁 scripts/                      # Deploy scripts
 │   ├── deploy.ts                    # Single chain deploy
+│   ├── deploy-stack.ts              # Full 3-contract deploy + wiring
 │   └── deploy-multichain.ts         # Multi-chain deploy
-├── 📄 hardhat.config.ts             # Multi-chain configuration
+├── 📁 security/                     # Security suite
+│   ├── foundry-fuzz/                # Foundry fuzz tests (13,000+ runs)
+│   ├── slither/                     # Static analysis reports
+│   └── gas-benchmarks/              # Gas profiling
+├── 📄 .github/workflows/ci.yml     # CI pipeline (contracts + API + website)
+├── 📄 hardhat.config.ts             # Multi-chain configuration (15+ chains)
 └── 📄 README.md                     # This file
 ```
 
@@ -863,12 +901,17 @@ REVERSO/
 - [x] Enterprise API
 - [x] Basic documentation
 
-### Phase 2: Launch (Q1 2026)
+### Phase 2: Launch (Q1 2026) ✅
 - [x] Ethereum Mainnet deployment (3 contracts verified)
 - [x] Testnet validation (Sepolia — 7/7 live tests passed)
 - [x] Multi-chain deployments (BSC, Base, Arbitrum, Polygon, Optimism, Avalanche)
+- [x] TypeScript SDK with HMAC signing
+- [x] Email verification + password reset
+- [x] Webhook delivery with retry + exponential backoff
+- [x] Fraud denylist (env + file + admin API)
+- [x] CI/CD pipeline (GitHub Actions)
+- [x] 163 total tests (131 Hardhat + 32 API)
 - [ ] External security audit
-- [ ] SDK release (JavaScript/TypeScript)
 
 ---
 
@@ -923,6 +966,34 @@ POLYGONSCAN_API_KEY=
 
 ---
 
+## ⚠️ Current Status & Limitations
+
+> **Transparency note:** REVERSO is a production-grade MVP. The sections below describe what is fully shipped and what is still in development.
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| **Smart Contracts** | ✅ Production | Deployed on 7 chains, verified on Etherscan, immutable |
+| **Hardhat Tests** | ✅ 131 passing | Full coverage of vault, guardian, monitor |
+| **API Tests** | ✅ 32 passing | HMAC, error handlers, validation, denylist logic, plan features |
+| **Foundry Fuzz Tests** | ✅ 13,000+ runs | Invariant + property-based |
+| **HMAC + Replay Protection** | ✅ Production | SHA-256, nonce DB, 60s drift window |
+| **Webhook Delivery** | ✅ Real POST | Exponential backoff retry (3 attempts, 1s/2s/4s), auto-disable after 10 failures |
+| **Fraud Denylist** | ✅ File + Env + API | Hot-reloaded every 60s, admin CRUD endpoints, persisted to JSON |
+| **Admin Stats** | ✅ Real SQLite | `byStatus`, `byChain`, `successRate`, insurance aggregation |
+| **Email Verification** | ✅ Production | Token-based, 24h expiry, Resend integration |
+| **Password Reset** | ✅ Production | SHA-256 hashed tokens, 1h expiry, anti-enumeration |
+| **Usecase Persistence** | ✅ SQLite | Checkout/payroll/escrow persist to DB (not in-memory) |
+| **CI/CD** | ✅ GitHub Actions | Contracts compile+test, API type-check+test, website build |
+| **Stripe Billing** | ✅ Production | Checkout sessions, webhook signature verification, plan upgrades |
+| **SDK** | ✅ Production | TypeScript SDK with HMAC signing, full CRUD |
+| **Keeper Bot** | ✅ Code complete | WebSocket listener, Monitor integration, reconnection logic |
+| **Database** | 🟡 SQLite (WAL) | Good for MVP; migration to PostgreSQL recommended at scale |
+| **White-Label** | 🟡 Placeholder | Endpoints exist, config not persisted to DB |
+| **SLA Reporting** | 🟡 Placeholder | Returns static values, no real uptime tracking yet |
+| **Email Delivery** | 🟡 Optional | Requires `RESEND_API_KEY`; gracefully skipped when absent |
+
+---
+
 ## 📜 License
 
 MIT License - see [LICENSE](LICENSE)
@@ -950,12 +1021,13 @@ REVERSO/
 │   ├── EmergencyGuardian   # Multi-sig + timelock + emergency pause
 │   ├── ReversoMonitor      # Anomaly detection + auto-pause
 │   └── interfaces/         # Contract interfaces
-├── 📁 test/                # Hardhat test suite (109 tests)
+├── 📁 test/                # Hardhat test suite (131 tests)
 ├── 📁 security/            # Security suite (Foundry fuzz 13,000+ runs + Slither)
-├── 📁 api/                 # Enterprise REST API
-│   ├── src/routes/         # Transfer, auth, webhooks, admin
+├── 📁 api/                 # Enterprise REST API (32 API tests)
+│   ├── src/routes/         # Transfer, auth, webhooks, admin, usecases, billing
 │   ├── src/middleware/     # HMAC, rate limiting, API keys
-│   └── sdk/                # JavaScript/TypeScript SDK
+│   ├── src/utils/          # Fraud denylist (file + env + runtime)
+│   └── sdk/                # TypeScript SDK with HMAC signing
 ├── 📁 website/             # Production website (Vite + vanilla JS)
 ├── 📁 scripts/             # Deploy scripts (single & multi-chain)
 ├── 📄 README.md            # This file
@@ -999,7 +1071,7 @@ npx hardhat run scripts/deploy.ts --network ethereum
 
 **[ReversoVault](https://etherscan.io/address/0x31ec8EeeCb341c7cefAefA6BC0Dd84BE9Bd11085#code)** · **[EmergencyGuardian](https://etherscan.io/address/0x7F1CB513B7A582A11f3057F104D561E9A9126A7d#code)** · **[ReversoMonitor](https://etherscan.io/address/0x152935935E86ab06ce75b6871c500f6Eb57f5332#code)**
 
-109 tests passing · 3-contract security stack · Enterprise REST API
+131 Hardhat + 32 API tests passing · 3-contract security stack · Enterprise REST API
 
 ---
 

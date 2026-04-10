@@ -24,6 +24,7 @@ db.exec(`
     hashed_password TEXT NOT NULL,
     company TEXT,
     plan TEXT NOT NULL DEFAULT 'starter',
+    email_verified INTEGER NOT NULL DEFAULT 0,
     stripe_customer_id TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
@@ -87,6 +88,21 @@ db.exec(`
     nonce TEXT NOT NULL,
     created_at INTEGER NOT NULL,
     PRIMARY KEY (api_key_id, nonce)
+  );
+
+  CREATE TABLE IF NOT EXISTS email_verifications (
+    user_id TEXT PRIMARY KEY REFERENCES users(id),
+    token TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS password_resets (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    token_hash TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    used INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
   CREATE INDEX IF NOT EXISTS idx_api_keys_user ON api_keys(user_id);
@@ -223,4 +239,41 @@ export const cleanOldNonces = db.prepare(`
   DELETE FROM nonces WHERE created_at < ?
 `);
 
+// --- Email Verification ---
+export const insertEmailVerification = db.prepare(`
+  INSERT OR REPLACE INTO email_verifications (user_id, token, created_at)
+  VALUES (@userId, @token, datetime('now'))
+`);
+
+export const findEmailVerification = db.prepare(`
+  SELECT * FROM email_verifications WHERE token = ?
+`);
+
+export const deleteEmailVerification = db.prepare(`
+  DELETE FROM email_verifications WHERE user_id = ?
+`);
+
+// --- Password Resets ---
+export const insertPasswordReset = db.prepare(`
+  INSERT INTO password_resets (id, user_id, token_hash, expires_at)
+  VALUES (@id, @userId, @tokenHash, @expiresAt)
+`);
+
+export const findPasswordResetByTokenHash = db.prepare(`
+  SELECT * FROM password_resets WHERE token_hash = ? AND used = 0 AND expires_at > datetime('now')
+`);
+
+export const markPasswordResetUsed = db.prepare(`
+  UPDATE password_resets SET used = 1 WHERE id = ?
+`);
+
+export const updateUserPassword = db.prepare(`
+  UPDATE users SET hashed_password = ? WHERE id = ?
+`);
+
+export const updateUserEmailVerified = db.prepare(`
+  UPDATE users SET email_verified = 1 WHERE id = ?
+`);
+
+export { db };
 export default db;
