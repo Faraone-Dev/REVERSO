@@ -1,10 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 import { AuthenticatedRequest } from './apiKey';
+import * as DB from '../db';
 
-// Replay protection store: apiKeyId -> Set of recent nonces
-const nonceStore: Map<string, Set<string>> = new Map();
 const MAX_DRIFT_MS = 60 * 1000; // 60 seconds - tight window for security
+
+// Clean old nonces every 5 minutes
+setInterval(() => {
+  const cutoff = Date.now() - MAX_DRIFT_MS * 2; // Keep 2x window for safety
+  DB.cleanOldNonces.run(cutoff);
+}, 5 * 60 * 1000);
 
 function safeJsonStringify(body: any): string {
   if (body === undefined || body === null) return '';
@@ -45,18 +50,14 @@ export function hmacMiddleware(req: AuthenticatedRequest, res: Response, next: N
     return res.status(401).json({ error: 'Timestamp drift too large', code: 'TIMESTAMP_DRIFT' });
   }
 
-  // Replay check
-  const nonceSet = nonceStore.get(apiKey.id) || new Set<string>();
-  if (nonceSet.has(nonceHeader)) {
+  // Replay check (DB-backed)
+  const existingNonce = DB.findNonce.get(apiKey.id, nonceHeader);
+  if (existingNonce) {
     return res.status(401).json({ error: 'Replay detected', code: 'REPLAY' });
   }
 
-  // Maintain window size to avoid unbounded growth
-  if (nonceSet.size > 1000) {
-    nonceSet.clear();
-  }
-  nonceSet.add(nonceHeader);
-  nonceStore.set(apiKey.id, nonceSet);
+  // Store nonce with timestamp for TTL cleanup
+  DB.insertNonce.run(apiKey.id, nonceHeader, Date.now());
 
   const bodyString = safeJsonStringify(req.body);
   const payload = `${timestamp}.${nonceHeader}.${req.method.toUpperCase()}.${req.originalUrl}.${crypto

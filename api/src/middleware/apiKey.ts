@@ -2,13 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcryptjs';
 import { ApiKey, ApiPlan, PLAN_CONFIG } from '../types';
+import * as DB from '../db';
 
-// In-memory store (replace with MongoDB/PostgreSQL in production)
-const apiKeys: Map<string, ApiKey> = new Map();
-
-// Simple per-key rate limiter (requests per minute)
+// In-memory rate limiter only (short-lived, no persistence needed)
 const rateWindows: Map<string, { start: number; count: number }> = new Map();
-const REQUESTS_PER_MINUTE = 300; // adjust per plan if needed
+const REQUESTS_PER_MINUTE = 300;
 
 export interface AuthenticatedRequest extends Request {
   apiKey?: ApiKey;
@@ -34,12 +32,27 @@ export async function apiKeyMiddleware(
 
     const apiKeyValue = authHeader.substring(7); // Remove 'Bearer '
     
-    // Find API key (hash compare only)
+    // Find API key (hash compare against DB)
     let foundKey: ApiKey | undefined;
-    for (const [, key] of apiKeys) {
-      const isValid = await bcrypt.compare(apiKeyValue, key.hashedKey);
+    const allKeys = DB.getAllApiKeys.all() as any[];
+    for (const row of allKeys) {
+      const isValid = await bcrypt.compare(apiKeyValue, row.hashed_key);
       if (isValid) {
-        foundKey = key;
+        foundKey = {
+          id: row.id,
+          key: '',
+          hashedKey: row.hashed_key,
+          signingSecret: row.signing_secret,
+          userId: row.user_id,
+          plan: row.plan as ApiPlan,
+          txLimit: row.tx_limit,
+          txUsed: row.tx_used,
+          webhookUrl: row.webhook_url || undefined,
+          allowedOrigins: JSON.parse(row.allowed_origins || '[]'),
+          createdAt: new Date(row.created_at),
+          expiresAt: new Date(row.expires_at),
+          isActive: !!row.is_active,
+        };
         break;
       }
     }
@@ -123,11 +136,7 @@ export async function apiKeyMiddleware(
  * Increment transaction counter for API key
  */
 export function incrementTxCount(apiKeyId: string): void {
-  const key = apiKeys.get(apiKeyId);
-  if (key) {
-    key.txUsed++;
-    apiKeys.set(apiKeyId, key);
-  }
+  DB.incrementApiKeyTxUsed.run(apiKeyId);
 }
 
 /**
@@ -159,8 +168,20 @@ export async function createApiKey(
     isActive: true
   };
 
-  // Store only hashed value to avoid keeping raw key in memory
-  apiKeys.set(apiKey.id, { ...apiKey, key: '' });
+  // Store in DB (hashed key only, raw key returned to caller once)
+  DB.insertApiKey.run({
+    id: apiKey.id,
+    hashedKey: apiKey.hashedKey,
+    signingSecret: apiKey.signingSecret,
+    userId: apiKey.userId,
+    plan: apiKey.plan,
+    txLimit: apiKey.txLimit,
+    txUsed: 0,
+    webhookUrl: apiKey.webhookUrl || null,
+    allowedOrigins: JSON.stringify(apiKey.allowedOrigins),
+    expiresAt: apiKey.expiresAt.toISOString(),
+    isActive: 1,
+  });
   return apiKey;
 }
 
@@ -168,20 +189,41 @@ export async function createApiKey(
  * Get API key by ID
  */
 export function getApiKey(id: string): ApiKey | undefined {
-  return apiKeys.get(id);
+  const row = DB.findApiKeyById.get(id) as any;
+  if (!row) return undefined;
+  return {
+    id: row.id,
+    key: '',
+    hashedKey: row.hashed_key,
+    signingSecret: row.signing_secret,
+    userId: row.user_id,
+    plan: row.plan as ApiPlan,
+    txLimit: row.tx_limit,
+    txUsed: row.tx_used,
+    webhookUrl: row.webhook_url || undefined,
+    allowedOrigins: JSON.parse(row.allowed_origins || '[]'),
+    createdAt: new Date(row.created_at),
+    expiresAt: new Date(row.expires_at),
+    isActive: !!row.is_active,
+  };
 }
 
 /**
  * Revoke API key
  */
 export function revokeApiKey(id: string): boolean {
-  const key = apiKeys.get(id);
-  if (key) {
-    key.isActive = false;
-    apiKeys.set(id, key);
-    return true;
-  }
-  return false;
+  const row = DB.findApiKeyById.get(id) as any;
+  if (!row) return false;
+  DB.updateApiKey.run({
+    id,
+    plan: row.plan,
+    txLimit: row.tx_limit,
+    txUsed: row.tx_used,
+    webhookUrl: row.webhook_url,
+    allowedOrigins: row.allowed_origins,
+    isActive: 0,
+  });
+  return true;
 }
 
 /**
@@ -191,8 +233,22 @@ export function hasFeature(plan: ApiPlan, feature: keyof typeof PLAN_CONFIG.star
   return !!PLAN_CONFIG[plan][feature];
 }
 
-// Create demo API key on startup
+// Create demo API key on startup (only if DB is empty)
 (async () => {
-  const demoKey = await createApiKey('demo-user', 'business', undefined, ['*']);
-  console.log(`\n📌 Demo API Key: ${demoKey.key}\n`);
+  const existingKeys = DB.getAllApiKeys.all();
+  if (existingKeys.length === 0) {
+    // Ensure demo user exists
+    const existingUser = DB.findUserById.get('demo-user') as any;
+    if (!existingUser) {
+      DB.insertUser.run({
+        id: 'demo-user',
+        email: 'demo@reverso.one',
+        hashedPassword: '',
+        company: 'Demo',
+        plan: 'business',
+      });
+    }
+    const demoKey = await createApiKey('demo-user', 'business', undefined, ['*']);
+    console.log(`\n📌 Demo API Key: ${demoKey.key}\n`);
+  }
 })();

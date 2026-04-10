@@ -10,11 +10,10 @@
 ![Tests](https://img.shields.io/badge/Tests-109%20passing-brightgreen?style=for-the-badge)
 ![Fuzz](https://img.shields.io/badge/Fuzz-13%2C000%2B%20runs-orange?style=for-the-badge)
 ![Security](https://img.shields.io/badge/Security-3%20Contract%20Stack-red?style=for-the-badge)
-![API](https://img.shields.io/badge/Enterprise%20API-Live-blue?style=for-the-badge)
 
-**The First Reversible Transaction Protocol on Blockchain**
+**Reversible Transaction Protocol for EVM Chains**
 
-*"Never lose crypto to mistakes again."*
+*Time-locked transfers with cancel, recovery, and insurance — deployed on 7 chains.*
 
 ### 🌐 [Live Demo](https://reverso.one/) • 📄 [Documentation](#-quick-start) • 🔌 [API](#-enterprise-api) • 🛡️ [Security](#-security-architecture)
 
@@ -41,17 +40,9 @@
 
 ## 🎯 The Problem
 
-Every year, **billions of dollars** in crypto are lost forever due to:
+Blockchain transactions are irreversible by design. Phishing, wrong-address sends, lost access, and contract bugs cause significant losses every year. Once confirmed, there is no undo.
 
-| Problem | Annual Loss |
-|---------|-------------|
-| 🎣 Phishing & Scams | $3.8B |
-| 📝 Wrong Address | $1.2B |
-| 🔐 Lost Access | $2.1B |
-| 💀 Smart Contract Bugs | $1.5B |
-| **TOTAL** | **$8.6B+** |
-
-**Blockchain's immutability is a feature... until it's a bug.**
+REVERSO adds a **time-locked reversibility layer** on top of standard EVM transfers — letting senders cancel, recover, or auto-refund before finalization.
 
 ---
 
@@ -110,7 +101,7 @@ REVERSO introduces **time-locked reversible transfers** with up to **5 layers of
 ### 🛡️ Premium Insurance (+0.2%)
 
 ```
-Pay 0.2% extra → Insurance coverage (per policy, fino al pool disponibile)
+Pay 0.2% extra → Insurance coverage (subject to pool balance)
 
 Even if scammer claims your funds:
 ├── You contact us with proof
@@ -145,14 +136,6 @@ Example: 10 ETH with insurance
 | Polygon | ✅ **Deployed** | 137 |
 | Optimism | ✅ **Deployed** | 10 |
 | Avalanche | ✅ **Deployed** | 43114 |
-| zkSync Era | 🔜 Planned | 324 |
-| Linea | 🔜 Planned | 59144 |
-| Scroll | 🔜 Planned | 534352 |
-| Mantle | 🔜 Planned | 5000 |
-| Blast | 🔜 Planned | 81457 |
-| Mode | 🔜 Planned | 34443 |
-| Celo | 🔜 Planned | 42220 |
-| Gnosis | 🔜 Planned | 100 |
 
 ---
 
@@ -180,7 +163,7 @@ npx hardhat run scripts/deploy.ts --network hardhat
 # Deploy to testnet
 npx hardhat run scripts/deploy.ts --network sepolia
 
-# Deploy multichain (usa config hardhat)
+# Deploy multichain (uses hardhat config)
 npx hardhat run scripts/deploy-multichain.ts
 ```
 
@@ -393,7 +376,7 @@ ReversoMonitor.guardian  → EmergencyGuardian  ✅
 | 10 | `freezeTransfer()` | Guardian blocks suspicious transfer | ⏳ Requires Guardian setup |
 | 11 | `rescueAbandoned()` | Rescue funds after 90+ days | ❌ Not feasible on testnet |
 
-**Note:** Tests 8-11 sono verificati nei test Hardhat locali (vedi sezione sotto). Su testnet richiedono tempi reali troppo lunghi.
+**Note:** Tests 8-11 are verified in local Hardhat tests (see section below). On testnet they require real wait times.
 
 ### 🔑 Test Wallets
 
@@ -412,7 +395,7 @@ ReversoMonitor.guardian  → EmergencyGuardian  ✅
 ---
 
 ## ✅ Test Results (Verified)
-Suite Hardhat in locale (ETH + ERC20 + insurance + rescue):
+Local Hardhat suite (ETH + ERC20 + insurance + rescue):
 
 ```
 ═══════════════════════════════════════════════════════════════
@@ -506,7 +489,7 @@ reversoVault.sendETHPremium{value: 10 ether}(
     "Large payment" // memo
 );
 // Pays: 0.5% base + 0.2% insurance = 0.7% total
-// Gets: Full scam/theft protection!
+// Gets: Scam/theft coverage from insurance pool
 
 // Cancel before delay expires (FREE!)
 reversoVault.cancel(transferId);
@@ -535,15 +518,7 @@ reversoVault.rescueAbandoned(transferId);
 
 ## 🔌 Enterprise API
 
-REVERSO offers a powerful REST API for businesses, exchanges, and dApps.
-
-### Plans & Pricing
-
-| Plan | Price | TX/Month | Features |
-|------|-------|----------|----------|
-| **Starter** | $99 | 100 | API Access, Email Support |
-| **Business** | $499 | Unlimited | + Webhooks, Dashboard, Priority Support |
-| **Enterprise** | $2,000 | Unlimited | + White-label, SLA 99.9%, 24/7 Support |
+REST API for programmatic access to reversible transfers.
 
 ### Base URL
 
@@ -648,6 +623,7 @@ cp .env.example .env
 npm run dev
 
 # Server runs on http://localhost:3000
+```
 
 
 ### API Security (HMAC)
@@ -680,22 +656,11 @@ sendToken(token, recipient, amount, delay, expiryPeriod, recovery1, recovery2, m
 
 ---
 
-## 📊 Revenue Model
-
-| Stream | Source | Estimated Revenue |
-|--------|--------|-------------------|
-| **Progressive Fees** | 0.3-0.7% on transfers | ~$5.8M/year @ $1B volume |
-| **Insurance Premiums** | 0.2% on premium transfers | ~$600K/year |
-| **Enterprise API** | $99-$2000/month subscriptions | ~$600K/year |
-| **TOTAL** | | **~$7M/year** |
-
----
-
 ## 🔐 Security
 
 ### Security Architecture (3-Contract System)
 
-REVERSO uses a **3-layer security architecture** that provides enterprise-grade protection:
+REVERSO uses a **3-layer security architecture**:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -830,7 +795,6 @@ Layer 5: RESCUE
 
 - Smart contract follows OpenZeppelin best practices
 - ReentrancyGuard, Pausable, SafeERC20 implemented
-- Bug bounty program active (up to $50K)
 
 **Current Status:**
 - ✅ Ethereum Mainnet deployed (all 3 contracts verified on Etherscan)
@@ -842,33 +806,16 @@ Layer 5: RESCUE
 - ✅ Gas benchmarks — all operations within L2-friendly limits
 - ✅ Website live at [reverso.one](https://reverso.one)
 - ✅ Enterprise API live at [reverso-tu3o.onrender.com](https://reverso-tu3o.onrender.com)
-- 🔜 External audit planned Q3 2026 (OpenZeppelin / Trail of Bits)
+- 🔜 External audit planned (not yet scheduled)
 
 ### Bug Bounty
 
-| Severity | Reward |
-|----------|--------|
-| Critical | Up to $50,000 |
-| High | Up to $20,000 |
-| Medium | Up to $5,000 |
-| Low | Up to $1,000 |
+If you find a security vulnerability, please report it responsibly via GitHub Issues or email. Severity-based rewards will be evaluated on a case-by-case basis.
 
 ### Insurance Policy
 
-| Requirement | Details |
-|-------------|---------|
-| **Eligibility** | Transfers with `hasInsurance = true` and `Claimed` status |
-| **Claim Window** | Within 30 days of the incident |
-| **Evidence Required** | Screenshots, tx hash, sender signature |
-| **Decision Timeline** | Security committee within 7 days |
-| **Coverage** | Up to full transfer amount (limited by pool balance) |
-| **Exclusions** | Price/market errors; only confirmed phishing/scams |
-### UX Guidelines
+Transfers sent with `hasInsurance = true` are eligible for coverage from the insurance pool if funds are claimed by a confirmed scammer. Coverage is subject to pool balance and requires evidence submission within 30 days.
 
-- **Send Screen:** Display fee breakdown (0.3/0.5/0.7% + 0.2% premium) and net amount
-- **Claim/Cancel:** Show time window, estimated gas cost, quick cancel button
-- **Notifications:** Alert on unlock, approaching expiry, auto-refund, rescue events
-- **Token Approvals:** Prefer targeted approvals over infinite approvals
 ---
 
 ## 📁 Project Structure
@@ -901,35 +848,12 @@ REVERSO/
 │   ├── deploy.ts                    # Single chain deploy
 │   └── deploy-multichain.ts         # Multi-chain deploy
 ├── 📄 hardhat.config.ts             # Multi-chain configuration
-├── 📄 README.md                     # This file
-└── 📄 PITCH_INVESTORS.md            # Investor documentation
+└── 📄 README.md                     # This file
 ```
 
 ---
 
-## 📊 Use Cases
-
-### 1. 🛡️ Protection Against Phishing
-> "I accidentally approved a malicious contract. With REVERSO, I had 24 hours to cancel before my funds were stolen."
-
-### 2. 💼 Business Payments
-> "We send contractor payments through REVERSO. If there's a dispute or error, we can cancel within the grace period."
-
-### 3. 👨‍👩‍👧 Family Transfers
-> "I send my daughter's allowance through REVERSO. She can see it's coming, and I can cancel if plans change."
-
-### 4. 🏦 Escrow Alternative
-> "Instead of complex escrow contracts, we use REVERSO with a 7-day delay for large purchases."
-
-### 5. 🔑 Inheritance Planning
-> "I scheduled transfers to my heirs with maximum delays. If something happens to me, funds auto-release."
-
-### 6. 🏢 Enterprise Integration
-> "Our exchange integrated REVERSO API. Now all withdrawals have a 1-hour safety window."
-
----
-
-## 🗺️ Roadmap
+## ️ Roadmap
 
 ### Phase 1: Foundation (Q4 2025) ✅
 - [x] Core smart contracts
@@ -942,36 +866,9 @@ REVERSO/
 ### Phase 2: Launch (Q1 2026)
 - [x] Ethereum Mainnet deployment (3 contracts verified)
 - [x] Testnet validation (Sepolia — 7/7 live tests passed)
-- [ ] Security audits (OpenZeppelin, Trail of Bits)
 - [x] Multi-chain deployments (BSC, Base, Arbitrum, Polygon, Optimism, Avalanche)
+- [ ] External security audit
 - [ ] SDK release (JavaScript/TypeScript)
-- [ ] Mobile app (React Native)
-
-### Phase 3: Growth (Q2 2026)
-- [ ] Cross-chain reversible transfers
-- [ ] Wallet integrations (MetaMask Snap, WalletConnect)
-- [ ] CEX partnerships (Coinbase, Binance)
-- [ ] DAO governance launch
-
-### Phase 4: Ecosystem (Q3 2026)
-- [ ] REVERSO token launch
-- [ ] Fiat on-ramp with reversibility
-- [ ] Insurance protocol integration (Nexus Mutual)
-- [ ] Enterprise white-label solutions
-
----
-
-## 🤝 Integrations
-
-REVERSO is designed to integrate with the broader DeFi ecosystem:
-
-| Category | Integrations |
-|----------|-------------|
-| **Wallets** | MetaMask, WalletConnect, Ledger, Trezor |
-| **Exchanges** | Coinbase, Binance, Kraken |
-| **DeFi** | Uniswap, Aave, Compound |
-| **Infrastructure** | Chainlink, The Graph, Alchemy |
-| **Insurance** | Nexus Mutual, InsurAce |
 
 ---
 
@@ -1041,7 +938,6 @@ MIT License - see [LICENSE](LICENSE)
 | 📦 **Repository** | [github.com/Faraone-Dev/REVERSO](https://github.com/Faraone-Dev/REVERSO) |
 | 📄 **Documentation** | [This README](#-quick-start) |
 | 🔌 **API Docs** | [Enterprise API Section](#-enterprise-api) |
-| 💼 **Investor Pitch** | [PITCH_INVESTORS.md](PITCH_INVESTORS.md) |
 
 ---
 
@@ -1063,7 +959,6 @@ REVERSO/
 ├── 📁 website/             # Production website (Vite + vanilla JS)
 ├── 📁 scripts/             # Deploy scripts (single & multi-chain)
 ├── 📄 README.md            # This file
-├── 📄 PITCH_INVESTORS.md   # Investor documentation
 └── 📄 hardhat.config.ts    # Multi-chain configuration (15+ chains)
 ```
 

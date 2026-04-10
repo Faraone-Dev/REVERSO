@@ -6,11 +6,31 @@ import { asyncHandler, BadRequest, NotFound } from '../middleware/errorHandler';
 import { TransferRequest, TransferResponse } from '../types';
 import { checkDenylist } from '../utils/fraud';
 import { loadChains } from '../config/chains';
+import * as DB from '../db';
 
 export const transferRouter = Router();
 
-// In-memory transfer store (use DB in production)
-const transfers: Map<string, TransferResponse> = new Map();
+// Map DB row (snake_case) to API response shape (camelCase)
+function mapTransferRow(row: any): any {
+  return {
+    id: row.id,
+    onChainTransferId: row.on_chain_transfer_id,
+    chainId: row.chain_id,
+    txHash: row.tx_hash,
+    status: row.status,
+    from: row.from_addr,
+    to: row.to_addr,
+    amount: row.amount,
+    token: row.token,
+    fee: row.fee,
+    insurance: row.insurance_active ? { active: true, premium: row.insurance_premium } : undefined,
+    lockDuration: row.lock_duration,
+    expiresAt: row.expires_at,
+    createdAt: row.created_at,
+    metadata: row.metadata ? JSON.parse(row.metadata) : undefined,
+    memo: row.memo
+  };
+}
 
 // ReversoVault ABI (aligned to current contract)
 const REVERSO_ABI = [
@@ -87,7 +107,22 @@ transferRouter.post('/', asyncHandler(async (req: AuthenticatedRequest, res: Res
     metadata
   };
 
-  transfers.set(transferId, transfer);
+  DB.insertTransfer.run({
+    id: transferId,
+    chainId,
+    status: 'pending',
+    fromAddr: '',
+    toAddr: to,
+    amount,
+    token: token || 'ETH',
+    fee: calculateFee(amount),
+    insuranceActive: withInsurance ? 1 : 0,
+    insurancePremium: withInsurance ? calculateInsurancePremium(amount) : null,
+    lockDuration: delay,
+    expiresAt: Math.floor(Date.now() / 1000) + delay + expiryPeriod,
+    metadata: metadata ? JSON.stringify(metadata) : null,
+    memo: memoStr || null
+  });
 
   // Increment usage
   incrementTxCount(apiKey.id);
@@ -154,7 +189,7 @@ transferRouter.post('/:id/confirm', asyncHandler(async (req: AuthenticatedReques
   const { id } = req.params;
   const { txHash, from } = req.body;
 
-  const transfer = transfers.get(id);
+  const transfer = DB.findTransferById.get(id) as any;
   if (!transfer) {
     throw NotFound('Transfer not found');
   }
@@ -164,18 +199,20 @@ transferRouter.post('/:id/confirm', asyncHandler(async (req: AuthenticatedReques
   }
 
   // Update transfer
-  transfer.txHash = txHash;
-  transfer.from = from;
-  transfer.status = 'submitted';
-  transfer.expiresAt = Math.floor(Date.now() / 1000) + transfer.lockDuration;
-  
-  transfers.set(id, transfer);
+  DB.updateTransfer.run({
+    id,
+    txHash,
+    fromAddr: from,
+    status: 'submitted',
+    expiresAt: Math.floor(Date.now() / 1000) + transfer.lock_duration
+  });
 
+  const updatedTransfer = DB.findTransferById.get(id) as any;
   const chains = loadChains();
   res.json({
     success: true,
-    transfer,
-    explorer: `${chains[transfer.chainId]?.explorer || ''}/tx/${txHash}`
+    transfer: mapTransferRow(updatedTransfer),
+    explorer: `${chains[updatedTransfer.chain_id]?.explorer || ''}/tx/${txHash}`
   });
 }));
 
@@ -186,12 +223,12 @@ transferRouter.post('/:id/confirm', asyncHandler(async (req: AuthenticatedReques
 transferRouter.get('/:id', asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   const { id } = req.params;
   
-  const transfer = transfers.get(id);
+  const transfer = DB.findTransferById.get(id) as any;
   if (!transfer) {
     throw NotFound('Transfer not found');
   }
 
-  res.json({ transfer });
+  res.json({ transfer: mapTransferRow(transfer) });
 }));
 
 /**
@@ -201,30 +238,31 @@ transferRouter.get('/:id', asyncHandler(async (req: AuthenticatedRequest, res: R
 transferRouter.get('/', asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   const CHAINS = loadChains();
   const { status, chainId, limit = 50, offset = 0 } = req.query;
+  const lim = Number(limit);
+  const off = Number(offset);
 
-  let results = Array.from(transfers.values());
+  let rows: any[];
+  let total: number;
 
-  // Filter by status
-  if (status) {
-    results = results.filter(t => t.status === status);
+  if (status && chainId) {
+    rows = DB.listTransfersByStatusAndChain.all(status, Number(chainId), lim, off) as any[];
+    total = (DB.countTransfersByStatusAndChain.get(status, Number(chainId)) as any).total;
+  } else if (status) {
+    rows = DB.listTransfersByStatus.all(status, lim, off) as any[];
+    total = (DB.countTransfersByStatus.get(status) as any).total;
+  } else if (chainId) {
+    rows = DB.listTransfersByChain.all(Number(chainId), lim, off) as any[];
+    total = (DB.countTransfersByChain.get(Number(chainId)) as any).total;
+  } else {
+    rows = DB.listTransfers.all(lim, off) as any[];
+    total = (DB.countTransfers.get() as any).total;
   }
-
-  // Filter by chain
-  if (chainId) {
-    results = results.filter(t => t.chainId === Number(chainId));
-  }
-
-  // Sort by date desc
-  results.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-
-  // Paginate
-  const paginated = results.slice(Number(offset), Number(offset) + Number(limit));
 
   res.json({
-    transfers: paginated,
-    total: results.length,
-    limit: Number(limit),
-    offset: Number(offset),
+    transfers: rows.map(mapTransferRow),
+    total,
+    limit: lim,
+    offset: off,
     chains: Object.values(CHAINS)
   });
 }));
@@ -236,7 +274,7 @@ transferRouter.get('/', asyncHandler(async (req: AuthenticatedRequest, res: Resp
 transferRouter.post('/:id/cancel', asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   const { id } = req.params;
   
-  const transfer = transfers.get(id);
+  const transfer = DB.findTransferById.get(id) as any;
   if (!transfer) {
     throw NotFound('Transfer not found');
   }
@@ -246,9 +284,9 @@ transferRouter.post('/:id/cancel', asyncHandler(async (req: AuthenticatedRequest
   }
 
   const CHAINS = loadChains();
-  const chain = CHAINS[transfer.chainId];
+  const chain = CHAINS[transfer.chain_id];
   const iface = new ethers.Interface(REVERSO_ABI);
-  const onChainId = transfer.onChainTransferId ?? 0;
+  const onChainId = transfer.on_chain_transfer_id ?? 0;
   const data = iface.encodeFunctionData('cancel', [onChainId]);
 
   res.json({
@@ -256,7 +294,7 @@ transferRouter.post('/:id/cancel', asyncHandler(async (req: AuthenticatedRequest
     transaction: {
       to: chain.contract,
       data,
-      chainId: transfer.chainId
+      chainId: transfer.chain_id
     },
     instructions: 'Sign and broadcast to cancel the transfer'
   });

@@ -3,24 +3,22 @@ import { v4 as uuidv4 } from 'uuid';
 import { AuthenticatedRequest, hasFeature } from '../middleware/apiKey';
 import { asyncHandler, BadRequest, Forbidden, NotFound } from '../middleware/errorHandler';
 import { WebhookEvent } from '../types';
+import * as DB from '../db';
 
 export const webhookRouter = Router();
 
-// Webhook configuration store
-interface WebhookConfig {
-  id: string;
-  apiKeyId: string;
-  url: string;
-  events: string[];
-  secret: string;
-  isActive: boolean;
-  createdAt: Date;
-  lastTriggered?: Date;
-  failCount: number;
+// Map DB row (snake_case) to API response shape
+function mapWebhookRow(row: any): any {
+  return {
+    id: row.id,
+    url: row.url,
+    events: JSON.parse(row.events),
+    isActive: !!row.is_active,
+    createdAt: row.created_at,
+    lastTriggered: row.last_triggered,
+    failCount: row.fail_count
+  };
 }
-
-const webhooks: Map<string, WebhookConfig> = new Map();
-const webhookLogs: WebhookEvent[] = [];
 
 /**
  * GET /api/v1/webhooks
@@ -34,17 +32,8 @@ webhookRouter.get('/', asyncHandler(async (req: AuthenticatedRequest, res: Respo
     throw Forbidden('Webhooks require Business or Enterprise plan. Upgrade at /api/v1/auth/plans');
   }
 
-  const userWebhooks = Array.from(webhooks.values())
-    .filter(w => w.apiKeyId === apiKey.id)
-    .map(w => ({
-      id: w.id,
-      url: w.url,
-      events: w.events,
-      isActive: w.isActive,
-      createdAt: w.createdAt,
-      lastTriggered: w.lastTriggered,
-      failCount: w.failCount
-    }));
+  const rows = DB.listWebhooksByApiKey.all(apiKey.id) as any[];
+  const userWebhooks = rows.map(mapWebhookRow);
 
   res.json({ webhooks: userWebhooks });
 }));
@@ -69,27 +58,26 @@ webhookRouter.post('/', asyncHandler(async (req: AuthenticatedRequest, res: Resp
   const validEvents = ['transfer.created', 'transfer.claimed', 'transfer.cancelled', 'transfer.refunded'];
   const selectedEvents = events?.filter((e: string) => validEvents.includes(e)) || validEvents;
 
-  const webhook: WebhookConfig = {
-    id: uuidv4(),
+  const webhookId = uuidv4();
+  const secret = `whsec_${uuidv4().replace(/-/g, '')}`;
+
+  DB.insertWebhook.run({
+    id: webhookId,
     apiKeyId: apiKey.id,
     url,
-    events: selectedEvents,
-    secret: `whsec_${uuidv4().replace(/-/g, '')}`,
-    isActive: true,
-    createdAt: new Date(),
-    failCount: 0
-  };
-
-  webhooks.set(webhook.id, webhook);
+    events: JSON.stringify(selectedEvents),
+    secret,
+    isActive: 1
+  });
 
   res.status(201).json({
     success: true,
     webhook: {
-      id: webhook.id,
-      url: webhook.url,
-      events: webhook.events,
-      secret: webhook.secret, // Only shown once!
-      isActive: webhook.isActive
+      id: webhookId,
+      url,
+      events: selectedEvents,
+      secret, // Only shown once!
+      isActive: true
     },
     message: '⚠️ Save your webhook secret! It will only be shown once.'
   });
@@ -103,16 +91,16 @@ webhookRouter.delete('/:id', asyncHandler(async (req: AuthenticatedRequest, res:
   const apiKey = req.apiKey!;
   const { id } = req.params;
 
-  const webhook = webhooks.get(id);
+  const webhook = DB.findWebhookById.get(id) as any;
   if (!webhook) {
     throw NotFound('Webhook not found');
   }
 
-  if (webhook.apiKeyId !== apiKey.id) {
+  if (webhook.api_key_id !== apiKey.id) {
     throw Forbidden('Not authorized to delete this webhook');
   }
 
-  webhooks.delete(id);
+  DB.deleteWebhook.run(id);
 
   res.json({ success: true, message: 'Webhook deleted' });
 }));
@@ -126,40 +114,51 @@ webhookRouter.patch('/:id', asyncHandler(async (req: AuthenticatedRequest, res: 
   const { id } = req.params;
   const { url, events, isActive } = req.body;
 
-  const webhook = webhooks.get(id);
+  const webhook = DB.findWebhookById.get(id) as any;
   if (!webhook) {
     throw NotFound('Webhook not found');
   }
 
-  if (webhook.apiKeyId !== apiKey.id) {
+  if (webhook.api_key_id !== apiKey.id) {
     throw Forbidden('Not authorized to update this webhook');
   }
+
+  let newUrl = webhook.url;
+  let newEvents = webhook.events;
+  let newIsActive = webhook.is_active;
 
   if (url) {
     if (!url.startsWith('https://')) {
       throw BadRequest('Webhook URL must use HTTPS');
     }
-    webhook.url = url;
+    newUrl = url;
   }
 
   if (events) {
     const validEvents = ['transfer.created', 'transfer.claimed', 'transfer.cancelled', 'transfer.refunded'];
-    webhook.events = events.filter((e: string) => validEvents.includes(e));
+    newEvents = JSON.stringify(events.filter((e: string) => validEvents.includes(e)));
   }
 
   if (typeof isActive === 'boolean') {
-    webhook.isActive = isActive;
+    newIsActive = isActive ? 1 : 0;
   }
 
-  webhooks.set(id, webhook);
+  DB.updateWebhook.run({
+    id,
+    url: newUrl,
+    events: newEvents,
+    isActive: newIsActive,
+    lastTriggered: webhook.last_triggered,
+    failCount: webhook.fail_count
+  });
 
   res.json({
     success: true,
     webhook: {
       id: webhook.id,
-      url: webhook.url,
-      events: webhook.events,
-      isActive: webhook.isActive
+      url: newUrl,
+      events: JSON.parse(typeof newEvents === 'string' ? newEvents : JSON.stringify(newEvents)),
+      isActive: !!newIsActive
     }
   });
 }));
@@ -172,12 +171,12 @@ webhookRouter.post('/:id/test', asyncHandler(async (req: AuthenticatedRequest, r
   const apiKey = req.apiKey!;
   const { id } = req.params;
 
-  const webhook = webhooks.get(id);
+  const webhook = DB.findWebhookById.get(id) as any;
   if (!webhook) {
     throw NotFound('Webhook not found');
   }
 
-  if (webhook.apiKeyId !== apiKey.id) {
+  if (webhook.api_key_id !== apiKey.id) {
     throw Forbidden('Not authorized');
   }
 
@@ -264,10 +263,13 @@ function generateSignature(payload: any, secret: string): string {
 
 // Export for use in transfer events
 export async function triggerWebhook(apiKeyId: string, event: WebhookEvent): Promise<void> {
-  const userWebhooks = Array.from(webhooks.values())
-    .filter(w => w.apiKeyId === apiKeyId && w.isActive && w.events.includes(event.type));
+  const allWebhooks = DB.listActiveWebhooksByApiKeyAndEvent.all(apiKeyId) as any[];
+  const matching = allWebhooks.filter(w => {
+    const events = JSON.parse(w.events);
+    return events.includes(event.type);
+  });
 
-  for (const webhook of userWebhooks) {
+  for (const webhook of matching) {
     try {
       const response = await fetch(webhook.url, {
         method: 'POST',
@@ -280,24 +282,42 @@ export async function triggerWebhook(apiKeyId: string, event: WebhookEvent): Pro
       });
 
       if (response.ok) {
-        webhook.lastTriggered = new Date();
-        webhook.failCount = 0;
+        DB.updateWebhook.run({
+          id: webhook.id,
+          url: webhook.url,
+          events: webhook.events,
+          isActive: webhook.is_active,
+          lastTriggered: new Date().toISOString(),
+          failCount: 0
+        });
       } else {
-        webhook.failCount++;
+        DB.updateWebhook.run({
+          id: webhook.id,
+          url: webhook.url,
+          events: webhook.events,
+          isActive: (webhook.fail_count + 1) >= 10 ? 0 : webhook.is_active,
+          lastTriggered: webhook.last_triggered,
+          failCount: webhook.fail_count + 1
+        });
       }
     } catch (error) {
-      webhook.failCount++;
+      const newFailCount = webhook.fail_count + 1;
+      DB.updateWebhook.run({
+        id: webhook.id,
+        url: webhook.url,
+        events: webhook.events,
+        isActive: newFailCount >= 10 ? 0 : webhook.is_active,
+        lastTriggered: webhook.last_triggered,
+        failCount: newFailCount
+      });
       console.error(`Webhook delivery failed for ${webhook.id}:`, error);
     }
-
-    // Disable after 10 consecutive failures
-    if (webhook.failCount >= 10) {
-      webhook.isActive = false;
-    }
-
-    webhooks.set(webhook.id, webhook);
   }
 
   // Log event
-  webhookLogs.push(event);
+  DB.insertWebhookLog.run({
+    id: uuidv4(),
+    type: event.type,
+    data: JSON.stringify(event.data)
+  });
 }

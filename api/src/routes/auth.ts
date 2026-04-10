@@ -7,6 +7,7 @@ import { Resend } from 'resend';
 import { createApiKey } from '../middleware/apiKey';
 import { asyncHandler, BadRequest } from '../middleware/errorHandler';
 import { ApiPlan, PLAN_CONFIG } from '../types';
+import * as DB from '../db';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -17,20 +18,7 @@ if (!JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is required');
 }
 
-// In-memory user store (use DB in production)
-interface User {
-  id: string;
-  email: string;
-  hashedPassword: string;
-  company?: string;
-  plan: ApiPlan;
-  apiKeys: string[];
-  createdAt: Date;
-}
-
-const users: Map<string, User> = new Map();
-
-// Rate limit for quick-key generation (per IP, 3 per hour)
+// Rate limit for quick-key generation (per IP, 3 per hour) — in-memory is fine for rate limits
 const quickKeyRateLimit: Map<string, { ts: number; count: number }> = new Map();
 
 /**
@@ -63,10 +51,9 @@ authRouter.post('/quick-key', asyncHandler(async (req: any, res: Response) => {
   }
 
   // Check if email already registered — return error
-  for (const user of users.values()) {
-    if (user.email === email.toLowerCase().trim()) {
-      throw BadRequest('Email already registered. Use /auth/login to get a new key.');
-    }
+  const existingUser = DB.findUserByEmail.get(email.toLowerCase().trim()) as any;
+  if (existingUser) {
+    throw BadRequest('Email already registered. Use /auth/login to get a new key.');
   }
 
   const userId = uuidv4();
@@ -74,30 +61,27 @@ authRouter.post('/quick-key', asyncHandler(async (req: any, res: Response) => {
   const hashedPassword = await bcrypt.hash(autoPassword, 4); // Low rounds: auto-generated pwd, user never sees it
   const plan: ApiPlan = 'starter';
 
-  const user: User = {
+  // Create user in DB
+  DB.insertUser.run({
     id: userId,
     email: email.toLowerCase().trim(),
     hashedPassword,
-    company: company || undefined,
-    plan,
-    apiKeys: [],
-    createdAt: new Date()
-  };
+    company: company || null,
+    plan
+  });
 
   // Create API key
   const apiKey = await createApiKey(userId, plan);
-  user.apiKeys.push(apiKey.id);
-  users.set(userId, user);
 
   // Generate JWT so they can manage their key later
-  const token = jwt.sign({ userId, email: user.email, plan }, JWT_SECRET!, { expiresIn: '30d' });
+  const token = jwt.sign({ userId, email: email.toLowerCase().trim(), plan }, JWT_SECRET!, { expiresIn: '30d' });
 
   // Send welcome email (non-blocking, no key in email)
   if (resend) {
     const txLimit = PLAN_CONFIG[plan].txLimit;
     resend.emails.send({
       from: 'REVERSO <noreply@reverso.one>',
-      to: user.email,
+      to: email.toLowerCase().trim(),
       subject: 'Welcome to REVERSO — Your API Access is Active',
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; color: #1a1a2e;">
@@ -161,31 +145,25 @@ authRouter.post('/register', asyncHandler(async (req: any, res: Response) => {
   }
 
   // Check if user exists
-  for (const user of users.values()) {
-    if (user.email === email) {
-      throw BadRequest('Email already registered');
-    }
+  const existingUser = DB.findUserByEmail.get(email) as any;
+  if (existingUser) {
+    throw BadRequest('Email already registered');
   }
 
   // Create user
   const hashedPassword = await bcrypt.hash(password, 10);
   const userId = uuidv4();
   
-  const user: User = {
+  DB.insertUser.run({
     id: userId,
     email,
     hashedPassword,
-    company,
-    plan: plan as ApiPlan,
-    apiKeys: [],
-    createdAt: new Date()
-  };
+    company: company || null,
+    plan: plan as ApiPlan
+  });
 
   // Create initial API key
   const apiKey = await createApiKey(userId, plan as ApiPlan);
-  user.apiKeys.push(apiKey.id);
-
-  users.set(userId, user);
 
   // Generate JWT
   const token = jwt.sign({ userId, email, plan }, JWT_SECRET, { expiresIn: '30d' });
@@ -197,7 +175,7 @@ authRouter.post('/register', asyncHandler(async (req: any, res: Response) => {
       email,
       company,
       plan,
-      createdAt: user.createdAt
+      createdAt: new Date().toISOString()
     },
     apiKey: {
       key: apiKey.key, // Only shown once!
@@ -224,19 +202,13 @@ authRouter.post('/login', asyncHandler(async (req: any, res: Response) => {
   }
 
   // Find user
-  let foundUser: User | undefined;
-  for (const user of users.values()) {
-    if (user.email === email) {
-      foundUser = user;
-      break;
-    }
-  }
+  const foundUser = DB.findUserByEmail.get(email) as any;
 
   if (!foundUser) {
     throw BadRequest('Invalid credentials', 'INVALID_CREDENTIALS');
   }
 
-  const isValidPassword = await bcrypt.compare(password, foundUser.hashedPassword);
+  const isValidPassword = await bcrypt.compare(password, foundUser.hashed_password);
   if (!isValidPassword) {
     throw BadRequest('Invalid credentials', 'INVALID_CREDENTIALS');
   }
@@ -248,6 +220,8 @@ authRouter.post('/login', asyncHandler(async (req: any, res: Response) => {
     { expiresIn: '30d' }
   );
 
+  const keyCount = (DB.countApiKeysByUserId.get(foundUser.id) as any)?.count || 0;
+
   res.json({
     success: true,
     user: {
@@ -257,7 +231,7 @@ authRouter.post('/login', asyncHandler(async (req: any, res: Response) => {
       plan: foundUser.plan
     },
     token,
-    apiKeyCount: foundUser.apiKeys.length
+    apiKeyCount: keyCount
   });
 }));
 
@@ -297,7 +271,7 @@ authRouter.post('/api-key', asyncHandler(async (req: any, res: Response) => {
   
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as any;
-    const user = users.get(decoded.userId);
+    const user = DB.findUserById.get(decoded.userId) as any;
     
     if (!user) {
       throw BadRequest('User not found');
@@ -310,9 +284,6 @@ authRouter.post('/api-key', asyncHandler(async (req: any, res: Response) => {
       webhookUrl,
       allowedOrigins || []
     );
-
-    user.apiKeys.push(apiKey.id);
-    users.set(user.id, user);
 
     res.status(201).json({
       success: true,

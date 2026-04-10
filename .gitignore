@@ -13,6 +13,9 @@ out/
 broadcast/
 website/dist/
 
+# SQLite data
+api/data/
+
 # Foundry libraries (installed via forge install)
 **/lib/forge-std/
 **/lib/openzeppelin-contracts/
