@@ -1,7 +1,8 @@
 import { Router, Request, Response } from 'express';
 import Stripe from 'stripe';
 import { asyncHandler } from '../middleware/errorHandler';
-import crypto from 'crypto';
+import { createApiKey } from '../middleware/apiKey';
+import { ApiPlan } from '../types';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2026-02-25.clover'
@@ -180,11 +181,12 @@ billingRouter.post('/webhook', asyncHandler(async (req: Request, res: Response) 
 
       console.log(`✅ Payment successful: ${customerEmail} → ${plan} plan (customer: ${customerId})`);
 
-      // Generate API key for the customer
-      const apiKey = `rsk_${plan}_${crypto.randomBytes(16).toString('hex')}`;
-      const signingSecret = `rss_${crypto.randomBytes(32).toString('hex')}`;
+      // Generate API key and persist to DB
+      const keyRecord = await createApiKey(customerId, (plan || 'starter') as ApiPlan);
+      const apiKey = keyRecord.key;
+      const signingSecret = keyRecord.signingSecret;
 
-      console.log(`🔑 API Key generated for ${customerEmail}: ${apiKey}`);
+      console.log(`🔑 API Key generated and stored for ${customerEmail}`);
 
       // Send welcome email with API key via Resend
       try {
