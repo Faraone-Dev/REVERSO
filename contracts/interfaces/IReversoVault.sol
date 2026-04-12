@@ -24,15 +24,14 @@ interface IReversoVault {
         address recoveryAddress2;      // Secondary recovery (backup)
         string memo;
         TransferStatus status;
-        bool frozenByGuardian;         // Guardian can freeze suspicious transfers
+        bool hasInsurance;             // Premium insurance coverage
     }
 
     enum TransferStatus {
         Pending,
         Claimed,
         Cancelled,
-        Refunded,
-        Frozen
+        Refunded
     }
 
     // ═══════════════════════════════════════════════════════════════
