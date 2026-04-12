@@ -1,4 +1,4 @@
-import { DatabaseSync } from 'node:sqlite';
+import Database from 'better-sqlite3';
 import path from 'path';
 
 const DB_PATH = process.env.DB_PATH || path.join(__dirname, '..', 'data', 'reverso.db');
@@ -7,7 +7,7 @@ const DB_PATH = process.env.DB_PATH || path.join(__dirname, '..', 'data', 'rever
 import fs from 'fs';
 fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
 
-const db = new DatabaseSync(DB_PATH);
+const db = new Database(DB_PATH);
 
 // WAL mode for better concurrent read performance
 db.exec('PRAGMA journal_mode = WAL');
