@@ -32,6 +32,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS api_keys (
     id TEXT PRIMARY KEY,
     hashed_key TEXT NOT NULL,
+    key_prefix TEXT NOT NULL DEFAULT '',
     signing_secret TEXT NOT NULL,
     user_id TEXT NOT NULL REFERENCES users(id),
     plan TEXT NOT NULL DEFAULT 'starter',
@@ -106,6 +107,7 @@ db.exec(`
   );
 
   CREATE INDEX IF NOT EXISTS idx_api_keys_user ON api_keys(user_id);
+  CREATE INDEX IF NOT EXISTS idx_api_keys_prefix ON api_keys(key_prefix);
   CREATE INDEX IF NOT EXISTS idx_transfers_status ON transfers(status);
   CREATE INDEX IF NOT EXISTS idx_transfers_chain ON transfers(chain_id);
   CREATE INDEX IF NOT EXISTS idx_webhooks_api_key ON webhooks(api_key_id);
@@ -132,8 +134,8 @@ export const findUserById = db.prepare(`
 
 // --- API Keys ---
 export const insertApiKey = db.prepare(`
-  INSERT INTO api_keys (id, hashed_key, signing_secret, user_id, plan, tx_limit, tx_used, webhook_url, allowed_origins, expires_at, is_active)
-  VALUES (@id, @hashedKey, @signingSecret, @userId, @plan, @txLimit, @txUsed, @webhookUrl, @allowedOrigins, @expiresAt, @isActive)
+  INSERT INTO api_keys (id, hashed_key, key_prefix, signing_secret, user_id, plan, tx_limit, tx_used, webhook_url, allowed_origins, expires_at, is_active)
+  VALUES (@id, @hashedKey, @keyPrefix, @signingSecret, @userId, @plan, @txLimit, @txUsed, @webhookUrl, @allowedOrigins, @expiresAt, @isActive)
 `);
 
 export const findApiKeyById = db.prepare(`
@@ -142,6 +144,10 @@ export const findApiKeyById = db.prepare(`
 
 export const getAllApiKeys = db.prepare(`
   SELECT * FROM api_keys WHERE is_active = 1 AND expires_at > datetime('now')
+`);
+
+export const findApiKeyByPrefix = db.prepare(`
+  SELECT * FROM api_keys WHERE key_prefix = ? AND is_active = 1 AND expires_at > datetime('now')
 `);
 
 export const incrementApiKeyTxUsed = db.prepare(`

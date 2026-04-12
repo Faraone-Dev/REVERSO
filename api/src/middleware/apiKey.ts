@@ -1,8 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { ApiKey, ApiPlan, PLAN_CONFIG } from '../types';
 import * as DB from '../db';
+
+/**
+ * Compute a fast, non-secret prefix hash for indexed DB lookup.
+ * SHA-256 of the first 16 chars of the raw key → hex string.
+ * This avoids iterating all rows with bcrypt on every request.
+ */
+function computeKeyPrefix(rawKey: string): string {
+  return crypto.createHash('sha256').update(rawKey.slice(0, 16)).digest('hex');
+}
 
 // In-memory rate limiter only (short-lived, no persistence needed)
 const rateWindows: Map<string, { start: number; count: number }> = new Map();
@@ -32,10 +42,11 @@ export async function apiKeyMiddleware(
 
     const apiKeyValue = authHeader.substring(7); // Remove 'Bearer '
     
-    // Find API key (hash compare against DB)
+    // Fast O(1) lookup: find candidate row by key prefix, then verify with bcrypt
+    const prefix = computeKeyPrefix(apiKeyValue);
     let foundKey: ApiKey | undefined;
-    const allKeys = DB.getAllApiKeys.all() as any[];
-    for (const row of allKeys) {
+    const row = DB.findApiKeyByPrefix.get(prefix) as any;
+    if (row) {
       const isValid = await bcrypt.compare(apiKeyValue, row.hashed_key);
       if (isValid) {
         foundKey = {
@@ -53,7 +64,6 @@ export async function apiKeyMiddleware(
           expiresAt: new Date(row.expires_at),
           isActive: !!row.is_active,
         };
-        break;
       }
     }
 
@@ -150,6 +160,7 @@ export async function createApiKey(
 ): Promise<ApiKey> {
   const rawKey = `rsk_${plan}_${uuidv4().replace(/-/g, '')}`;
   const hashedKey = await bcrypt.hash(rawKey, 10);
+  const keyPrefix = computeKeyPrefix(rawKey);
   const signingSecret = `sig_${uuidv4().replace(/-/g, '')}`;
   
   const apiKey: ApiKey = {
@@ -172,6 +183,7 @@ export async function createApiKey(
   DB.insertApiKey.run({
     id: apiKey.id,
     hashedKey: apiKey.hashedKey,
+    keyPrefix,
     signingSecret: apiKey.signingSecret,
     userId: apiKey.userId,
     plan: apiKey.plan,
