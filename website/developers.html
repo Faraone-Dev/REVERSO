@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="description" content="REVERSO API - Integrate reversible transactions into your platform. Multi-chain, fast, secure.">
+    <meta name="keywords" content="crypto API, blockchain API, reversible transactions, DeFi API, Ethereum API">
+    <meta name="author" content="REVERSO Protocol">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="REVERSO Developers - Enterprise API">
+    <meta property="og:description" content="Integrate reversible transactions into your platform. API keys, code examples, and pricing.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://reverso.one/developers.html">
+    <meta property="og:image" content="https://reverso.one/og-image.png">
+    
+    <title>REVERSO Developers | Enterprise API</title>
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://esm.sh 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data: blob:; connect-src 'self' https://*.alchemy.com https://*.publicnode.com https://*.base.org https://*.optimism.io https://*.binance.org https://api.avax.network https://reverso-tu3o.onrender.com https://api.coingecko.com wss://*.walletconnect.com wss://*.walletconnect.org https://*.walletconnect.com https://*.walletconnect.org; frame-src https://*.walletconnect.com https://*.walletconnect.org; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/src/styles/main.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/og-image.png">
+</head>
+<body>
+<div id="page-wrapper">
+    <!-- Animated Background -->
+    <div class="bg-grid" aria-hidden="true"></div>
+    <div class="bg-glow" aria-hidden="true"></div>
+    <div class="aurora-orb aurora-orb-1" aria-hidden="true"></div>
+    <div class="aurora-orb aurora-orb-2" aria-hidden="true"></div>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <span class="logo-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="lg1" x1="0" y1="0" x2="24" y2="24"><stop offset="0%" stop-color="#00e59b"/><stop offset="50%" stop-color="#00d4aa"/><stop offset="100%" stop-color="#00b4d8"/></linearGradient></defs><path d="M17.5 2.5L21 6l-3.5 3.5" stroke="url(#lg1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 6h18" stroke="url(#lg1)" stroke-width="2" stroke-linecap="round"/><path d="M6.5 21.5L3 18l3.5-3.5" stroke="url(#lg1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 18H3" stroke="url(#lg1)" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="11" stroke="url(#lg1)" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.3"/></svg></span>
+                <span class="logo-text">REVERSO</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/#features">Features</a>
+                <a href="/#pricing">Pricing</a>
+                <a href="/developers.html" class="active">Developers</a>
+            </div>
+            
+            <div class="nav-actions">
+                <a href="/#app" class="btn btn-primary">Launch App</a>
+            </div>
+            
+            <button type="button" class="nav-mobile-toggle" id="mobileToggle" aria-label="Toggle navigation menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+    
+    <main>
+    <!-- Hero -->
+    <section class="hero" style="padding-top:140px;min-height:auto">
+        <div class="hero-content" style="max-width:800px">
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                Enterprise API · Live on 7 Chains
+            </div>
+            
+            <h1 class="hero-title">
+                <span class="gradient-text">Developer</span>
+                API
+            </h1>
+            
+            <p class="hero-subtitle">
+                Integrate reversible transactions into your platform in minutes. One API, 7 chains, real-time webhooks.
+            </p>
+        </div>
+    </section>
+
+    <!-- API Features -->
+    <section class="solution" id="api-features">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Why REVERSO API</span>
+                <h2>Built for Scale</h2>
+            </div>
+            
+            <div class="api-features">
+                <div class="api-feature">
+                    <div class="api-feature-icon">⚡</div>
+                    <h4>Lightning Fast</h4>
+                    <p>Sub-100ms response time. Create transfers instantly.</p>
+                </div>
+                <div class="api-feature">
+                    <div class="api-feature-icon">🔗</div>
+                    <h4>Multi-chain</h4>
+                    <p>One API, 7 chains: Ethereum, BSC, Arbitrum, Base, Polygon, Optimism, Avalanche.</p>
+                </div>
+                <div class="api-feature">
+                    <div class="api-feature-icon">🔔</div>
+                    <h4>Webhooks</h4>
+                    <p>Real-time notifications for all transfer events.</p>
+                </div>
+                <div class="api-feature">
+                    <div class="api-feature-icon">📊</div>
+                    <h4>Dashboard</h4>
+                    <p>Full analytics and monitoring included.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Examples -->
+    <section class="api-section" id="code-examples">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Code Examples</span>
+                <h2>Quick Start</h2>
+                <p>Copy, paste, integrate. It's that simple.</p>
+            </div>
+            
+            <div class="api-demo-tabs">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="create">Create Transfer</button>
+                    <button class="tab-btn" data-tab="cancel">Cancel Transfer</button>
+                    <button class="tab-btn" data-tab="webhook">Webhook Event</button>
+                    <button class="tab-btn" data-tab="status">Check Status</button>
+                </div>
+                
+                <div class="tab-content active" id="tab-create">
+                    <div class="api-code">
+                        <div class="code-header">
+                            <span class="code-dot red"></span>
+                            <span class="code-dot yellow"></span>
+                            <span class="code-dot green"></span>
+                            <span class="code-title">POST /api/v1/transfers</span>
+                            <span class="code-copy" onclick="copyCode(this)">📋 Copy</span>
+                        </div>
+                        <pre><code><span class="code-keyword">const</span> body = {
+    <span class="code-property">chainId</span>: <span class="code-number">1</span>,
+    <span class="code-property">to</span>: <span class="code-string">'0xRecipient...'</span>,
+    <span class="code-property">amount</span>: <span class="code-string">'1000000000000000000'</span>,
+    <span class="code-property">lockDuration</span>: <span class="code-number">86400</span>,
+    <span class="code-property">withInsurance</span>: <span class="code-keyword">true</span>,
+    <span class="code-property">metadata</span>: { <span class="code-property">orderId</span>: <span class="code-string">'12345'</span> }
+};
+
+<span class="code-keyword">const</span> timestamp = <span class="code-function">Math</span>.<span class="code-function">floor</span>(<span class="code-function">Date</span>.<span class="code-function">now</span>() / <span class="code-number">1000</span>);
+<span class="code-keyword">const</span> signature = <span class="code-function">signHmac</span>(
+    <span class="code-function">JSON</span>.<span class="code-function">stringify</span>(body),
+    <span class="code-function">`${timestamp}.YOUR_SIGNING_SECRET`</span>
+); <span class="code-comment">// HMAC-SHA256</span>
+
+<span class="code-keyword">const</span> response = <span class="code-keyword">await</span> <span class="code-function">fetch</span>(<span class="code-string">'https://reverso-tu3o.onrender.com/api/v1/transfers'</span>, {
+    <span class="code-property">method</span>: <span class="code-string">'POST'</span>,
+    <span class="code-property">headers</span>: {
+        <span class="code-string">'X-API-KEY'</span>: <span class="code-string">'YOUR_API_KEY'</span>,
+        <span class="code-string">'X-Signature'</span>: signature,
+        <span class="code-string">'X-Timestamp'</span>: timestamp.<span class="code-function">toString</span>(),
+        <span class="code-string">'Content-Type'</span>: <span class="code-string">'application/json'</span>
+    },
+    <span class="code-property">body</span>: <span class="code-function">JSON</span>.<span class="code-function">stringify</span>(body)
+});
+
+<span class="code-keyword">const</span> { transfer, transaction } = <span class="code-keyword">await</span> response.<span class="code-function">json</span>();
+<span class="code-comment">// Sign `transaction` with user's wallet and broadcast.</span></code></pre>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="tab-cancel">
+                    <div class="api-code">
+                        <div class="code-header">
+                            <span class="code-dot red"></span>
+                            <span class="code-dot yellow"></span>
+                            <span class="code-dot green"></span>
+                            <span class="code-title">POST /api/v1/transfers/:id/cancel</span>
+                            <span class="code-copy" onclick="copyCode(this)">📋 Copy</span>
+                        </div>
+                        <pre><code><span class="code-keyword">const</span> timestamp = <span class="code-function">Math</span>.<span class="code-function">floor</span>(<span class="code-function">Date</span>.<span class="code-function">now</span>() / <span class="code-number">1000</span>);
+<span class="code-keyword">const</span> signature = <span class="code-function">signHmac</span>(<span class="code-string">''</span>, <span class="code-function">`${timestamp}.YOUR_SIGNING_SECRET`</span>);
+
+<span class="code-keyword">const</span> response = <span class="code-keyword">await</span> <span class="code-function">fetch</span>(<span class="code-string">'https://reverso-tu3o.onrender.com/api/v1/transfers/abc123/cancel'</span>, {
+    <span class="code-property">method</span>: <span class="code-string">'POST'</span>,
+    <span class="code-property">headers</span>: {
+        <span class="code-string">'X-API-KEY'</span>: <span class="code-string">'YOUR_API_KEY'</span>,
+        <span class="code-string">'X-Signature'</span>: signature,
+        <span class="code-string">'X-Timestamp'</span>: timestamp.<span class="code-function">toString</span>()
+    }
+});
+
+<span class="code-keyword">const</span> { transaction } = <span class="code-keyword">await</span> response.<span class="code-function">json</span>();
+<span class="code-comment">// Sign and broadcast to cancel - funds return to sender instantly!</span></code></pre>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="tab-webhook">
+                    <div class="api-code">
+                        <div class="code-header">
+                            <span class="code-dot red"></span>
+                            <span class="code-dot yellow"></span>
+                            <span class="code-dot green"></span>
+                            <span class="code-title">Webhook Payload</span>
+                            <span class="code-copy" onclick="copyCode(this)">📋 Copy</span>
+                        </div>
+                        <pre><code><span class="code-comment">// Your server receives this when transfer status changes:</span>
+{
+  <span class="code-property">"event"</span>: <span class="code-string">"transfer.claimed"</span>,
+  <span class="code-property">"transfer"</span>: {
+    <span class="code-property">"id"</span>: <span class="code-string">"abc123"</span>,
+    <span class="code-property">"status"</span>: <span class="code-string">"claimed"</span>,
+    <span class="code-property">"from"</span>: <span class="code-string">"0xSender..."</span>,
+    <span class="code-property">"to"</span>: <span class="code-string">"0xRecipient..."</span>,
+    <span class="code-property">"amount"</span>: <span class="code-string">"1000000000000000000"</span>,
+    <span class="code-property">"chainId"</span>: <span class="code-number">1</span>,
+    <span class="code-property">"txHash"</span>: <span class="code-string">"0x..."</span>,
+    <span class="code-property">"claimedAt"</span>: <span class="code-string">"2025-01-15T12:00:00Z"</span>
+  },
+  <span class="code-property">"metadata"</span>: { <span class="code-property">"orderId"</span>: <span class="code-string">"12345"</span> }
+}</code></pre>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="tab-status">
+                    <div class="api-code">
+                        <div class="code-header">
+                            <span class="code-dot red"></span>
+                            <span class="code-dot yellow"></span>
+                            <span class="code-dot green"></span>
+                            <span class="code-title">GET /api/v1/transfers/:id</span>
+                            <span class="code-copy" onclick="copyCode(this)">📋 Copy</span>
+                        </div>
+                        <pre><code><span class="code-keyword">const</span> timestamp = <span class="code-function">Math</span>.<span class="code-function">floor</span>(<span class="code-function">Date</span>.<span class="code-function">now</span>() / <span class="code-number">1000</span>);
+<span class="code-keyword">const</span> signature = <span class="code-function">signHmac</span>(<span class="code-string">''</span>, <span class="code-function">`${timestamp}.YOUR_SIGNING_SECRET`</span>);
+
+<span class="code-keyword">const</span> response = <span class="code-keyword">await</span> <span class="code-function">fetch</span>(<span class="code-string">'https://reverso-tu3o.onrender.com/api/v1/transfers/abc123'</span>, {
+    <span class="code-property">headers</span>: {
+        <span class="code-string">'X-API-KEY'</span>: <span class="code-string">'YOUR_API_KEY'</span>,
+        <span class="code-string">'X-Signature'</span>: signature,
+        <span class="code-string">'X-Timestamp'</span>: timestamp.<span class="code-function">toString</span>()
+    }
+});
+
+<span class="code-keyword">const</span> { transfer } = <span class="code-keyword">await</span> response.<span class="code-function">json</span>();
+
+console.<span class="code-function">log</span>(transfer.status);       <span class="code-comment">// "locked" | "claimable" | "claimed" | "cancelled"</span>
+console.<span class="code-function">log</span>(transfer.timeRemaining); <span class="code-comment">// Seconds until claimable</span>
+console.<span class="code-function">log</span>(transfer.canCancel);     <span class="code-comment">// true if still cancellable</span></code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Plans -->
+    <section class="pricing" id="api-pricing">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">API Pricing</span>
+                <h2>Choose Your Plan</h2>
+                <p>Start free, scale as you grow</p>
+            </div>
+
+            <div class="api-plans-grid">
+                <div class="api-plan">
+                    <div class="plan-header">
+                        <h4>Starter</h4>
+                        <div class="plan-price">$99<span>/mo</span></div>
+                    </div>
+                    <ul class="plan-features">
+                        <li><span class="check">✓</span> 100 transfers/month</li>
+                        <li><span class="check">✓</span> REST API access</li>
+                        <li><span class="check">✓</span> 7 chains supported</li>
+                        <li><span class="check">✓</span> Email support</li>
+                        <li class="disabled"><span class="x">✕</span> Webhooks</li>
+                        <li class="disabled"><span class="x">✕</span> Dashboard</li>
+                    </ul>
+                    <a href="javascript:void(0)" class="btn btn-ghost btn-plan" data-plan="starter" onclick="startCheckout('starter')">Get Started</a>
+                </div>
+                
+                <div class="api-plan featured">
+                    <div class="plan-badge">Most Popular</div>
+                    <div class="plan-header">
+                        <h4>Business</h4>
+                        <div class="plan-price">$499<span>/mo</span></div>
+                    </div>
+                    <ul class="plan-features">
+                        <li><span class="check">✓</span> <strong>Unlimited</strong> transfers</li>
+                        <li><span class="check">✓</span> REST API access</li>
+                        <li><span class="check">✓</span> <strong>All supported chains</strong></li>
+                        <li><span class="check">✓</span> Webhooks (real-time)</li>
+                        <li><span class="check">✓</span> Analytics dashboard</li>
+                        <li><span class="check">✓</span> Priority support</li>
+                    </ul>
+                    <a href="javascript:void(0)" class="btn btn-primary btn-plan" data-plan="business" onclick="startCheckout('business')">Start Free Trial</a>
+                </div>
+                
+                <div class="api-plan">
+                    <div class="plan-header">
+                        <h4>Enterprise</h4>
+                        <div class="plan-price">$2,000<span>/mo</span></div>
+                    </div>
+                    <ul class="plan-features">
+                        <li><span class="check">✓</span> <strong>Everything in Business</strong></li>
+                        <li><span class="check">✓</span> White-label solution</li>
+                        <li><span class="check">✓</span> 99.9% SLA guarantee</li>
+                        <li><span class="check">✓</span> 24/7 dedicated support</li>
+                        <li><span class="check">✓</span> Custom integration</li>
+                        <li><span class="check">✓</span> On-chain fee discount</li>
+                    </ul>
+                    <a href="javascript:void(0)" class="btn btn-ghost btn-plan" data-plan="enterprise" onclick="startCheckout('enterprise')">Get Started</a>
+                </div>
+            </div>
+            
+            <div class="api-cta" style="margin-top:3rem;text-align:center">
+                <a href="https://github.com/Faraone-Dev/REVERSO#-enterprise-api" class="btn btn-primary btn-large" target="_blank" rel="noopener noreferrer">
+                    📖 Read Full Documentation
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Key Generator -->
+    <section class="solution" id="get-api-key">
+        <div class="container">
+            <div class="api-lead" id="getApiKey">
+                <h3>🔑 Get Your API Key — Instantly</h3>
+                <p>Enter your email and get a Starter key now. No sign-up, no waiting.</p>
+                <form class="lead-form" id="apiKeyForm">
+                    <input type="email" id="apiKeyEmail" placeholder="your@email.com" required>
+                    <input type="text" id="apiKeyCompany" placeholder="Company / Project (optional)">
+                    <button type="submit" class="btn btn-primary" id="apiKeyBtn">Generate API Key</button>
+                </form>
+                <div class="api-key-result hidden" id="apiKeyResult">
+                    <div class="key-row">
+                        <span class="key-label">API Key</span>
+                        <code class="key-value" id="apiKeyValue"></code>
+                        <button class="btn btn-ghost copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('apiKeyValue').textContent);this.textContent='Copied!'">Copy</button>
+                    </div>
+                    <div class="key-row">
+                        <span class="key-label">Signing Secret</span>
+                        <code class="key-value" id="signingSecretValue"></code>
+                        <button class="btn btn-ghost copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('signingSecretValue').textContent);this.textContent='Copied!'">Copy</button>
+                    </div>
+                    <p class="key-warning">⚠️ Save these now — they are shown only once!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Integrate?</h2>
+                <p>Start building with reversible transactions today</p>
+                <div class="cta-actions">
+                    <a href="#get-api-key" class="btn btn-large btn-white">Get API Key</a>
+                    <a href="https://github.com/Faraone-Dev/REVERSO" class="btn btn-large btn-ghost-white" target="_blank" rel="noopener noreferrer">Read Docs</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="/" class="footer-logo">
+                        <span class="logo-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="lg2" x1="0" y1="0" x2="24" y2="24"><stop offset="0%" stop-color="#00e59b"/><stop offset="50%" stop-color="#00d4aa"/><stop offset="100%" stop-color="#00b4d8"/></linearGradient></defs><path d="M17.5 2.5L21 6l-3.5 3.5" stroke="url(#lg2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 6h18" stroke="url(#lg2)" stroke-width="2" stroke-linecap="round"/><path d="M6.5 21.5L3 18l3.5-3.5" stroke="url(#lg2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 18H3" stroke="url(#lg2)" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="11" stroke="url(#lg2)" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.3"/></svg></span>
+                        <span class="logo-text">REVERSO</span>
+                    </a>
+                    <p>The first reversible transaction protocol on blockchain. Never lose crypto to mistakes again.</p>
+                    <div class="social-links">
+                        <a href="https://x.com/REVERSOteam" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        </a>
+                        <a href="https://github.com/Faraone-Dev/REVERSO" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Protocol</h4>
+                        <a href="/">Home</a>
+                        <a href="/#features">Features</a>
+                        <a href="/#pricing">Pricing</a>
+                        <a href="/#security">Security</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Developers</h4>
+                        <a href="/developers.html">API & Pricing</a>
+                        <a href="https://github.com/Faraone-Dev/REVERSO" target="_blank" rel="noopener noreferrer">GitHub</a>
+                        <a href="https://github.com/Faraone-Dev/REVERSO" target="_blank" rel="noopener noreferrer">Documentation</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Community</h4>
+                        <a href="https://x.com/REVERSOteam" target="_blank" rel="noopener noreferrer">Twitter / X</a>
+                        <a href="https://t.me/reversoprotocol" target="_blank" rel="noopener noreferrer">Telegram</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Legal</h4>
+                        <a href="/terms.html">Terms of Service</a>
+                        <a href="/privacy.html">Privacy Policy</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>© 2026 REVERSO Protocol. All rights reserved.</p>
+                <p>Built with ❤️ for a safer crypto future</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script type="module" src="/src/main.js"></script>
+</div>
+</body>
+</html>
