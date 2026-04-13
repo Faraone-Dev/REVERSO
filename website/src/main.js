@@ -3,7 +3,14 @@
  * Handles wallet connection, animations, and interactivity
  */
 
-import { ethers } from 'ethers';
+let ethers;
+async function loadEthers() {
+    if (!ethers) {
+        const mod = await import('ethers');
+        ethers = mod.ethers || mod;
+    }
+    return ethers;
+}
 
 // ==========================================
 // Security: HTML sanitizer for user data
@@ -312,6 +319,7 @@ function updateFees() {
 // Send Transaction
 // ==========================================
 async function handleSend() {
+    await loadEthers();
     const sendBtn = document.getElementById('sendBtn');
     const sendBtnText = document.getElementById('sendBtnText');
     
@@ -366,6 +374,7 @@ async function handleSend() {
 // Execute Real Reverso Transaction
 // ==========================================
 async function executeReversoTransaction(amount, recipient, recovery1, recovery2) {
+    await loadEthers();
     showNotification('Preparing reversible transaction...', 'info');
     
     try {
@@ -480,6 +489,7 @@ function getExplorerUrl(chainId, txHash) {
 
 // Load user's transfers from contract
 async function loadUserTransfers() {
+    await loadEthers();
     if (!appState.contract || !appState.address) return;
     
     try {
@@ -1301,6 +1311,7 @@ function showWalletModal() {
 }
 
 async function initWalletConnect() {
+    await loadEthers();
     const connectBtn = document.getElementById('connectWallet');
     if (!connectBtn) return;
     
@@ -1371,6 +1382,7 @@ async function initWalletConnect() {
 
 // Setup ethers provider, signer, and contract
 async function setupProvider() {
+    await loadEthers();
     if (typeof window.ethereum === 'undefined') return;
     
     try {

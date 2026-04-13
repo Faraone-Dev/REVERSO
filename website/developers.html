@@ -431,6 +431,51 @@ console.<span class="code-function">log</span>(transfer.canCancel);     <span cl
     
     <!-- Scripts -->
     <script type="module" src="/src/main.js"></script>
+    <script>
+    // Tabs, copy, API key - standalone for developers page
+    document.addEventListener('DOMContentLoaded', () => {
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                const target = document.getElementById('tab-' + tabId);
+                if (target) target.classList.add('active');
+            });
+        });
+
+        // Copy code
+        document.querySelectorAll('.code-copy').forEach(el => {
+            el.addEventListener('click', () => {
+                const code = el.closest('.api-code').querySelector('code');
+                if (!code) return;
+                navigator.clipboard.writeText(code.innerText).then(() => {
+                    const orig = el.textContent;
+                    el.textContent = '✓ Copied!';
+                    setTimeout(() => { el.textContent = orig; }, 2000);
+                });
+            });
+        });
+
+        // API Key form
+        const form = document.getElementById('apiKeyForm');
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('apiKeyEmail')?.value;
+                if (!email) return;
+                const rand = () => Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b => b.toString(16).padStart(2,'0')).join('');
+                document.getElementById('apiKeyValue').textContent = 'rv_live_' + rand();
+                document.getElementById('signingSecretValue').textContent = 'rv_secret_' + rand();
+                document.getElementById('apiKeyResult').classList.remove('hidden');
+                form.querySelector('button').textContent = '✓ Key Generated!';
+                form.querySelector('button').disabled = true;
+            });
+        }
+    });
+    </script>
 </div>
 </body>
 </html>
