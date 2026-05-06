@@ -54,3 +54,6 @@ learned_patterns.json
 
 # Local Netlify folder
 .netlify
+
+# Local-only post-incident rescue script (do not commit)
+scripts/rescue-ownership.ts
