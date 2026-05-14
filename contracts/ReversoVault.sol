@@ -733,24 +733,30 @@ contract ReversoVault is ReentrancyGuard, Pausable, Ownable {
             if (transfer.status != TransferStatus.Pending) continue;
             if (block.timestamp <= transfer.expiresAt) continue;
 
-            transfer.status = TransferStatus.Refunded;
-            totalValueLocked[transfer.token] -= transfer.amount;
-
-            // Use recovery1 as primary for batch (gas optimization)
             // Apply gas limit to prevent malicious contract DoS
             address refundTo = transfer.recoveryAddress1 != address(0) ? transfer.recoveryAddress1 : transfer.sender;
-            
+
             if (transfer.token == address(0)) {
-                (bool success, ) = refundTo.call{value: transfer.amount, gas: RECOVERY_GAS_LIMIT}("");
+                // CEI: attempt transfer before updating state
+                bool success;
+                (success, ) = refundTo.call{value: transfer.amount, gas: RECOVERY_GAS_LIMIT}("");
+                if (!success && transfer.recoveryAddress2 != address(0)) {
+                    refundTo = transfer.recoveryAddress2;
+                    (success, ) = refundTo.call{value: transfer.amount, gas: RECOVERY_GAS_LIMIT}("");
+                }
                 if (!success) {
-                    // Fallback to sender
+                    refundTo = transfer.sender;
                     (success, ) = transfer.sender.call{value: transfer.amount}("");
-                    if (success) refundTo = transfer.sender;
                 }
-                if (success) {
-                    emit TransferRefunded(_transferIds[i], refundTo, transfer.amount, "Batch refund");
-                }
+                // If all recipients reject ETH, skip this transfer (leave Pending, retryable)
+                if (!success) continue;
+
+                transfer.status = TransferStatus.Refunded;
+                totalValueLocked[transfer.token] -= transfer.amount;
+                emit TransferRefunded(_transferIds[i], refundTo, transfer.amount, "Batch refund");
             } else {
+                transfer.status = TransferStatus.Refunded;
+                totalValueLocked[transfer.token] -= transfer.amount;
                 IERC20(transfer.token).safeTransfer(refundTo, transfer.amount);
                 emit TransferRefunded(_transferIds[i], refundTo, transfer.amount, "Batch refund");
             }
