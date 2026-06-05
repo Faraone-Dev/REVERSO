@@ -16,7 +16,7 @@ security/
 │   └── README.md               # Slither usage guide
 ├── foundry-fuzz/
 │   ├── foundry.toml            # Foundry configuration
-│   ├── fuzz-report.md          # Fuzz testing results
+│   ├── (see ../../docs/fuzz-report.md)
 │   └── test/
 │       └── ReversoVault.fuzz.t.sol  # Fuzz test suite
 └── gas-benchmarks/
